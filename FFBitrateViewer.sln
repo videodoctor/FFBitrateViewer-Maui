@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFBitrateViewer", "FFBitrateViewer.csproj", "{8D618B0D-D9F3-4F33-966A-1C648020CD3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationWPF", "FFBitrateViewer.ApplicationWPF\FFBitrateViewer.ApplicationWPF.csproj", "{8C6C4962-1B04-42FE-92D3-7BA748221B48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8D618B0D-D9F3-4F33-966A-1C648020CD3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8D618B0D-D9F3-4F33-966A-1C648020CD3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8D618B0D-D9F3-4F33-966A-1C648020CD3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8D618B0D-D9F3-4F33-966A-1C648020CD3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C6C4962-1B04-42FE-92D3-7BA748221B48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C6C4962-1B04-42FE-92D3-7BA748221B48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C6C4962-1B04-42FE-92D3-7BA748221B48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C6C4962-1B04-42FE-92D3-7BA748221B48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
