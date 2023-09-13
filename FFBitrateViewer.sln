@@ -5,6 +5,12 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationWPF", "FFBitrateViewer.ApplicationWPF\FFBitrateViewer.ApplicationWPF.csproj", "{8C6C4962-1B04-42FE-92D3-7BA748221B48}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationAvalonia", "FFBitrateViewer.ApplicationAvalonia\FFBitrateViewer.ApplicationAvalonia.csproj", "{3B66B317-1BA6-4F73-BEB2-A462CBB98CDA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationAvalonia.Desktop", "FFBitrateViewer.ApplicationAvalonia.Desktop\FFBitrateViewer.ApplicationAvalonia.Desktop.csproj", "{3AE75912-772D-494A-8574-DA9E8F9FF770}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationAvalonia.Browser", "FFBitrateViewer.ApplicationAvalonia.Browser\FFBitrateViewer.ApplicationAvalonia.Browser.csproj", "{68D38951-4F97-4BA8-957A-F47D52918971}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{8C6C4962-1B04-42FE-92D3-7BA748221B48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C6C4962-1B04-42FE-92D3-7BA748221B48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C6C4962-1B04-42FE-92D3-7BA748221B48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B66B317-1BA6-4F73-BEB2-A462CBB98CDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B66B317-1BA6-4F73-BEB2-A462CBB98CDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B66B317-1BA6-4F73-BEB2-A462CBB98CDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B66B317-1BA6-4F73-BEB2-A462CBB98CDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AE75912-772D-494A-8574-DA9E8F9FF770}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AE75912-772D-494A-8574-DA9E8F9FF770}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AE75912-772D-494A-8574-DA9E8F9FF770}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AE75912-772D-494A-8574-DA9E8F9FF770}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68D38951-4F97-4BA8-957A-F47D52918971}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68D38951-4F97-4BA8-957A-F47D52918971}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68D38951-4F97-4BA8-957A-F47D52918971}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68D38951-4F97-4BA8-957A-F47D52918971}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
