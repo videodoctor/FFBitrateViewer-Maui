@@ -6,11 +6,80 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FFBitrateViewer.ApplicationAvalonia.Views.MainView"
              x:DataType="vm:MainViewModel">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
-  </Design.DataContext>
+		<vm:MainViewModel />
+	</Design.DataContext>
 
-  <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+	<Grid RowDefinitions="Auto,Auto,*,Auto,*,Auto">
+		<!-- Menu -->
+		<Menu Grid.Row="0">
+			<MenuItem Header="_File">
+				<MenuItem Header="E_xit"/>
+			</MenuItem>
+			<MenuItem Header="A_ctions">
+				<MenuItem Header="_Add files…"/>
+				<MenuItem Header="_Remove selected files"/>
+				<MenuItem Header="Remove ALL files"/>
+				<Separator/>
+				<MenuItem Header="Refresh _media info"/>
+				<Separator/>
+				<MenuItem Header="_Start"/>
+				<MenuItem Header="St_op"/>
+				<Separator/>
+				<MenuItem Header="Copy plot to _clipboard"/>
+				<MenuItem Header="Save plot to _file…"/>
+			</MenuItem>
+			<MenuItem Header="_Options">
+				<MenuItem Header="Write _FFProbe commands to log"/>
+			</MenuItem>
+			<MenuItem Header="_Help">
+				<MenuItem Header="_About"/>
+			</MenuItem>
+		</Menu>
+		<!--
+
+		-->
+
+		<!--buttons-->
+		<StackPanel Grid.Row="1" Orientation="Horizontal">
+			<Button Content="Add file"/>
+			<Button Content="Remove selected"/>
+		</StackPanel>
+
+		<ListBox Grid.Row="2">
+			<!--
+            TODO: It may be simple to use a data grid
+            https://docs.devexpress.com/MAUI/403255/data-grid/data-grid
+            https://github.com/akgulebubekir/Maui.DataGrid
+            https://help.syncfusion.com/maui/datagrid/getting-started
+            
+            Items may use tool tip
+            https://learn.microsoft.com/en-us/dotnet/maui/user-interface/tooltips
+            -->
+		</ListBox>
+
+		<!--Button and check buttons-->
+		<StackPanel Grid.Row="3" Orientation="Horizontal">
+			<ToggleButton>
+			</ToggleButton>
+			<Label Content="Plot view:" VerticalAlignment="Center" />
+			<RadioButton GroupName="PotViewGroupName" Content="Frame based" />
+			<RadioButton GroupName="PotViewGroupName" Content="Second based" />
+			<Label Content="Adjust frame start time" VerticalAlignment="Center"/>
+			<CheckBox></CheckBox>
+		</StackPanel>
+
+		<!--Plot view-->
+		<Grid Grid.Row="4" >
+
+		</Grid>
+
+		<!--Status bar-->
+		<Grid Grid.Row="5">
+			<TextBlock Text="FFProbe version" FontSize="18" />
+		</Grid>
+	</Grid>
+
 </UserControl>

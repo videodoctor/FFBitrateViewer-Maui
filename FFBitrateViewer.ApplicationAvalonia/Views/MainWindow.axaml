@@ -8,5 +8,5 @@
         x:Class="FFBitrateViewer.ApplicationAvalonia.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="FFBitrateViewer.ApplicationAvalonia">
-        <views:MainView />
+        <views:MainView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 </Window>
