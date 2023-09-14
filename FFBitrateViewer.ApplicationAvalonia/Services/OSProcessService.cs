@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,6 +53,23 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             process.OutputDataReceived -= OnProcessOutputDataReceived;
             process.ErrorDataReceived -= OnProcessErrorDataReceived;
 
+        }
+
+        public IEnumerable<string> Which(string executableFileName)
+        {
+            var environmentPath = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+
+            var paths = environmentPath.Split(Path.PathSeparator);
+            paths.Append(Environment.CurrentDirectory);
+
+            foreach (var path in paths)
+            {
+                var fullPath = Path.Combine(path, executableFileName);
+                if (File.Exists(fullPath))
+                {
+                    yield return fullPath;
+                }
+            }
         }
 
         private void OnProcessErrorDataReceived(object sender, DataReceivedEventArgs e)

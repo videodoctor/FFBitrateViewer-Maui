@@ -3,6 +3,6 @@ using FFBitrateViewer.ApplicationAvalonia.Services;
 
 var oSProcessService = new OSProcessService();
 await oSProcessService.ExecuteAsync(@"echo ""`env`""", standardOutputWriter: Console.Out);
+oSProcessService.Which("zsh").ToList().ForEach(Console.WriteLine);
 Console.WriteLine("Press any key to exit");
-Console.ReadLine();
-//Console.WriteLine("Hello, World!");
+//Console.ReadLine();
