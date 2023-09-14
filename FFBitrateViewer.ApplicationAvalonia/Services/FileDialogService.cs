@@ -2,6 +2,7 @@
 using Avalonia.Platform.Storage;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
 {
     public class FileDialogService
     {
-        public async Task<IEnumerable<FileEntry>> OpenAsync(
+        public async Task<IList<FileEntry>> OpenAsync(
             string filePickerTitle = "Open Text File",
             bool IsSingleSelection = true
         )
@@ -29,7 +30,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             });
 
 
-            return files.Select(f => new FileEntry(f));
+            return files.Select(f => new FileEntry(f)).ToImmutableList();
         }
 
     }

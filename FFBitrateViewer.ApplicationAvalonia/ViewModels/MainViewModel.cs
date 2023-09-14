@@ -1,10 +1,6 @@
-﻿using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Platform.Storage;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Services;
-using System;
-using System.IO;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
@@ -16,6 +12,8 @@ public partial class MainViewModel : ViewModelBase
 
     public ICommand AddFilesCommand { get; }
 
+    public ObservableCollection<FileItemViewModel> Files { get; }
+
     private readonly AppProcessService _appProcessService;
     private readonly FileDialogService _fileDialogService;
 
@@ -23,6 +21,8 @@ public partial class MainViewModel : ViewModelBase
     {
         _appProcessService = new AppProcessService();
         _fileDialogService = new FileDialogService();
+
+        Files = new ObservableCollection<FileItemViewModel>();
 
         ExitCommand = new RelayCommand(ExitCommandHandler);
         AddFilesCommand = new RelayCommand(AddFilesCommandHandler);
@@ -32,7 +32,10 @@ public partial class MainViewModel : ViewModelBase
     private async void AddFilesCommandHandler()
     {
         var fileEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false);
-
+        foreach (var fileEntry in fileEntries)
+        {
+            Files.Add(new FileItemViewModel(fileEntry));
+        }
     }
 
     private void ExitCommandHandler()

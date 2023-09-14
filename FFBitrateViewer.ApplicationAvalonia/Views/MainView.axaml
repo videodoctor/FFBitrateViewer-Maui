@@ -50,7 +50,7 @@
 			<Button Content="Remove selected"/>
 		</StackPanel>
 
-		<ListBox Grid.Row="2">
+		<ListBox Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}">
 			<!--
             TODO: It may be simple to use a data grid
             https://docs.devexpress.com/MAUI/403255/data-grid/data-grid
