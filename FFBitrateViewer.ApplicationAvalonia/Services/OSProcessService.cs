@@ -96,7 +96,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             stdOutWriter.WriteLine(e.Data);
         }
 
-        public static Process GetNewProcessInstance(string command, string? workingDirectory = null)
+        private Process GetNewProcessInstance(string command, string? workingDirectory = null)
         {
             workingDirectory ??= Environment.CurrentDirectory;
 
@@ -104,24 +104,24 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             process.StartInfo.WorkingDirectory = workingDirectory;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
-            //process.StartInfo.RedirectStandardInput = true;
+            process.StartInfo.RedirectStandardInput = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
 
-            // TODO: Implement Which(string executableFileName) method that performs a look up shell using entries from PATH, returns (enum Shell, string path)
-            // [Flags] private enum Shell : int { Cmd = 1, Pwsh = 2, Sh = 4, Bash = 8, Zsh = 16}
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Default Shells (with %SystemRoot% == C:\WINDOWS )
                 // %SystemRoot%\System32\cmd.exe /U /C ...
                 // %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -NoLogo -Mta -NoProfile -NonInteractive -WindowStyle Hidden -EncodedCommand -Command ...
-                const string PWSH_FILE_PATH = @"C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe";
-                const string CMD_FILE_PATH = @"C:\WINDOWS\System32\cmd.exe";
+                const string PWSH_FILE_NAME = @"powershell.exe";
+                const string CMD_FILE_NAME = @"cmd.exe";
 
-                if (System.IO.File.Exists(PWSH_FILE_PATH))
+                var powershellExeFilePaths = Which(PWSH_FILE_NAME).ToList();
+                var cmdExeFilePaths = Which(CMD_FILE_NAME).ToList();
+                if (powershellExeFilePaths.Any())
                 {
-                    process.StartInfo.FileName = PWSH_FILE_PATH;
+                    process.StartInfo.FileName = powershellExeFilePaths.First();
                     process.StartInfo.ArgumentList.Add("-NoLogo");
                     process.StartInfo.ArgumentList.Add("-Mta");
                     process.StartInfo.ArgumentList.Add("-NoProfile");
@@ -131,42 +131,34 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
                     process.StartInfo.ArgumentList.Add("-EncodedCommand");
                     process.StartInfo.ArgumentList.Add(Convert.ToBase64String(System.Text.Encoding.Unicode.GetBytes(command)));
                 }
-                else if (System.IO.File.Exists(CMD_FILE_PATH))
+                else if (cmdExeFilePaths.Any())
                 {
-                    process.StartInfo.FileName = CMD_FILE_PATH;
+                    process.StartInfo.FileName = cmdExeFilePaths.First();
                     process.StartInfo.ArgumentList.Add("/U");
                     process.StartInfo.ArgumentList.Add("/C");
                     process.StartInfo.ArgumentList.Add(command);
                 }
                 else
                 {
-                    throw new OSProcessServiceException(string.Join(string.Empty,
-                        "Failed to find a compatible shell. Searched for: " + Environment.NewLine,
-                        "   - ", PWSH_FILE_PATH, Environment.NewLine,
-                        "   - ", CMD_FILE_PATH
-                    ));
+                    throw new OSProcessServiceException($"Neither {PWSH_FILE_NAME} or {CMD_FILE_NAME} were not found in PATH.");
                 }
 
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                // Default Shell zsh
-                // /bin/zsh
-                const string ZSH_FILE_PATH = @"/bin/zsh";
-
-                if (System.IO.File.Exists(ZSH_FILE_PATH))
+                // Normally in MacOS default shell is: zsh
+                const string ZSH_FILE_NAME = @"zsh";
+                var zshFilePaths = Which(ZSH_FILE_NAME).ToList();
+                if (zshFilePaths.Any())
                 {
-                    process.StartInfo.FileName = ZSH_FILE_PATH;
+                    process.StartInfo.FileName = zshFilePaths.First();
                     process.StartInfo.ArgumentList.Add("-l");
                     process.StartInfo.ArgumentList.Add("-c");
                     process.StartInfo.ArgumentList.Add(command);
                 }
                 else
                 {
-                    throw new OSProcessServiceException(string.Join(string.Empty,
-                        "Failed to find a compatible shell. Searched for: " + Environment.NewLine,
-                        "   - ", ZSH_FILE_PATH
-                    ));
+                    throw new OSProcessServiceException($"{ZSH_FILE_NAME} was not found in PATH.");
                 }
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -183,21 +175,19 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
                 //  - Friendly Interactive Shell (fish)
                 //  - Powershell (pwsh)
                 //
-                // Modern distros use /bin/sh as an alias for the default shell
+                // Modern distros already includes sh (Bourne Shell)
 
-                const string SH_FILE_PATH = @"/usr/bin/sh";
-                if (!System.IO.File.Exists(SH_FILE_PATH))
+                const string SH_FILE_NAME = @"sh";
+                var shFilePaths = Which(SH_FILE_NAME).ToList();
+                if (shFilePaths.Any())
                 {
-                    process.StartInfo.FileName = SH_FILE_PATH;
+                    process.StartInfo.FileName = shFilePaths.First();
                     process.StartInfo.ArgumentList.Add("-c");
                     process.StartInfo.ArgumentList.Add(command);
                 }
                 else
                 {
-                    throw new OSProcessServiceException(string.Join(string.Empty,
-                        "Failed to find a compatible shell. Searched for: " + Environment.NewLine,
-                        "   - ", SH_FILE_PATH
-                    ));
+                    throw new OSProcessServiceException($"{SH_FILE_NAME} was not found in PATH.");
                 }
             }
             else
