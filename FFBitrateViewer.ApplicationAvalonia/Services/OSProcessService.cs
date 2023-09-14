@@ -47,12 +47,11 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             await process.WaitForExitAsync(cancellationToken);
             _processes.Remove(process);
 
-            await standardOutputWriter.FlushAsync();
-            await standardErrorWriter.FlushAsync();
-
             process.OutputDataReceived -= OnProcessOutputDataReceived;
             process.ErrorDataReceived -= OnProcessErrorDataReceived;
 
+            await standardOutputWriter.FlushAsync();
+            await standardErrorWriter.FlushAsync();
         }
 
         public IEnumerable<string> Which(string executableFileName)
