@@ -21,7 +21,7 @@
 				<MenuItem Header="E_xit" Command="{Binding ExitCommand,Mode=OneTime}" />
 			</MenuItem>
 			<MenuItem Header="A_ctions">
-				<MenuItem Header="_Add files…"/>
+				<MenuItem Header="_Add files…" Command="{Binding AddFilesCommand,Mode=OneTime}" />
 				<MenuItem Header="_Remove selected files"/>
 				<MenuItem Header="Remove ALL files"/>
 				<Separator/>
