@@ -12,7 +12,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
     public class OSProcessService
     {
 
-        private readonly Dictionary<Process, (TextWriter, TextWriter)> _processes = new Dictionary<Process, (TextWriter, TextWriter)>();
+        private readonly Dictionary<Process, (TextWriter, TextWriter)> _processes = new();
 
         public async Task ExecuteAsync(
             string command,
@@ -76,24 +76,24 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
         {
             var process = (Process)sender;
             var (_, stdErrWriter) = _processes[process];
-            if (e.Data == null)
+            WriteReceivedData(e, stdErrWriter);
+        }
+
+        private static void WriteReceivedData(DataReceivedEventArgs dataReceivedEventArgs, TextWriter textWriter)
+        {
+            if (dataReceivedEventArgs.Data == null)
             {
-                stdErrWriter.Flush();
+                textWriter.Flush();
                 return;
             }
-            stdErrWriter.WriteLine(e.Data);
+            textWriter.WriteLine(dataReceivedEventArgs.Data);
         }
 
         private void OnProcessOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             var process = (Process)sender;
             var (stdOutWriter, _) = _processes[process];
-            if (e.Data == null)
-            {
-                stdOutWriter.Flush();
-                return;
-            }
-            stdOutWriter.WriteLine(e.Data);
+            WriteReceivedData(e, stdOutWriter);
         }
 
         private Process GetNewProcessInstance(string command, string? workingDirectory = null)
