@@ -86,7 +86,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             process.StartInfo.WorkingDirectory = workingDirectory;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardInput = true;
+            //process.StartInfo.RedirectStandardInput = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
 
@@ -133,12 +133,13 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 // Default Shell zsh
-                // /usr/bin/zsh
-                const string ZSH_FILE_PATH = @"/usr/bin/zsh";
+                // /bin/zsh
+                const string ZSH_FILE_PATH = @"/bin/zsh";
 
                 if (System.IO.File.Exists(ZSH_FILE_PATH))
                 {
                     process.StartInfo.FileName = ZSH_FILE_PATH;
+                    process.StartInfo.ArgumentList.Add("-l");
                     process.StartInfo.ArgumentList.Add("-c");
                     process.StartInfo.ArgumentList.Add(command);
                 }
@@ -152,7 +153,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                // Linux has many shells: 
+                // Linux has many shells:
                 //
                 //  - Bourne Shell (sh) The Bourne shell was the first default shell on Unix systems, released in 1979. ...
                 //  - C Shell (csh) ...
@@ -163,7 +164,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
                 //  - Z Shell (zsh) ...
                 //  - Friendly Interactive Shell (fish)
                 //  - Powershell (pwsh)
-                // 
+                //
                 // Modern distros use /bin/sh as an alias for the default shell
 
                 const string SH_FILE_PATH = @"/usr/bin/sh";
