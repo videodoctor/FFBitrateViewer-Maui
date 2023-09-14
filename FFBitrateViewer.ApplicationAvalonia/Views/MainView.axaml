@@ -50,18 +50,25 @@
 			<Button Content="Remove selected"/>
 		</StackPanel>
 
-		<ListBox Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}">
-			<!--
-            TODO: It may be simple to use a data grid
-            https://docs.devexpress.com/MAUI/403255/data-grid/data-grid
-            https://github.com/akgulebubekir/Maui.DataGrid
-            https://help.syncfusion.com/maui/datagrid/getting-started
-            
-            Items may use tool tip
-            https://learn.microsoft.com/en-us/dotnet/maui/user-interface/tooltips
-            -->
-		</ListBox>
+		<!--<DataGrid Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}"
+				  CanUserReorderColumns="True"
+				  CanUserResizeColumns="True"
+				  CanUserSortColumns="False"
+				  GridLinesVisibility="All"
+				  BorderThickness="1" BorderBrush="Gray">
+			<DataGrid.Columns>
+				<DataGridTextColumn Header=""  Binding="{Binding IsSelected}"/>
+				<DataGridTextColumn Header="Path to file"  Binding="{Binding Path,Mode=OneTime}"/>
+			</DataGrid.Columns>
+		</DataGrid>-->
 
+		<DataGrid Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}"
+				  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+				  AutoGenerateColumns="True"
+				  GridLinesVisibility="All"
+				  BorderThickness="1" BorderBrush="Gray">
+		</DataGrid>
+		
 		<!--Button and check buttons-->
 		<StackPanel Grid.Row="3" Orientation="Horizontal">
 			<ToggleButton>
