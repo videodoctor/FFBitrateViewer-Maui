@@ -51,7 +51,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             using StringWriter sw = new(sb);
 
             var command = $"{_ffprobeFilePath.Value} -version";
-            await _oSProcessService.ExecuteAsync(command, standardOutputWriter: sw);
+            var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: sw);
+            if (exitCode != 0)
+            { throw new FFProbeAppClientException($"{_ffprobeFilePath.Value} return exit code: {exitCode}. For command:{Environment.NewLine}{command}"); }
 
             var versionText = sb.ToString().Split(" ").Last().Trim();
             if (!Version.TryParse(versionText, out var version))
@@ -75,7 +77,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             using var streamWriter = new StreamWriter(memoryStream);
             var command = $"{_ffprobeFilePath.Value} -hide_banner -threads {threadCount} -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration {mediaFilePath}";
             command = $"{_ffprobeFilePath.Value} -hide_banner -threads 11 -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration {mediaFilePath}";
-            await _oSProcessService.ExecuteAsync(command, standardOutputWriter: streamWriter);
+            var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: streamWriter);
+            if (exitCode != 0)
+            { throw new FFProbeAppClientException($"{_ffprobeFilePath.Value} return exit code: {exitCode}. For command:{Environment.NewLine}{command}"); }
 
 #if DEBUG
             memoryStream.Seek(0, SeekOrigin.Begin);
@@ -116,6 +120,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             var csvDataReaderOptions = new CsvDataReaderOptions
             { HasHeaders = false, };
 
+            // NOTE: Because of command output can be quite larget.
+            //       We use Publisher/Consumer pattern thru System.Threading.Channel
             await foreach (var csvLine in commandStdOuputChannel.Reader.ReadAllAsync())
             {
                 // Converts a CSV line to a Packet instance. Following is a sample line:
@@ -139,7 +145,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
                 };
             }
 
-            await commandTask;
+            var exitCode = await commandTask;
+            if (exitCode != 0)
+            { throw new FFProbeAppClientException($"{_ffprobeFilePath.Value} return exit code: {exitCode}. For command:{Environment.NewLine}{command}"); }
         }
     }
 
