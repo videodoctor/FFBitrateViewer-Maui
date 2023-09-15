@@ -4,8 +4,8 @@ using FFBitrateViewer.ApplicationAvalonia.Extensibility.OxyPlot;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
@@ -14,41 +14,23 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private string _version = string.Empty;
 
-    public ICommand ExitCommand { get; }
+    public ObservableCollection<FileItemViewModel> Files { get; } = new();
+    public FFProbePlotModel PlotModel { get; } = new(string.Empty);
 
-    public ICommand AddFilesCommand { get; }
+    private readonly AppProcessService _appProcessService = new();
+    private readonly FileDialogService _fileDialogService = new();
+    private readonly FFProbeAppClient _ffprobeAppClient = new();
 
-    public ICommand OnLoadedCommand { get; }
 
-    public ObservableCollection<FileItemViewModel> Files { get; }
-    public FFProbePlotModel PlotModel { get; }
-
-    private readonly AppProcessService _appProcessService;
-    private readonly FileDialogService _fileDialogService;
-    private readonly FFProbeAppClient _ffprobeAppClient;
-
-    public MainViewModel()
-    {
-        _appProcessService = new();
-        _fileDialogService = new();
-        _ffprobeAppClient = new();
-
-        Files = new();
-        PlotModel = new(string.Empty);
-
-        ExitCommand = new RelayCommand(ExitCommandHandler);
-        AddFilesCommand = new RelayCommand(AddFilesCommandHandler);
-        OnLoadedCommand = new AsyncRelayCommand(OnLoadedCommandHandler);
-
-    }
-
-    private async Task OnLoadedCommandHandler()
+    [RelayCommand]
+    private async Task OnLoaded(CancellationToken token)
     {
         var version = await _ffprobeAppClient.GetVersionAsync();
         Version = $"{System.IO.Path.GetFileName(_ffprobeAppClient.FFProbeFilePath)} v{version}";
     }
 
-    private async void AddFilesCommandHandler()
+    [RelayCommand]
+    private async Task AddFiles(CancellationToken token)
     {
         var fileEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false);
         foreach (var fileEntry in fileEntries)
@@ -57,7 +39,8 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    private void ExitCommandHandler()
+    [RelayCommand]
+    private void Exit()
     {
         _appProcessService.Exit();
     }

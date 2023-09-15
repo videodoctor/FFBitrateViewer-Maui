@@ -13,7 +13,7 @@
 			 >
 	<i:Interaction.Behaviors>
 		<ia:EventTriggerBehavior EventName="Loaded" SourceObject="MainViewUserControl">
-			<ia:InvokeCommandAction Command="{Binding OnLoadedCommand,Mode=OneTime}" />
+			<ia:InvokeCommandAction Command="{Binding LoadedCommand,Mode=OneTime}" />
 		</ia:EventTriggerBehavior>
 	</i:Interaction.Behaviors>
 	<Design.DataContext>
