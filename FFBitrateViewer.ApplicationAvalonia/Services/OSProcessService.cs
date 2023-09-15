@@ -15,7 +15,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
 
         private readonly Dictionary<Process, (TextWriter, TextWriter, Channel<string>?, Channel<string>?)> _processes = new();
 
-        public async Task ExecuteAsync(
+        public async Task<int> ExecuteAsync(
             string command,
             string? workingDirectory = null,
             CancellationToken cancellationToken = default,
@@ -58,6 +58,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
 
             await standardOutputWriter.FlushAsync();
             await standardErrorWriter.FlushAsync();
+
+            return process.ExitCode;
         }
 
         public IEnumerable<string> Which(string executableFileName)
