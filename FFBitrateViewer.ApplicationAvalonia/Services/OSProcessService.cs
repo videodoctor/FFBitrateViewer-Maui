@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Services
@@ -12,7 +13,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
     public class OSProcessService
     {
 
-        private readonly Dictionary<Process, (TextWriter, TextWriter)> _processes = new();
+        private readonly Dictionary<Process, (TextWriter, TextWriter, Channel<string>?, Channel<string>?)> _processes = new();
 
         public async Task ExecuteAsync(
             string command,
@@ -20,7 +21,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             CancellationToken cancellationToken = default,
             TextWriter? standardOutputWriter = null,
             TextWriter? standardErrorWriter = null,
-            IDictionary<string, string?>? environment = null
+            IDictionary<string, string?>? environment = null,
+            Channel<string>? standardOutputChannel = null,
+            Channel<string>? standardErrorChannel = null
             )
         {
             standardOutputWriter ??= TextWriter.Null;
@@ -29,7 +32,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
 
             var process = GetNewProcessInstance(command, workingDirectory);
 
-            _processes[process] = (standardOutputWriter, standardErrorWriter);
+            _processes[process] = (standardOutputWriter, standardErrorWriter, standardOutputChannel, standardErrorChannel);
             foreach (var envVar in environment)
             { process.StartInfo.Environment[envVar.Key] = environment[envVar.Key]; }
 
@@ -49,6 +52,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
 
             process.OutputDataReceived -= OnProcessOutputDataReceived;
             process.ErrorDataReceived -= OnProcessErrorDataReceived;
+
+            standardOutputChannel?.Writer.TryComplete();
+            standardErrorChannel?.Writer.TryComplete();
 
             await standardOutputWriter.FlushAsync();
             await standardErrorWriter.FlushAsync();
@@ -71,14 +77,14 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             }
         }
 
-        private void OnProcessErrorDataReceived(object sender, DataReceivedEventArgs e)
+        private async void OnProcessErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             var process = (Process)sender;
-            var (_, stdErrWriter) = _processes[process];
-            WriteReceivedData(e, stdErrWriter);
+            var (_, stdErrWriter, _, stdErrChannel) = _processes[process];
+            await WriteReceivedData(e, stdErrWriter, stdErrChannel);
         }
 
-        private static void WriteReceivedData(DataReceivedEventArgs dataReceivedEventArgs, TextWriter textWriter)
+        private static async Task WriteReceivedData(DataReceivedEventArgs dataReceivedEventArgs, TextWriter textWriter, Channel<string>? channel)
         {
             if (dataReceivedEventArgs.Data == null)
             {
@@ -86,13 +92,19 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
                 return;
             }
             textWriter.WriteLine(dataReceivedEventArgs.Data);
+
+            if (channel != null)
+            {
+                await channel.Writer.WriteAsync(dataReceivedEventArgs.Data);
+            }
+
         }
 
-        private void OnProcessOutputDataReceived(object sender, DataReceivedEventArgs e)
+        private async void OnProcessOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             var process = (Process)sender;
-            var (stdOutWriter, _) = _processes[process];
-            WriteReceivedData(e, stdOutWriter);
+            var (stdOutWriter, _, stdOutChannel, _) = _processes[process];
+            await WriteReceivedData(e, stdOutWriter, stdOutChannel);
         }
 
         private Process GetNewProcessInstance(string command, string? workingDirectory = null)
