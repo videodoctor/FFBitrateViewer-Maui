@@ -12,6 +12,11 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 {
     public class FFProbeAppClient
     {
+        // ffprobe can produce different output as exlpained in
+        // https://ffmpeg.org/ffprobe.html
+        // large lists, csv ( see parsers https://www.joelverhagen.com/blog/2020/12/fastest-net-csv-parsers )
+        // hierchical info json ( using built in .NET Parser)
+
         private readonly OSProcessService _oSProcessService;
 
         private readonly Lazy<string> _ffprobeFilePath;
