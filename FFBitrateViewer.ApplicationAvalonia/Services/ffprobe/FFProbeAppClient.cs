@@ -85,6 +85,38 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
             return mediaInfo!;
         }
+
+        public async Task<Frame> GetMediaFrame(string mediaFilePath)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
+
+            if (!File.Exists(mediaFilePath))
+            { throw new FileNotFoundException(mediaFilePath); }
+
+            using var memoryStream = new MemoryStream();
+            using var streamWriter = new StreamWriter(memoryStream);
+
+            var command = $"{_ffprobeFilePath.Value} -hide_banner -threads 11 -print_format csv -loglevel fatal -show_error -select_streams v:0 -show_entries packet=dts_time,duration_time,pts_time,size,flags {mediaFilePath}";
+            await _oSProcessService.ExecuteAsync(command, standardOutputWriter: streamWriter);
+
+#if DEBUG
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            var jsonText = Encoding.UTF8.GetString(memoryStream.ToArray());
+            Debug.WriteLine(jsonText);
+#endif
+
+            throw new NotImplementedException();
+            //memoryStream.Seek(0, SeekOrigin.Begin);
+
+
+            //var jsonSerializerOptions = new JsonSerializerOptions
+            //{
+            //    NumberHandling = JsonNumberHandling.AllowReadingFromString
+            //};
+            //var mediaInfo = await JsonSerializer.DeserializeAsync<MediaInfo>(memoryStream, jsonSerializerOptions);
+
+            //return mediaInfo!;
+        }
     }
 
 

@@ -193,6 +193,36 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
         public TimeSpan? Duration { get; set; }
     }
 
+    #endregion
+
+    #region Frame Model
+    public partial class Frame
+    {
+        [JsonPropertyName("packets")]
+        public Packet[] Packets { get; set; }
+    }
+
+    public partial class Packet
+    {
+        [JsonPropertyName("pts_time")]
+        public string PtsTime { get; set; }
+
+        [JsonPropertyName("duration_time")]
+        public string DurationTime { get; set; }
+
+        [JsonPropertyName("size")]
+        public long? Size { get; set; }
+
+        [JsonPropertyName("flags")]
+        public string Flags { get; set; }
+
+        [JsonPropertyName("dts_time")]
+        public string DtsTime { get; set; }
+    }
+
+    #endregion
+
+    #region JsonConverters
     internal class NullableTimeSpanConverter : JsonConverter<TimeSpan?>
     {
         public override TimeSpan? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -242,7 +272,6 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             throw new NotSupportedException($"{nameof(NullableTimeSpanConverter)}.{Write} is not supported");
         }
     }
-
     #endregion
 #nullable enable
 }
