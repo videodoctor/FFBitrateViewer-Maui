@@ -59,17 +59,20 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             return version;
         }
 
-        public async Task<MediaInfo> GetMediaInfoAsync(string mediaFilePath)
+        public async Task<MediaInfo> GetMediaInfoAsync(string mediaFilePath, int threadCount = 11)
         {
             ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
+
+            if (threadCount <= 0)
+            { throw new ArgumentOutOfRangeException(nameof(threadCount)); }
 
             if (!File.Exists(mediaFilePath))
             { throw new FileNotFoundException(mediaFilePath); }
 
             using var memoryStream = new MemoryStream();
             using var streamWriter = new StreamWriter(memoryStream);
-
-            var command = $"{_ffprobeFilePath.Value} -hide_banner -threads 11 -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration {mediaFilePath}";
+            var command = $"{_ffprobeFilePath.Value} -hide_banner -threads {threadCount} -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration {mediaFilePath}";
+            command = $"{_ffprobeFilePath.Value} -hide_banner -threads 11 -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration {mediaFilePath}";
             await _oSProcessService.ExecuteAsync(command, standardOutputWriter: streamWriter);
 
 #if DEBUG
@@ -90,16 +93,22 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             return mediaInfo!;
         }
 
-        public async IAsyncEnumerable<Packet> GetMediaPackets(string mediaFilePath)
+        public async IAsyncEnumerable<ProbePacket> GetProbePackets(
+            string mediaFilePath,
+            int streamId = 0,
+            int threadCount = 11
+        )
         {
             ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
+
+            if (threadCount <= 0)
+            { throw new ArgumentOutOfRangeException(nameof(threadCount)); }
 
             if (!File.Exists(mediaFilePath))
             { throw new FileNotFoundException(mediaFilePath); }
 
             var commandStdOuputChannel = Channel.CreateUnbounded<string>();
-
-            var command = $"{_ffprobeFilePath.Value} -hide_banner -threads 11 -print_format csv -loglevel fatal -show_error -select_streams v:0 -show_entries packet=dts_time,duration_time,pts_time,size,flags {mediaFilePath}";
+            var command = $"{_ffprobeFilePath.Value} -hide_banner -threads {threadCount} -print_format csv -loglevel fatal -show_error -select_streams v:{streamId} -show_entries packet=dts_time,duration_time,pts_time,size,flags {mediaFilePath}";
             var commandTask = _oSProcessService.ExecuteAsync(command, standardOutputChannel: commandStdOuputChannel);
 
             var csvDataReaderOptions = new CsvDataReaderOptions
@@ -118,7 +127,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
                 var csvDataReader = CsvDataReader.Create(textReader, csvDataReaderOptions);
                 await csvDataReader.ReadAsync();
 
-                yield return new Packet
+                yield return new ProbePacket
                 {
                     PtsTime = double.TryParse(csvDataReader.GetString(1), out var pstTime) ? pstTime : default,
                     DtsTime = double.TryParse(csvDataReader.GetString(2), out var dtsTime) ? dtsTime : default,
