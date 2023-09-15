@@ -27,55 +27,56 @@ namespace FFBitrateViewer
 
     public class MainViewModel : Bindable
     {
-        public CancellationTokenSource?                               cancellationTokenSource;
-        private readonly Channel<bool>                                filesMediaInfoNotificationChannel = Channel.CreateUnbounded<bool>();
-        private readonly ConcurrentQueue<FilesMediaInfoQueueItem>     filesMediaInfoQueue = new();
-        private Task?                                                 filesBitRateInfoGetTask;
+        public CancellationTokenSource? cancellationTokenSource;
+        private readonly Channel<bool> filesMediaInfoNotificationChannel = Channel.CreateUnbounded<bool>();
+        private readonly ConcurrentQueue<FilesMediaInfoQueueItem> filesMediaInfoQueue = new();
+        private Task? filesBitRateInfoGetTask;
 
-        public VersionInfo? VersionInfo { get { return Get<VersionInfo>();     }    private set { Set(value); } }
-        public ObservableCollection<FileItem> Files                   { get;                                      private set; }
-        public bool                           IsAdjustStartTimeOnPlot { get { return Get<bool>();            }    set { Set(value); IsAdjustOffsetOnPlotUpdated(); } }
-        public bool                           IsAutoRun               { get;                                      set; }
-        public bool                           IsMediaInfoGetRunning   { get { return Get<bool>();            }    private set { Set(value); } }
-        public bool                           IsLoggingFFCommands     { get { return IsLogCommands || Log.LogLevelIs(LogLevel.DEBUG); } set { if(!Log.LogLevelIs(LogLevel.DEBUG)) IsLogCommands = value; } }
-        public bool                           IsLogCommandsEnabled    { get { return !Log.LogLevelIs(LogLevel.DEBUG); } }
-        public bool                           IsReady                 { get { return Get<bool>();            }    private set { Set(value); } } // true when program initialisation is finished
-        public bool                           IsRunning               { get { return Get<bool>();            }    private set { Set(value); } }
+        public VersionInfo? VersionInfo { get { return Get<VersionInfo>(); } private set { Set(value); } }
+        public ObservableCollection<FileItem> Files { get; private set; }
+        public bool IsAdjustStartTimeOnPlot { get { return Get<bool>(); } set { Set(value); IsAdjustOffsetOnPlotUpdated(); } }
+        public bool IsAutoRun { get; set; }
+        public bool IsMediaInfoGetRunning { get { return Get<bool>(); } private set { Set(value); } }
+        public bool IsLoggingFFCommands { get { return IsLogCommands || Log.LogLevelIs(LogLevel.DEBUG); } set { if (!Log.LogLevelIs(LogLevel.DEBUG)) IsLogCommands = value; } }
+        public bool IsLogCommandsEnabled { get { return !Log.LogLevelIs(LogLevel.DEBUG); } }
+        public bool IsReady { get { return Get<bool>(); } private set { Set(value); } } // true when program initialisation is finished
+        public bool IsRunning { get { return Get<bool>(); } private set { Set(value); } }
 
-        public bool                           IsLogCommands           { get { return Get<bool>();            }    set { Set(value); Log.IsLogCommands = value; OnPropertyChanged(nameof(IsLoggingFFCommands)); } }
-        public Action?                        AfterGettingMediaInfo   { get;                                      private set; }
-        public OverallProgress?               OverallProgress         { get { return Get<OverallProgress>(); }    set { Set(value); } }
-        public MyPlotModel?                   PlotModel               { get { return Get<MyPlotModel?>();    }    private set { Set(value); } }
-        public string?                        PlotViewType            { get { return Get<string>();          }    set { Set(value); PlotViewTypeUpdated(); } }
-        public string                         WindowTitle             { get { return WindowTitleGet();       } }
+        public bool IsLogCommands { get { return Get<bool>(); } set { Set(value); Log.IsLogCommands = value; OnPropertyChanged(nameof(IsLoggingFFCommands)); } }
+        public Action? AfterGettingMediaInfo { get; private set; }
+        public OverallProgress? OverallProgress { get { return Get<OverallProgress>(); } set { Set(value); } }
+        public MyPlotModel? PlotModel { get { return Get<MyPlotModel?>(); } private set { Set(value); } }
+        public string? PlotViewType { get { return Get<string>(); } set { Set(value); PlotViewTypeUpdated(); } }
+        public string WindowTitle { get { return WindowTitleGet(); } }
 
         // Commands
-        public RelayCommand?    AboutShowCmd                        { get; set; }
-        public RelayCommand?    ExecStartCmd                        { get; set; }
-        public RelayCommand?    ExecStopCmd                         { get; set; }
-        public RelayCommand?    ExecToggleCmd                       { get; set; }
-        public RelayCommand?    ExitCmd                             { get; set; }
-        public RelayCommand?    FilesAddCmd                         { get; set; }
-        public RelayCommand?    FilesClearCmd                       { get; set; }
-        public RelayCommand?    FilesRemoveCmd                      { get; set; }
-        public RelayCommand?    MediaInfoReloadCmd                  { get; set; }
-        public RelayCommand?    PlotExportToClipboardCmd            { get; set; }
-        public RelayCommand?    PlotExportToFileCmd                 { get; set; }
+        public RelayCommand? AboutShowCmd { get; set; }
+        public RelayCommand? ExecStartCmd { get; set; }
+        public RelayCommand? ExecStopCmd { get; set; }
+        public RelayCommand? ExecToggleCmd { get; set; }
+        public RelayCommand? ExitCmd { get; set; }
+        public RelayCommand? FilesAddCmd { get; set; }
+        public RelayCommand? FilesClearCmd { get; set; }
+        public RelayCommand? FilesRemoveCmd { get; set; }
+        public RelayCommand? MediaInfoReloadCmd { get; set; }
+        public RelayCommand? PlotExportToClipboardCmd { get; set; }
+        public RelayCommand? PlotExportToFileCmd { get; set; }
 
 
         public MainViewModel()
         {
-            VersionInfo             = new();
-            OverallProgress         = new();
+            VersionInfo = new();
+            OverallProgress = new();
 
-            Files                   = new();
+            Files = new();
             Files.CollectionChanged += OnFilesCollectionChanged;
 
             PlotModel = new MyPlotModel("");
 
             PlotViewType = "frame";
 
-            AfterGettingMediaInfo = new(() => {
+            AfterGettingMediaInfo = new(() =>
+            {
                 if (IsAutoRun)
                 {
                     IsAutoRun = false;
@@ -113,7 +114,7 @@ namespace FFBitrateViewer
 
         public bool IsFileOnList(string fs)
         {
-            foreach(var file in Files) if (fs.Equals(file.FS)) return true;
+            foreach (var file in Files) if (fs.Equals(file.FS)) return true;
             return false;
         }
 
@@ -245,7 +246,7 @@ namespace FFBitrateViewer
                 }
             }
             OverallProgress?.Hide();
-            
+
             AfterGettingMediaInfo?.Invoke();
             if (updated > 0) PlotAxesUpdate();
 
@@ -258,7 +259,7 @@ namespace FFBitrateViewer
         public async void FilesProcess()
         {
             if (filesBitRateInfoGetTask != null && filesBitRateInfoGetTask.Status == TaskStatus.Running) return;
-            IsReady   = false;
+            IsReady = false;
             IsRunning = true;
             OverallProgress?.Show("Processing files");
             cancellationTokenSource = new CancellationTokenSource();
@@ -274,7 +275,7 @@ namespace FFBitrateViewer
                         if (!file.IsExistsAndEnabled) continue;
                         file.FramesClear();
                         PlotSerieClear(idx);
-                        file.FramesGet(cancellationToken, (pos, frame) => {});
+                        file.FramesGet(cancellationToken, (pos, frame) => { });
 
                         if (PlotModel != null)
                         {
@@ -288,7 +289,7 @@ namespace FFBitrateViewer
                     }
                 }, cancellationToken);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 // todo@
                 Debug.WriteLine("exception", ex.ToString());
@@ -302,7 +303,7 @@ namespace FFBitrateViewer
             OverallProgress?.Reset();
             OverallProgress?.Stop();
             IsRunning = false;
-            IsReady   = true;
+            IsReady = true;
         }
 
 
@@ -395,7 +396,7 @@ namespace FFBitrateViewer
             var result = new ProgramOptions
             {
                 AdjustStartTimeOnPlot = IsAdjustStartTimeOnPlot,
-                LogCommands           = IsLogCommands,
+                LogCommands = IsLogCommands,
             };
             foreach (var file in Files) result.Files.Add(new FileItemPO(file));
             return result;
@@ -409,7 +410,7 @@ namespace FFBitrateViewer
             options ??= new ProgramOptions();
 
             IsAdjustStartTimeOnPlot = options.AdjustStartTimeOnPlot == true;
-            IsLogCommands           = options.LogCommands == true;
+            IsLogCommands = options.LogCommands == true;
 
             FilesClear();
             foreach (var file in options.Files) if (!string.IsNullOrEmpty(file.FS)) FileAdd(file.FS, file.IsEnabled);
@@ -419,7 +420,8 @@ namespace FFBitrateViewer
         }
 
 
-        public void PlotAxesUpdate(bool force = false) {
+        public void PlotAxesUpdate(bool force = false)
+        {
             if (PlotModel == null) return;
             if (force)
             {
@@ -428,7 +430,7 @@ namespace FFBitrateViewer
                 PlotModel.AxesRedraw();
             }
             double maxX = -1;
-            int    maxY = -1;
+            int maxY = -1;
             foreach (var file in Files)
             {
                 if (!file.IsExistsAndEnabled) continue;
@@ -444,7 +446,7 @@ namespace FFBitrateViewer
 
         public void PlotExport(string? fs = null)
         {
-            if(PlotModel == null) return;
+            if (PlotModel == null) return;
             if (string.IsNullOrEmpty(fs))
             {
                 // To clipboard
@@ -479,14 +481,15 @@ namespace FFBitrateViewer
 
         public void PlotUpdate()
         {
-            if(PlotModel == null) return;
+            if (PlotModel == null) return;
 
             PlotModel.AxisMaximumSet(0);
             PlotModel.AxisMaximumSet(1);
 
             double maxX = -1;
-            int    maxY = -1;
-            for (int idx = 0; idx < Files.Count; ++idx){
+            int maxY = -1;
+            for (int idx = 0; idx < Files.Count; ++idx)
+            {
                 var file = Files[idx];
                 if (!file.IsExistsAndEnabled) continue;
 
