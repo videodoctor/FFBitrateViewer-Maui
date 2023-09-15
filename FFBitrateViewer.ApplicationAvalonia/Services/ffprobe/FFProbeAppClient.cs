@@ -17,9 +17,10 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
     public class FFProbeAppClient
     {
         // ffprobe can produce different output as exlpained in
-        // https://ffmpeg.org/ffprobe.html
-        // large lists, csv ( see parsers https://www.joelverhagen.com/blog/2020/12/fastest-net-csv-parsers )
-        // hierchical info json ( using built in .NET Parser)
+        // https://ffmpeg.org/ffprobe.html . Thus we use CSV for
+        // large lists. The CSV parser is Sylvan.Data.Csv which has the best performance 
+        // based on benchmark (2020/12) https://www.joelverhagen.com/blog/2020/12/fastest-net-csv-parsers 
+        // For hierarchical structures with "reasonable" size we use JSON with System.Text.Json parser.
 
         private readonly OSProcessService _oSProcessService;
 
@@ -119,7 +120,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             var csvDataReaderOptions = new CsvDataReaderOptions
             { HasHeaders = false, };
 
-            // NOTE: Because of command output can be quite larget.
+            // NOTE: Because of command output can be quite large.
             //       We use Publisher/Consumer pattern thru System.Threading.Channel
             await foreach (var csvLine in commandStdOuputChannel.Reader.ReadAllAsync())
             {
