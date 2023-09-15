@@ -76,7 +76,6 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             using var memoryStream = new MemoryStream();
             using var streamWriter = new StreamWriter(memoryStream);
             var command = $"{_ffprobeFilePath.Value} -hide_banner -threads {threadCount} -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration {mediaFilePath}";
-            command = $"{_ffprobeFilePath.Value} -hide_banner -threads 11 -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration {mediaFilePath}";
             var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: streamWriter);
             if (exitCode != 0)
             { throw new FFProbeAppClientException($"{_ffprobeFilePath.Value} return exit code: {exitCode}. For command:{Environment.NewLine}{command}"); }
