@@ -1,19 +1,22 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace FFBitrateViewer.ApplicationAvalonia.Services
+namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 {
-    public class FFProbeProcessor
+    public class FFProbeAppClient
     {
         private readonly OSProcessService _oSProcessService;
 
         private readonly Lazy<string> _ffprobeFilePath;
 
-        public FFProbeProcessor()
+        public FFProbeAppClient()
         {
             _oSProcessService = new OSProcessService();
             _ffprobeFilePath = new Lazy<string>(WhichFFProbeFilePath);
@@ -31,7 +34,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
 
         }
 
-        public async Task<Version> GetVersion()
+        public async Task<Version> GetVersionAsync()
         {
             var sb = new StringBuilder();
             using StringWriter sw = new(sb);
@@ -46,9 +49,41 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             }
             return version;
         }
+
+        public async Task<MediaInfo> GetMediaInfoAsync(string mediaFilePath)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
+
+            if (!File.Exists(mediaFilePath))
+            { throw new FileNotFoundException(mediaFilePath); }
+
+            using var memoryStream = new MemoryStream();
+            using var streamWriter = new StreamWriter(memoryStream);
+
+            var command = $"{_ffprobeFilePath.Value} -hide_banner -threads 11 -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration {mediaFilePath}";
+            await _oSProcessService.ExecuteAsync(command, standardOutputWriter: streamWriter);
+
+#if DEBUG
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            var jsonText = Encoding.UTF8.GetString(memoryStream.ToArray());
+            Debug.WriteLine(jsonText);
+#endif
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+
+
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                NumberHandling = JsonNumberHandling.AllowReadingFromString
+            };
+            var mediaInfo = await JsonSerializer.DeserializeAsync<MediaInfo>(memoryStream, jsonSerializerOptions);
+
+            return mediaInfo!;
+        }
     }
 
 
+    #region FFProbeProcessorException
     [Serializable]
     public class FFProbeProcessorException : ApplicationException
     {
@@ -59,4 +94,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
+    #endregion
+
+
 }
