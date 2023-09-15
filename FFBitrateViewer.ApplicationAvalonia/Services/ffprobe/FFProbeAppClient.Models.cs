@@ -205,10 +205,10 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
     public partial class Packet
     {
         [JsonPropertyName("pts_time")]
-        public string PtsTime { get; set; }
+        public double? PtsTime { get; set; }
 
         [JsonPropertyName("duration_time")]
-        public string DurationTime { get; set; }
+        public double? DurationTime { get; set; }
 
         [JsonPropertyName("size")]
         public long? Size { get; set; }
@@ -217,7 +217,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
         public string Flags { get; set; }
 
         [JsonPropertyName("dts_time")]
-        public string DtsTime { get; set; }
+        public double? DtsTime { get; set; }
     }
 
     #endregion

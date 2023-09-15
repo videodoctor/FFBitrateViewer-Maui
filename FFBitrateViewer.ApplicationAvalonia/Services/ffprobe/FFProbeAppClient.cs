@@ -102,15 +102,30 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             var command = $"{_ffprobeFilePath.Value} -hide_banner -threads 11 -print_format csv -loglevel fatal -show_error -select_streams v:0 -show_entries packet=dts_time,duration_time,pts_time,size,flags {mediaFilePath}";
             var commandTask = _oSProcessService.ExecuteAsync(command, standardOutputChannel: commandStdOuputChannel);
 
-            await foreach (var todo in commandStdOuputChannel.Reader.ReadAllAsync())
+            var csvDataReaderOptions = new CsvDataReaderOptions
+            { HasHeaders = false, };
+
+            await foreach (var csvLine in commandStdOuputChannel.Reader.ReadAllAsync())
             {
-                //        var csvLine = _buffer.ToString();
-                //        using var textReader = new StringReader(csvLine);
-                //        var csvDataReader = CsvDataReader.Create(textReader);
-                //        _buffer = new();
-                //        csvDataReader.GetRecords<
-                Console.WriteLine($"Completing todo: {todo}");
-                yield return new Packet();
+                // Converts a CSV line to a Packet instance. Following is a sample line:
+                // [CSV format]
+                // packet,0.088000,N/A,0.033000,15368,K__
+                // [COMPAT format]
+                // packet|pts_time=0.088000|dts_time=N/A|duration_time=0.033000|size=15368|flags=K__
+                // [indexesfor the reader]
+                // 0      1                 2            3                      4          5
+                using var textReader = new StringReader(csvLine);
+                var csvDataReader = CsvDataReader.Create(textReader, csvDataReaderOptions);
+                await csvDataReader.ReadAsync();
+
+                yield return new Packet
+                {
+                    PtsTime = double.TryParse(csvDataReader.GetString(1), out var pstTime) ? pstTime : default,
+                    DtsTime = double.TryParse(csvDataReader.GetString(2), out var dtsTime) ? dtsTime : default,
+                    DurationTime = double.TryParse(csvDataReader.GetString(3), out var durationTime) ? durationTime : default,
+                    Size = long.TryParse(csvDataReader.GetString(4), out var size) ? size : default,
+                    Flags = csvDataReader.GetString(5)
+                };
             }
 
             await commandTask;
