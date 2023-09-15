@@ -20,7 +20,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             string? workingDirectory = null,
             TextWriter? standardOutputWriter = null,
             TextWriter? standardErrorWriter = null,
-            IDictionary<string, string?>? environment = null,
+            IDictionary<string, string?>? environmentOverrides = null,
             Channel<string>? standardOutputChannel = null,
             Channel<string>? standardErrorChannel = null,
             CancellationToken cancellationToken = default
@@ -28,13 +28,13 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
         {
             standardOutputWriter ??= TextWriter.Null;
             standardErrorWriter ??= TextWriter.Null;
-            environment ??= new Dictionary<string, string?>();
+            environmentOverrides ??= new Dictionary<string, string?>();
 
             var process = GetNewProcessInstance(command, workingDirectory);
 
             _processes[process] = (standardOutputWriter, standardErrorWriter, standardOutputChannel, standardErrorChannel);
-            foreach (var envVar in environment)
-            { process.StartInfo.Environment[envVar.Key] = environment[envVar.Key]; }
+            foreach (var envVar in environmentOverrides)
+            { process.StartInfo.Environment[envVar.Key] = environmentOverrides[envVar.Key]; }
 
             process.OutputDataReceived += OnProcessOutputDataReceived;
             process.ErrorDataReceived += OnProcessErrorDataReceived;
