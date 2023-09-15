@@ -19,7 +19,7 @@ var mediaFilePath = @"D:\documents\video\my-journey\NUCUMA\Nucuma-1.mkv";
 
 await foreach (var packet in ffprobeAppClient.GetMediaPackets(mediaFilePath))
 {
-    Console.WriteLine($"ffprobe media info output :{packet}");
+    Console.WriteLine($"PtsTime:{packet.PtsTime} DtsTime:{packet.DtsTime} DurationTime:{packet.DurationTime} Size:{packet.Size} Flags:{packet.Flags}");
 }
 
 
