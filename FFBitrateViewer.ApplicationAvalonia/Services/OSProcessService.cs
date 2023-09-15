@@ -18,12 +18,12 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
         public async Task<int> ExecuteAsync(
             string command,
             string? workingDirectory = null,
-            CancellationToken cancellationToken = default,
             TextWriter? standardOutputWriter = null,
             TextWriter? standardErrorWriter = null,
             IDictionary<string, string?>? environment = null,
             Channel<string>? standardOutputChannel = null,
-            Channel<string>? standardErrorChannel = null
+            Channel<string>? standardErrorChannel = null,
+            CancellationToken cancellationToken = default
             )
         {
             standardOutputWriter ??= TextWriter.Null;
