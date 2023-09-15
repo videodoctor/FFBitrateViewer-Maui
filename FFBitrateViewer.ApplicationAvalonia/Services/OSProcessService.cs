@@ -62,14 +62,20 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             return process.ExitCode;
         }
 
-        public IEnumerable<string> Which(string executableFileName)
+        public IEnumerable<string> Which(
+            string executableFileName,
+            params string[] additionalLookupPaths)
         {
+            ArgumentException.ThrowIfNullOrEmpty(executableFileName, nameof(executableFileName));
+
+            additionalLookupPaths ??= new string[] { Environment.CurrentDirectory };
+
             var environmentPath = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
 
-            var paths = environmentPath.Split(Path.PathSeparator);
-            paths.Append(Environment.CurrentDirectory);
+            IEnumerable<string> lookupPaths = environmentPath.Split(Path.PathSeparator);
+            lookupPaths = lookupPaths.Concat(additionalLookupPaths);
 
-            foreach (var path in paths)
+            foreach (var path in lookupPaths)
             {
                 var fullPath = Path.Combine(path, executableFileName);
                 if (File.Exists(fullPath))
