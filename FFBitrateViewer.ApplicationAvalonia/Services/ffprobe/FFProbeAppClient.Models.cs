@@ -195,7 +195,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
     #endregion
 
-    #region Frame Model
+    #region ProbePacket Model
     public partial class ProbePacket
     {
         [JsonPropertyName("pts_time")]
