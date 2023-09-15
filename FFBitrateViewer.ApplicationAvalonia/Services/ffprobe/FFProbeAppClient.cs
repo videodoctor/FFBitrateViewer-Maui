@@ -37,7 +37,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             var ffprobeFilePaths = _oSProcessService.Which(ffProbeFileName);
             if (!ffprobeFilePaths.Any())
             {
-                throw new FFProbeProcessorException($"Executable {ffProbeFileName} was not found.");
+                throw new FFProbeAppClientException($"Executable {ffProbeFileName} was not found.");
             }
             return ffprobeFilePaths.First();
 
@@ -54,7 +54,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             var versionText = sb.ToString().Split(" ").Last().Trim();
             if (!Version.TryParse(versionText, out var version))
             {
-                throw new FFProbeProcessorException($"Failed extracting ffprobe version with command: {command}");
+                throw new FFProbeAppClientException($"Failed extracting ffprobe version with command: {command}");
             }
             return version;
         }
@@ -145,12 +145,12 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
     #region FFProbeProcessorException
     [Serializable]
-    public class FFProbeProcessorException : ApplicationException
+    public class FFProbeAppClientException : ApplicationException
     {
-        public FFProbeProcessorException() { }
-        public FFProbeProcessorException(string message) : base(message) { }
-        public FFProbeProcessorException(string message, Exception inner) : base(message, inner) { }
-        protected FFProbeProcessorException(
+        public FFProbeAppClientException() { }
+        public FFProbeAppClientException(string message) : base(message) { }
+        public FFProbeAppClientException(string message, Exception inner) : base(message, inner) { }
+        protected FFProbeAppClientException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
