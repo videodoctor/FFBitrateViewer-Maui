@@ -1,36 +1,51 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Extensibility.OxyPlot;
 using FFBitrateViewer.ApplicationAvalonia.Services;
-using OxyPlot;
+using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    public string Greeting => "Welcome to Avalonia!";
+    [ObservableProperty]
+    private string _version = string.Empty;
+
     public ICommand ExitCommand { get; }
 
     public ICommand AddFilesCommand { get; }
+
+    public ICommand OnLoadedCommand { get; }
 
     public ObservableCollection<FileItemViewModel> Files { get; }
     public FFProbePlotModel PlotModel { get; }
 
     private readonly AppProcessService _appProcessService;
     private readonly FileDialogService _fileDialogService;
+    private readonly FFProbeAppClient _ffprobeAppClient;
 
     public MainViewModel()
     {
-        _appProcessService = new AppProcessService();
-        _fileDialogService = new FileDialogService();
+        _appProcessService = new();
+        _fileDialogService = new();
+        _ffprobeAppClient = new();
 
         Files = new();
         PlotModel = new(string.Empty);
 
         ExitCommand = new RelayCommand(ExitCommandHandler);
         AddFilesCommand = new RelayCommand(AddFilesCommandHandler);
+        OnLoadedCommand = new AsyncRelayCommand(OnLoadedCommandHandler);
 
+    }
+
+    private async Task OnLoadedCommandHandler()
+    {
+        var version = await _ffprobeAppClient.GetVersionAsync();
+        Version = $"{System.IO.Path.GetFileName(_ffprobeAppClient.FFProbeFilePath)} v{version}";
     }
 
     private async void AddFilesCommandHandler()

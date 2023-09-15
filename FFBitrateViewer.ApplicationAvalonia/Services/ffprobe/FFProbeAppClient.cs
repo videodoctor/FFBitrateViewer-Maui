@@ -25,6 +25,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
         private readonly Lazy<string> _ffprobeFilePath;
 
+        public string FFProbeFilePath { get => _ffprobeFilePath.Value; }
+
         public FFProbeAppClient()
         {
             _oSProcessService = new OSProcessService();

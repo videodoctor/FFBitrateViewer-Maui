@@ -7,7 +7,15 @@
              x:Class="FFBitrateViewer.ApplicationAvalonia.Views.MainView"
              x:DataType="vm:MainViewModel"
 			 xmlns:OxyPlot_Avalonia="clr-namespace:OxyPlot.Avalonia;assembly=OxyPlot.Avalonia"
+			 xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+			 x:Name="MainViewUserControl"
 			 >
+	<i:Interaction.Behaviors>
+		<ia:EventTriggerBehavior EventName="Loaded" SourceObject="MainViewUserControl">
+			<ia:InvokeCommandAction Command="{Binding OnLoadedCommand,Mode=OneTime}" />
+		</ia:EventTriggerBehavior>
+	</i:Interaction.Behaviors>
 	<Design.DataContext>
 		<!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
@@ -90,7 +98,7 @@
 
 		<!--Status bar-->
 		<Grid Grid.Row="5">
-			<TextBlock Text="FFProbe version" FontSize="18" />
+			<TextBlock Text="{Binding Version}" FontSize="18" />
 		</Grid>
 	</Grid>
 
