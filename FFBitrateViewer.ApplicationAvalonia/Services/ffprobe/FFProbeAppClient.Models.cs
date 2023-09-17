@@ -10,262 +10,262 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
     #region Get MediaInfo Models
 
-    public class FFProbeJsonOutput
-    {
+    public record FFProbeJsonOutput
+    (
         /// <summary>
         /// Information about the container
         /// </summary>
-        [JsonPropertyName("format")]
-        public FFProbeFormat Format { get; set; }
+        [property: JsonPropertyName("format")]
+        FFProbeFormat Format,
 
         ///// <summary>
         ///// Information about frames
         ///// </summary>
-        //[JsonPropertyName("frames")]
-        //public List<FFProbeFrame> Frames { get; set; }
+        //[property: JsonPropertyName("frames")]
+        //List<FFProbeFrame> Frames,
 
         /// <summary>
         /// Information about packets
         /// </summary>
-        [JsonPropertyName("packets")]
-        public List<FFProbePacket> Packets { get; set; }
+        [property: JsonPropertyName("packets")]
+        List<FFProbePacket> Packets,
 
         /// <summary>
         /// Information about streams
         /// </summary>
-        [JsonPropertyName("streams")]
-        public List<FFProbeStream> Streams { get; set; }
+        [property: JsonPropertyName("streams")]
+        List<FFProbeStream> Streams
 
-        [JsonExtensionData]
-        public Dictionary<string, JsonElement> ExtensionData { get; set; }
-    }
+        // [property: JsonExtensionData]
+        // Dictionary<string, JsonElement> ExtensionData
+    );
 
-    public class FFProbeFormat
-    {
-        [JsonPropertyName("bit_rate")]
-        public int? BitRate { get; set; }
+     public record FFProbeFormat
+    (
+        [property: JsonPropertyName("bit_rate")]
+        int? BitRate,
 
         /// <summary>
         /// Approximate duration in seconds (stream can start *after* the 00:00:00 timecode).
         /// </summary>
-        [JsonPropertyName("duration")]
-        public double? Duration { get; set; }
+        [property: JsonPropertyName("duration")]
+        double? Duration,
 
-        [JsonPropertyName("filename")]
-        public string FileName { get; set; }
+        [property: JsonPropertyName("filename")]
+        string FileName,
 
-        [JsonPropertyName("format_long_name")]
-        public string FormatLongName { get; set; }
+        [property: JsonPropertyName("format_long_name")]
+        string FormatLongName,
 
-        [JsonPropertyName("format_name")]
-        public string FormatName { get; set; }
+        [property: JsonPropertyName("format_name")]
+        string FormatName,
 
-        [JsonPropertyName("probe_score")]
-        public int? ProbeScore { get; set; }
+        [property: JsonPropertyName("probe_score")]
+        int? ProbeScore,
 
-        [JsonPropertyName("nb_programs")]
-        public int? ProgramsCount { get; set; }
+        [property: JsonPropertyName("nb_programs")]
+        int? ProgramsCount,
 
-        [JsonPropertyName("size")]
-        public long? Size { get; set; }
+        [property: JsonPropertyName("size")]
+        long? Size,
 
-        [JsonPropertyName("start_time")]
-        public double? StartTime { get; set; }
+        [property: JsonPropertyName("start_time")]
+        double? StartTime,
 
-        [JsonPropertyName("nb_streams")]
-        public int? StreamsCount { get; set; }
+        [property: JsonPropertyName("nb_streams")]
+        int? StreamsCount,
 
         /// <summary>
         /// Container and format tags/metadata, not stream-specific tags.
         /// </summary>
-        [JsonPropertyName("tags")]
-        public Dictionary<string, string> Tags { get; set; }
+        [property: JsonPropertyName("tags")]
+        Dictionary<string, string> Tags
 
-        [JsonExtensionData]
-        public Dictionary<string, JsonElement> ExtensionData { get; set; }
-    }
+        // [property: JsonExtensionData]
+        // Dictionary<string, JsonElement> ExtensionData
+    );
 
-    public class FFProbePacket
-    {
-        [JsonPropertyName("codec_type")]
-        public string CodecType { get; set; }
+    public record FFProbePacket
+    (
+        [property: JsonPropertyName("codec_type")]
+        string CodecType,
 
         /// <summary>
         /// decoding time stamp -- how packets stored in stream
         /// </summary>
-        [JsonPropertyName("dts")]
-        public int? DTS { get; set; }
+        [property: JsonPropertyName("dts")]
+        int? DTS,
 
-        [JsonPropertyName("dts_time")]
-        public double? DTSTime { get; set; }
+        [property: JsonPropertyName("dts_time")]
+        double? DTSTime,
 
-        [JsonPropertyName("duration")]
-        public int? Duration { get; set; }
+        [property: JsonPropertyName("duration")]
+        int? Duration,
 
-        [JsonPropertyName("duration_time")]
-        public double? DurationTime { get; set; }
+        [property: JsonPropertyName("duration_time")]
+        double? DurationTime,
 
-        [JsonPropertyName("flags")]
-        public string Flags { get; set; }
+        [property: JsonPropertyName("flags")]
+        string Flags,
 
         /// <summary>
         /// presentation time stamp -- how packets should be displayed
         /// </summary>
-        [JsonPropertyName("pts")]
-        public int? PTS { get; set; }
+        [property: JsonPropertyName("pts")]
+        int? PTS,
 
-        [JsonPropertyName("pts_time")]
-        public double? PTSTime { get; set; }
+        [property: JsonPropertyName("pts_time")]
+        double? PTSTime,
 
-        [JsonPropertyName("size")]
-        public int? Size { get; set; }
+        [property: JsonPropertyName("size")]
+        int? Size,
 
-        [JsonPropertyName("stream_index")]
-        public int? StreamIndex { get; set; }
+        [property: JsonPropertyName("stream_index")]
+        int? StreamIndex
 
-        [JsonExtensionData]
-        public Dictionary<string, JsonElement> ExtensionData { get; set; }
-    }
+        // [property: JsonExtensionData]
+        // Dictionary<string, JsonElement> ExtensionData
+    );
 
-    public class FFProbeStream
-    {
-        [JsonPropertyName("bit_rate")]
-        public int? BitRate { get; set; }
+    public record FFProbeStream
+    (
+        [property: JsonPropertyName("bit_rate")]
+        int? BitRate,
 
-        [JsonPropertyName("bits_per_sample")]
-        public int? BitsPerSample { get; set; }
+        [property: JsonPropertyName("bits_per_sample")]
+        int? BitsPerSample,
 
-        [JsonPropertyName("bits_per_raw_sample")]
-        public string BitsPerSampleRaw { get; set; }
+        [property: JsonPropertyName("bits_per_raw_sample")]
+        string BitsPerSampleRaw,
 
-        [JsonPropertyName("channel_layout")]
-        public string ChannelLayout { get; set; }
+        [property: JsonPropertyName("channel_layout")]
+        string ChannelLayout,
 
-        [JsonPropertyName("channels")]
-        public int? Channels { get; set; }
+        [property: JsonPropertyName("channels")]
+        int? Channels,
 
-        [JsonPropertyName("chroma_location")]
-        public string ChromaLocation { get; set; }
+        [property: JsonPropertyName("chroma_location")]
+        string ChromaLocation,
 
-        [JsonPropertyName("codec_name")]
-        public string CodecName { get; set; }
+        [property: JsonPropertyName("codec_name")]
+        string CodecName,
 
         /// <summary>
         /// H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
         /// </summary>
-        [JsonPropertyName("codec_long_name")]
-        public string CodecLongName { get; set; }
+        [property: JsonPropertyName("codec_long_name")]
+        string CodecLongName,
 
-        [JsonPropertyName("codec_type")]
-        public string CodecType { get; set; }
+        [property: JsonPropertyName("codec_type")]
+        string CodecType,
 
-        [JsonPropertyName("codec_tag")]
-        public string CodecTag { get; set; }
+        [property: JsonPropertyName("codec_tag")]
+        string CodecTag,
 
         /// <summary>
         /// Video codec's FourCC or audio codec's TwoCC
         /// </summary>
-        [JsonPropertyName("codec_tag_string")]
-        public string CodecTagString { get; set; }
+        [property: JsonPropertyName("codec_tag_string")]
+        string CodecTagString,
 
-        [JsonPropertyName("coded_height")]
-        public int? CodedHeight { get; set; }
+        [property: JsonPropertyName("coded_height")]
+        int? CodedHeight,
 
-        [JsonPropertyName("coded_width")]
-        public int? CodedWidth { get; set; }
+        [property: JsonPropertyName("coded_width")]
+        int? CodedWidth,
 
-        [JsonPropertyName("color_range")]
-        public string ColorRange { get; set; }
+        [property: JsonPropertyName("color_range")]
+        string ColorRange,
 
-        [JsonPropertyName("display_aspect_ratio")]
-        public string DAR { get; set; }
+        [property: JsonPropertyName("display_aspect_ratio")]
+        string DAR,
 
-        [JsonPropertyName("duration")]
-        public double? Duration { get; set; }
+        [property: JsonPropertyName("duration")]
+        double? Duration,
 
         /// <summary>
         /// Duration expressed in integer time-base units (https://video.stackexchange.com/questions/27546/difference-between-duration-ts-and-duration-in-ffprobe-output
         /// </summary>
-        [JsonPropertyName("duration_ts")]
-        public long? DurationTS { get; set; }
+        [property: JsonPropertyName("duration_ts")]
+        long? DurationTS,
 
-        [JsonPropertyName("field_order")]
-        public string FieldOrder { get; set; }
+        [property: JsonPropertyName("field_order")]
+        string FieldOrder,
 
-        [JsonPropertyName("nb_frames")]
-        public int? FramesCount { get; set; }
+        [property: JsonPropertyName("nb_frames")]
+        int? FramesCount,
 
-        [JsonPropertyName("r_frame_rate")]
-        public string FrameRateR { get; set; }
+        [property: JsonPropertyName("r_frame_rate")]
+        string FrameRateR,
 
-        [JsonPropertyName("avg_frame_rate")]
-        public string FrameRateAvg { get; set; }
+        [property: JsonPropertyName("avg_frame_rate")]
+        string FrameRateAvg,
 
-        [JsonPropertyName("height")]
-        public int? Height { get; set; }
+        [property: JsonPropertyName("height")]
+        int? Height,
 
-        [JsonPropertyName("id")]
-        public string Id { get; set; }
+        [property: JsonPropertyName("id")]
+        string Id,
 
-        [JsonPropertyName("index")]
-        public int Index { get; set; }
+        [property: JsonPropertyName("index")]
+        int Index,
 
-        [JsonPropertyName("is_avc")]
-        [JsonConverter(typeof(TruthyOrFalsyConverter))]
-        public bool? IsAVC { get; set; }
+        [property: JsonPropertyName("is_avc")]
+        [property: JsonConverter(typeof(TruthyOrFalsyConverter))]
+        bool? IsAVC,
 
         //  todo@ type bool?
-        [JsonPropertyName("has_b_frames")]
-        public int? IsHasBFrames { get; set; }
+        [property: JsonPropertyName("has_b_frames")]
+        int? IsHasBFrames,
 
-        [JsonPropertyName("level")]
-        public int? Level { get; set; }
+        [property: JsonPropertyName("level")]
+        int? Level,
 
-        [JsonPropertyName("nb_packets")]
-        public int? PacketsCount { get; set; }
+        [property: JsonPropertyName("nb_packets")]
+        int? PacketsCount,
 
-        [JsonPropertyName("pix_fmt")]
-        public string PixFmt { get; set; }
+        [property: JsonPropertyName("pix_fmt")]
+        string PixFmt,
 
-        [JsonPropertyName("profile")]
-        public string Profile { get; set; }
+        [property: JsonPropertyName("profile")]
+        string Profile,
 
-        [JsonPropertyName("refs")]
-        public int? Refs { get; set; }
+        [property: JsonPropertyName("refs")]
+        int? Refs,
 
-        [JsonPropertyName("sample_fmt")]
-        public string SampleFormat { get; set; }
+        [property: JsonPropertyName("sample_fmt")]
+        string SampleFormat,
 
-        [JsonPropertyName("sample_rate")]
-        public int? SampleRate { get; set; }
+        [property: JsonPropertyName("sample_rate")]
+        int? SampleRate,
 
-        [JsonPropertyName("sample_aspect_ratio")]
-        public string SAR { get; set; }
+        [property: JsonPropertyName("sample_aspect_ratio")]
+        string SAR,
 
-        [JsonPropertyName("start_pts")]
-        public long? StartPTS { get; set; }
+        [property: JsonPropertyName("start_pts")]
+        long? StartPTS,
 
-        [JsonPropertyName("start_time")]
-        public double? StartTime { get; set; }
+        [property: JsonPropertyName("start_time")]
+        double? StartTime,
 
         /// <summary>
         /// Stream-specific tags/metadata. See <see cref="KnownFFProbeVideoStreamTags"/>.
         /// </summary>
-        [JsonPropertyName("tags")]
-        public Dictionary<string, string> Tags { get; set; }
+        [property: JsonPropertyName("tags")]
+        Dictionary<string, string> Tags,
 
         /// <summary>
-        /// Values like &quot;1/600&quot;. See https://stackoverflow.com/questions/43333542/what-is-video-timescale-timebase-or-timestamp-in-ffmpeg 
+        /// Values like &quot;1/600&quot;. See https://stackoverflow.com/questions/43333542/what-is-video-timescale-timebase-or-timestamp-in-ffmpeg
         /// </summary>
-        [JsonPropertyName("time_base")]
-        public string TimeBase { get; set; }
+        [property: JsonPropertyName("time_base")]
+        string TimeBase,
 
-        [JsonPropertyName("width")]
-        public int? Width { get; set; }
+        [property: JsonPropertyName("width")]
+        int? Width
 
-        [JsonExtensionData]
-        public Dictionary<string, JsonElement> ExtensionData { get; set; }
-    }
+        // [property: JsonExtensionData]
+        // Dictionary<string, JsonElement> ExtensionData
+    );
 
     #endregion
 
@@ -344,11 +344,11 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
     /// <summary>
     /// Converts input to a True or False applying Javascript truthy or falsy value.
     /// <para>
-    /// In JavaScript, a truthy value is a value that is considered true when encountered in a Boolean context. 
+    /// In JavaScript, a truthy value is a value that is considered true when encountered in a Boolean context.
     /// All values are truthy unless they are defined as falsy. That is, all values are truthy except false, 0, -0, 0n, "", null, undefined, and NaN.
     /// </para>
     /// </summary>
-    /// 
+    ///
     internal class TruthyOrFalsyConverter : JsonConverter<bool>
     {
         public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
