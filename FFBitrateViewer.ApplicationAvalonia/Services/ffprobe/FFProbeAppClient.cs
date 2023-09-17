@@ -18,21 +18,16 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
     {
         // ffprobe can produce different output as exlpained in
         // https://ffmpeg.org/ffprobe.html . Thus we use CSV for
-        // large lists. The CSV parser is Sylvan.Data.Csv which has the best performance 
-        // based on benchmark (2020/12) https://www.joelverhagen.com/blog/2020/12/fastest-net-csv-parsers 
+        // large lists. The CSV parser is Sylvan.Data.Csv which has the best performance
+        // based on benchmark (2020/12) https://www.joelverhagen.com/blog/2020/12/fastest-net-csv-parsers
         // For hierarchical structures with "reasonable" size we use JSON with System.Text.Json parser.
 
-        private readonly OSProcessService _oSProcessService;
+        private readonly OSProcessService _oSProcessService = new OSProcessService();
 
-        private readonly Lazy<string> _ffprobeFilePath;
 
-        public string FFProbeFilePath { get => _ffprobeFilePath.Value; }
+        public string FFProbeFilePath { get => _ffprobeFilePath ??= WhichFFProbeFilePath(); }
+        private string? _ffprobeFilePath;
 
-        public FFProbeAppClient()
-        {
-            _oSProcessService = new OSProcessService();
-            _ffprobeFilePath = new Lazy<string>(WhichFFProbeFilePath);
-        }
 
         private string WhichFFProbeFilePath()
         {
@@ -51,7 +46,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             var sb = new StringBuilder();
             using StringWriter sw = new(sb);
 
-            var command = $"{_ffprobeFilePath.Value} -version";
+            var command = $"{FFProbeFilePath} -version";
             var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: sw);
             if (exitCode != 0)
             { throw new FFProbeAppClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
@@ -74,9 +69,10 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             if (!File.Exists(mediaFilePath))
             { throw new FileNotFoundException(mediaFilePath); }
 
+            var command = $@"{FFProbeFilePath} -hide_banner -threads {threadCount} -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration ""{mediaFilePath}""";
+
             using var memoryStream = new MemoryStream();
             using var streamWriter = new StreamWriter(memoryStream);
-            var command = $@"{_ffprobeFilePath.Value} -hide_banner -threads {threadCount} -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration ""{mediaFilePath}""";
             var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: streamWriter);
             if (exitCode != 0)
             { throw new FFProbeAppClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
@@ -114,7 +110,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             { throw new FileNotFoundException(mediaFilePath); }
 
             var commandStdOuputChannel = Channel.CreateUnbounded<string>();
-            var command = $@"{_ffprobeFilePath.Value} -hide_banner -threads {threadCount} -print_format csv -loglevel fatal -show_error -select_streams v:{streamId} -show_entries packet=dts_time,duration_time,pts_time,size,flags ""{mediaFilePath}""";
+            var command = $@"{FFProbeFilePath} -hide_banner -threads {threadCount} -print_format csv -loglevel fatal -show_error -select_streams v:{streamId} -show_entries packet=dts_time,duration_time,pts_time,size,flags ""{mediaFilePath}""";
             var commandTask = _oSProcessService.ExecuteAsync(command, standardOutputChannel: commandStdOuputChannel);
 
             var csvDataReaderOptions = new CsvDataReaderOptions

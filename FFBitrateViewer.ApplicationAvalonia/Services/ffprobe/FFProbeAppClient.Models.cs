@@ -211,6 +211,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
         public int Index { get; set; }
 
         [JsonPropertyName("is_avc")]
+        [JsonConverter(typeof(TruthyOrFalsyConverter))]
         public bool? IsAVC { get; set; }
 
         //  todo@ type bool?
@@ -337,6 +338,52 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
         public override void Write(Utf8JsonWriter writer, TimeSpan? value, JsonSerializerOptions options)
         {
             throw new NotSupportedException($"{nameof(NullableTimeSpanConverter)}.{Write} is not supported");
+        }
+    }
+
+    /// <summary>
+    /// Converts input to a True or False applying Javascript truthy or falsy value.
+    /// <para>
+    /// In JavaScript, a truthy value is a value that is considered true when encountered in a Boolean context. 
+    /// All values are truthy unless they are defined as falsy. That is, all values are truthy except false, 0, -0, 0n, "", null, undefined, and NaN.
+    /// </para>
+    /// </summary>
+    /// 
+    internal class TruthyOrFalsyConverter : JsonConverter<bool>
+    {
+        public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType == JsonTokenType.False
+                || reader.TokenType == JsonTokenType.Null)
+            {
+                _ = reader.GetBoolean();
+                return false;
+            }
+
+            if (reader.TokenType == JsonTokenType.Number)
+            {
+                if (reader.TryGetInt32(out var intValue))
+                {
+                    return intValue != 0 && intValue != -0;
+                }
+                if (reader.TryGetDouble(out var doubleValue))
+                {
+                    return doubleValue != 0.0 && doubleValue != -0.0;
+                }
+            }
+
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                var stringValue = reader.GetString();
+                return !string.IsNullOrEmpty(stringValue);
+            }
+
+            return true;
+        }
+
+        public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
+        {
+            throw new NotImplementedException();
         }
     }
     #endregion

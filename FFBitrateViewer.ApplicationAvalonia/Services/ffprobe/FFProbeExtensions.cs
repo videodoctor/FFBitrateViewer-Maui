@@ -6,15 +6,14 @@ public static class FFProbeExtensions
 {
     public static double? GetDuration(this FFProbeJsonOutput ffProbeOutput)
     {
+        if (ffProbeOutput == null)
+        { return null; }
+
         if (ffProbeOutput?.Format?.Duration != null)
-        {
-            return ffProbeOutput.Format.Duration;
-        }
+        { return ffProbeOutput.Format.Duration; }
 
         if (ffProbeOutput.Streams == null)
-        {
-            return default;
-        }
+        { return null; }
 
         double? result = (
             from stream in ffProbeOutput.Streams
@@ -22,7 +21,8 @@ public static class FFProbeExtensions
             let start = stream.StartTime ?? 0
             where duration != null
             select duration + start
-            ).FirstOrDefault()
+            )
+            .FirstOrDefault()
             ;
         return result;
 

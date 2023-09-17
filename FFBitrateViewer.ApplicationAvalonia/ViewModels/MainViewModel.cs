@@ -32,10 +32,13 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task AddFiles(CancellationToken token)
     {
-        var fileEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false);
-        foreach (var fileEntry in fileEntries)
+        var fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false);
+        for (int fileInfoIndex = 0; fileInfoIndex < fileInfoEntries.Count; fileInfoIndex++)
         {
-            Files.Add(new FileItemViewModel(fileEntry));
+            var fileInfo = fileInfoEntries[fileInfoIndex];
+            var mediaInfo = await _ffprobeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath);
+            var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo);
+            Files.Add(fileItemViewModel);
         }
     }
 
