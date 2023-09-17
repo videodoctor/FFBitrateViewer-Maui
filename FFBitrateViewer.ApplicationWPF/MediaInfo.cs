@@ -69,23 +69,23 @@ namespace FFBitrateViewer
         }
 
 
-        public static UInt? Find(string item, Regex regex)
-        {
-            Match m = regex.Match(item);
-            if (m.Success && int.TryParse(m.Groups[1].Value, out int value)) return new UInt(value, m.Groups[2].Value);
-            return null;
-        }
+        //public static UInt? Find(string item, Regex regex)
+        //{
+        //    Match m = regex.Match(item);
+        //    if (m.Success && int.TryParse(m.Groups[1].Value, out int value)) return new UInt(value, m.Groups[2].Value);
+        //    return null;
+        //}
 
 
-        public static UInt? Find(List<string> items, Regex regex)
-        {
-            foreach (string item in items)
-            {
-                UInt? v = Find(item, regex);
-                if (v != null) return v;
-            }
-            return null;
-        }
+        //public static UInt? Find(List<string> items, Regex regex)
+        //{
+        //    foreach (string item in items)
+        //    {
+        //        UInt? v = Find(item, regex);
+        //        if (v != null) return v;
+        //    }
+        //    return null;
+        //}
 
 
         public override int GetHashCode()
