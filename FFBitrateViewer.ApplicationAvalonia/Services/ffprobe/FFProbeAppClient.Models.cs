@@ -1,196 +1,269 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 {
-    // Models were generated automatically from https://jsonformatter.org/json-to-csharp
 
 #nullable disable
-    #region MediaInfo Models
-    public partial class MediaInfo
-    {
-        [JsonPropertyName("streams")]
-        public Stream[] Streams { get; set; }
 
+    #region Get MediaInfo Models
+
+    public class FFProbeJsonOutput
+    {
+        /// <summary>
+        /// Information about the container
+        /// </summary>
         [JsonPropertyName("format")]
-        public Format Format { get; set; }
+        public FFProbeFormat Format { get; set; }
+
+        ///// <summary>
+        ///// Information about frames
+        ///// </summary>
+        //[JsonPropertyName("frames")]
+        //public List<FFProbeFrame> Frames { get; set; }
+
+        /// <summary>
+        /// Information about packets
+        /// </summary>
+        [JsonPropertyName("packets")]
+        public List<FFProbePacket> Packets { get; set; }
+
+        /// <summary>
+        /// Information about streams
+        /// </summary>
+        [JsonPropertyName("streams")]
+        public List<FFProbeStream> Streams { get; set; }
+
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement> ExtensionData { get; set; }
     }
 
-    public partial class Format
+    public class FFProbeFormat
     {
+        [JsonPropertyName("bit_rate")]
+        public int? BitRate { get; set; }
+
+        /// <summary>
+        /// Approximate duration in seconds (stream can start *after* the 00:00:00 timecode).
+        /// </summary>
+        [JsonPropertyName("duration")]
+        public double? Duration { get; set; }
+
         [JsonPropertyName("filename")]
-        public string Filename { get; set; }
-
-        [JsonPropertyName("nb_streams")]
-        public long? NbStreams { get; set; }
-
-        [JsonPropertyName("nb_programs")]
-        public long? NbPrograms { get; set; }
-
-        [JsonPropertyName("format_name")]
-        public string FormatName { get; set; }
+        public string FileName { get; set; }
 
         [JsonPropertyName("format_long_name")]
         public string FormatLongName { get; set; }
 
-        [JsonPropertyName("start_time")]
-        public string StartTime { get; set; }
+        [JsonPropertyName("format_name")]
+        public string FormatName { get; set; }
 
-        [JsonPropertyName("duration")]
-        public string Duration { get; set; }
+        [JsonPropertyName("probe_score")]
+        public int? ProbeScore { get; set; }
+
+        [JsonPropertyName("nb_programs")]
+        public int? ProgramsCount { get; set; }
 
         [JsonPropertyName("size")]
         public long? Size { get; set; }
 
-        [JsonPropertyName("bit_rate")]
-        public long? BitRate { get; set; }
+        [JsonPropertyName("start_time")]
+        public double? StartTime { get; set; }
 
-        [JsonPropertyName("probe_score")]
-        public long? ProbeScore { get; set; }
+        [JsonPropertyName("nb_streams")]
+        public int? StreamsCount { get; set; }
 
+        /// <summary>
+        /// Container and format tags/metadata, not stream-specific tags.
+        /// </summary>
         [JsonPropertyName("tags")]
-        public FormatTags Tags { get; set; }
+        public Dictionary<string, string> Tags { get; set; }
+
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement> ExtensionData { get; set; }
     }
 
-    public partial class FormatTags
+    public class FFProbePacket
     {
-        [JsonPropertyName("creation_time")]
-        public DateTimeOffset? CreationTime { get; set; }
-
-        [JsonPropertyName("ENCODER")]
-        public string Encoder { get; set; }
-    }
-
-    public partial class Stream
-    {
-        [JsonPropertyName("index")]
-        public long? Index { get; set; }
-
-        [JsonPropertyName("codec_name")]
-        public string CodecName { get; set; }
-
-        [JsonPropertyName("codec_long_name")]
-        public string CodecLongName { get; set; }
-
-        [JsonPropertyName("profile")]
-        public string Profile { get; set; }
-
         [JsonPropertyName("codec_type")]
         public string CodecType { get; set; }
 
-        [JsonPropertyName("codec_tag_string")]
-        public string CodecTagString { get; set; }
+        /// <summary>
+        /// decoding time stamp -- how packets stored in stream
+        /// </summary>
+        [JsonPropertyName("dts")]
+        public int? DTS { get; set; }
 
-        [JsonPropertyName("codec_tag")]
-        public string CodecTag { get; set; }
+        [JsonPropertyName("dts_time")]
+        public double? DTSTime { get; set; }
 
-        [JsonPropertyName("width")]
-        public long? Width { get; set; }
+        [JsonPropertyName("duration")]
+        public int? Duration { get; set; }
 
-        [JsonPropertyName("height")]
-        public long? Height { get; set; }
+        [JsonPropertyName("duration_time")]
+        public double? DurationTime { get; set; }
 
-        [JsonPropertyName("coded_width")]
-        public long? CodedWidth { get; set; }
+        [JsonPropertyName("flags")]
+        public string Flags { get; set; }
 
-        [JsonPropertyName("coded_height")]
-        public long? CodedHeight { get; set; }
+        /// <summary>
+        /// presentation time stamp -- how packets should be displayed
+        /// </summary>
+        [JsonPropertyName("pts")]
+        public int? PTS { get; set; }
 
-        [JsonPropertyName("closed_captions")]
-        public long? ClosedCaptions { get; set; }
+        [JsonPropertyName("pts_time")]
+        public double? PTSTime { get; set; }
 
-        [JsonPropertyName("film_grain")]
-        public long? FilmGrain { get; set; }
+        [JsonPropertyName("size")]
+        public int? Size { get; set; }
 
-        [JsonPropertyName("has_b_frames")]
-        public long? HasBFrames { get; set; }
+        [JsonPropertyName("stream_index")]
+        public int? StreamIndex { get; set; }
 
-        [JsonPropertyName("sample_aspect_ratio")]
-        public string SampleAspectRatio { get; set; }
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement> ExtensionData { get; set; }
+    }
 
-        [JsonPropertyName("display_aspect_ratio")]
-        public string DisplayAspectRatio { get; set; }
+    public class FFProbeStream
+    {
+        [JsonPropertyName("bit_rate")]
+        public int? BitRate { get; set; }
 
-        [JsonPropertyName("pix_fmt")]
-        public string PixFmt { get; set; }
+        [JsonPropertyName("bits_per_sample")]
+        public int? BitsPerSample { get; set; }
 
-        [JsonPropertyName("level")]
-        public long? Level { get; set; }
-
-        [JsonPropertyName("color_range")]
-        public string ColorRange { get; set; }
-
-        [JsonPropertyName("color_space")]
-        public string ColorSpace { get; set; }
-
-        [JsonPropertyName("color_transfer")]
-        public string ColorTransfer { get; set; }
-
-        [JsonPropertyName("color_primaries")]
-        public string ColorPrimaries { get; set; }
-
-        [JsonPropertyName("chroma_location")]
-        public string ChromaLocation { get; set; }
-
-        [JsonPropertyName("refs")]
-        public long? Refs { get; set; }
-
-        [JsonPropertyName("r_frame_rate")]
-        public string RFrameRate { get; set; }
-
-        [JsonPropertyName("avg_frame_rate")]
-        public string AvgFrameRate { get; set; }
-
-        [JsonPropertyName("time_base")]
-        public string TimeBase { get; set; }
-
-        [JsonPropertyName("start_pts")]
-        public long? StartPts { get; set; }
-
-        [JsonPropertyName("start_time")]
-        public string StartTime { get; set; }
-
-        [JsonPropertyName("extradata_size")]
-        public long? ExtradataSize { get; set; }
-
-        [JsonPropertyName("disposition")]
-        public System.Collections.Generic.Dictionary<string, long?> Disposition { get; set; }
-
-        [JsonPropertyName("tags")]
-        public StreamTags Tags { get; set; }
-
-        [JsonPropertyName("sample_fmt")]
-        public string SampleFmt { get; set; }
-
-        //[JsonPropertyName("sample_rate")]
-        ////[JsonConverter(typeof(ParseStringConverter))]
-        //public long? SampleRate { get; set; }
-
-        [JsonPropertyName("channels")]
-        public long? Channels { get; set; }
+        [JsonPropertyName("bits_per_raw_sample")]
+        public string BitsPerSampleRaw { get; set; }
 
         [JsonPropertyName("channel_layout")]
         public string ChannelLayout { get; set; }
 
-        [JsonPropertyName("bits_per_sample")]
-        public long? BitsPerSample { get; set; }
+        [JsonPropertyName("channels")]
+        public int? Channels { get; set; }
 
-        [JsonPropertyName("initial_padding")]
-        public long? InitialPadding { get; set; }
+        [JsonPropertyName("chroma_location")]
+        public string ChromaLocation { get; set; }
 
-        [JsonPropertyName("duration_ts")]
-        public long? DurationTs { get; set; }
+        [JsonPropertyName("codec_name")]
+        public string CodecName { get; set; }
+
+        /// <summary>
+        /// H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
+        /// </summary>
+        [JsonPropertyName("codec_long_name")]
+        public string CodecLongName { get; set; }
+
+        [JsonPropertyName("codec_type")]
+        public string CodecType { get; set; }
+
+        [JsonPropertyName("codec_tag")]
+        public string CodecTag { get; set; }
+
+        /// <summary>
+        /// Video codec's FourCC or audio codec's TwoCC
+        /// </summary>
+        [JsonPropertyName("codec_tag_string")]
+        public string CodecTagString { get; set; }
+
+        [JsonPropertyName("coded_height")]
+        public int? CodedHeight { get; set; }
+
+        [JsonPropertyName("coded_width")]
+        public int? CodedWidth { get; set; }
+
+        [JsonPropertyName("color_range")]
+        public string ColorRange { get; set; }
+
+        [JsonPropertyName("display_aspect_ratio")]
+        public string DAR { get; set; }
 
         [JsonPropertyName("duration")]
-        public string Duration { get; set; }
-    }
+        public double? Duration { get; set; }
 
-    public partial class StreamTags
-    {
-        [JsonPropertyName("DURATION")]
-        [JsonConverter(typeof(NullableTimeSpanConverter))]
-        public TimeSpan? Duration { get; set; }
+        /// <summary>
+        /// Duration expressed in integer time-base units (https://video.stackexchange.com/questions/27546/difference-between-duration-ts-and-duration-in-ffprobe-output
+        /// </summary>
+        [JsonPropertyName("duration_ts")]
+        public long? DurationTS { get; set; }
+
+        [JsonPropertyName("field_order")]
+        public string FieldOrder { get; set; }
+
+        [JsonPropertyName("nb_frames")]
+        public int? FramesCount { get; set; }
+
+        [JsonPropertyName("r_frame_rate")]
+        public string FrameRateR { get; set; }
+
+        [JsonPropertyName("avg_frame_rate")]
+        public string FrameRateAvg { get; set; }
+
+        [JsonPropertyName("height")]
+        public int? Height { get; set; }
+
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [JsonPropertyName("index")]
+        public int Index { get; set; }
+
+        [JsonPropertyName("is_avc")]
+        public bool? IsAVC { get; set; }
+
+        //  todo@ type bool?
+        [JsonPropertyName("has_b_frames")]
+        public int? IsHasBFrames { get; set; }
+
+        [JsonPropertyName("level")]
+        public int? Level { get; set; }
+
+        [JsonPropertyName("nb_packets")]
+        public int? PacketsCount { get; set; }
+
+        [JsonPropertyName("pix_fmt")]
+        public string PixFmt { get; set; }
+
+        [JsonPropertyName("profile")]
+        public string Profile { get; set; }
+
+        [JsonPropertyName("refs")]
+        public int? Refs { get; set; }
+
+        [JsonPropertyName("sample_fmt")]
+        public string SampleFormat { get; set; }
+
+        [JsonPropertyName("sample_rate")]
+        public int? SampleRate { get; set; }
+
+        [JsonPropertyName("sample_aspect_ratio")]
+        public string SAR { get; set; }
+
+        [JsonPropertyName("start_pts")]
+        public long? StartPTS { get; set; }
+
+        [JsonPropertyName("start_time")]
+        public double? StartTime { get; set; }
+
+        /// <summary>
+        /// Stream-specific tags/metadata. See <see cref="KnownFFProbeVideoStreamTags"/>.
+        /// </summary>
+        [JsonPropertyName("tags")]
+        public Dictionary<string, string> Tags { get; set; }
+
+        /// <summary>
+        /// Values like &quot;1/600&quot;. See https://stackoverflow.com/questions/43333542/what-is-video-timescale-timebase-or-timestamp-in-ffmpeg 
+        /// </summary>
+        [JsonPropertyName("time_base")]
+        public string TimeBase { get; set; }
+
+        [JsonPropertyName("width")]
+        public int? Width { get; set; }
+
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement> ExtensionData { get; set; }
     }
 
     #endregion

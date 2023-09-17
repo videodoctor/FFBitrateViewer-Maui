@@ -64,7 +64,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             return version;
         }
 
-        public async Task<MediaInfo> GetMediaInfoAsync(string mediaFilePath, int threadCount = 11)
+        public async Task<FFProbeJsonOutput> GetMediaInfoAsync(string mediaFilePath, int threadCount = 11)
         {
             ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
 
@@ -94,7 +94,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             {
                 NumberHandling = JsonNumberHandling.AllowReadingFromString
             };
-            var mediaInfo = await JsonSerializer.DeserializeAsync<MediaInfo>(memoryStream, jsonSerializerOptions);
+            var mediaInfo = await JsonSerializer.DeserializeAsync<FFProbeJsonOutput>(memoryStream, jsonSerializerOptions);
 
             return mediaInfo!;
         }
