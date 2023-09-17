@@ -131,23 +131,23 @@ namespace FFBitrateViewer
         }
 
 
-        public static UDouble? Find(string item, Regex regex, string? unit = null)
-        {
-            Match m = regex.Match(item);
-            if (m.Success && Helpers.TryParseDouble(m.Groups[1].Value, out double value)) return new UDouble(value, unit ?? m.Groups[2].Value);
-            return null;
-        }
+        //public static UDouble? Find(string item, Regex regex, string? unit = null)
+        //{
+        //    Match m = regex.Match(item);
+        //    if (m.Success && Helpers.TryParseDouble(m.Groups[1].Value, out double value)) return new UDouble(value, unit ?? m.Groups[2].Value);
+        //    return null;
+        //}
 
 
-        public static UDouble? Find(List<string> items, Regex regex, string? unit = null)
-        {
-            foreach (string item in items)
-            {
-                UDouble? v = Find(item, regex, unit);
-                if (v != null) return v;
-            }
-            return null;
-        }
+        //public static UDouble? Find(List<string> items, Regex regex, string? unit = null)
+        //{
+        //    foreach (string item in items)
+        //    {
+        //        UDouble? v = Find(item, regex, unit);
+        //        if (v != null) return v;
+        //    }
+        //    return null;
+        //}
 
 
         public override int GetHashCode()
