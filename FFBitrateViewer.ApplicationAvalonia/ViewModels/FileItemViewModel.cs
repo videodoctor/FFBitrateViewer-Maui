@@ -101,11 +101,14 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
     }
 
     public record UnitValue<T, V>(T Value, V Unit, V DefaultUnit);
-    public record UInt(int Value, Unit Unit) : UnitValue<int, Unit>(Value, Unit, Unit.Unknown);
-    public record UDouble(double Value, Unit Unit) : UnitValue<double, Unit>(Value, Unit, Unit.Unknown);
-    public record BitRate(int Value) : UInt(Value, Unit.BitsPerSecond);
-    public record SampleRate(int Value) : UInt(Value, Unit.Hertz);
 
+    public record UInt(int Value, Unit Unit) : UnitValue<int, Unit>(Value, Unit, Unit.Unknown);
+
+    public record UDouble(double Value, Unit Unit) : UnitValue<double, Unit>(Value, Unit, Unit.Unknown);
+
+    public record BitRate(int Value) : UInt(Value, Unit.BitsPerSecond);
+
+    public record SampleRate(int Value) : UInt(Value, Unit.Hertz);
 
     public record NDPair(string Value, int? Numerator, int? Denominator)
     {
@@ -156,6 +159,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         }
 
     }
+
     public class BaseStream
     {
         public string? CodecName { get; set; }
