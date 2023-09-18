@@ -22,7 +22,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
         // based on benchmark (2020/12) https://www.joelverhagen.com/blog/2020/12/fastest-net-csv-parsers
         // For hierarchical structures with "reasonable" size we use JSON with System.Text.Json parser.
 
-        private readonly OSProcessService _oSProcessService = new OSProcessService();
+        private readonly OSProcessService _oSProcessService = new();
 
 
         public string FFProbeFilePath { get => _ffprobeFilePath ??= WhichFFProbeFilePath(); }
@@ -43,7 +43,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
         public async Task<Version> GetVersionAsync()
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new ();
             using StringWriter sw = new(sb);
 
             var command = $"{FFProbeFilePath} -version";
