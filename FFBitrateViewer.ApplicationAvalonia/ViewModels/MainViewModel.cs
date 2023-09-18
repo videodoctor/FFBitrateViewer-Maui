@@ -57,7 +57,7 @@ public partial class MainViewModel : ViewModelBase
             token.ThrowIfCancellationRequested();
 
             FileItemViewModel? file = selectedFiles[fileIndex];
-            await foreach (var probePacket in _ffprobeAppClient.GetProbePackets(file.Path.LocalPath))
+            await foreach (var probePacket in _ffprobeAppClient.GetProbePackets(file.Path.LocalPath, token: token))
             {
                 token.ThrowIfCancellationRequested();
             }
