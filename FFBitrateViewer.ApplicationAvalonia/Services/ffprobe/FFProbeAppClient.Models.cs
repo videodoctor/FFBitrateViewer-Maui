@@ -8,8 +8,6 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
 #nullable disable
 
-    #region Get MediaInfo Models
-
     public record FFProbeJsonOutput
     (
         /// <summary>
@@ -36,54 +34,54 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
         [property: JsonPropertyName("streams")]
         List<FFProbeStream> Streams
 
-        // [property: JsonExtensionData]
-        // Dictionary<string, JsonElement> ExtensionData
+    // [property: JsonExtensionData]
+    // Dictionary<string, JsonElement> ExtensionData
     );
 
-     public record FFProbeFormat
-    (
-        [property: JsonPropertyName("bit_rate")]
+    public record FFProbeFormat
+   (
+       [property: JsonPropertyName("bit_rate")]
         int? BitRate,
 
-        /// <summary>
-        /// Approximate duration in seconds (stream can start *after* the 00:00:00 timecode).
-        /// </summary>
-        [property: JsonPropertyName("duration")]
+       /// <summary>
+       /// Approximate duration in seconds (stream can start *after* the 00:00:00 timecode).
+       /// </summary>
+       [property: JsonPropertyName("duration")]
         double? Duration,
 
-        [property: JsonPropertyName("filename")]
+       [property: JsonPropertyName("filename")]
         string FileName,
 
-        [property: JsonPropertyName("format_long_name")]
+       [property: JsonPropertyName("format_long_name")]
         string FormatLongName,
 
-        [property: JsonPropertyName("format_name")]
+       [property: JsonPropertyName("format_name")]
         string FormatName,
 
-        [property: JsonPropertyName("probe_score")]
+       [property: JsonPropertyName("probe_score")]
         int? ProbeScore,
 
-        [property: JsonPropertyName("nb_programs")]
+       [property: JsonPropertyName("nb_programs")]
         int? ProgramsCount,
 
-        [property: JsonPropertyName("size")]
+       [property: JsonPropertyName("size")]
         long? Size,
 
-        [property: JsonPropertyName("start_time")]
+       [property: JsonPropertyName("start_time")]
         double? StartTime,
 
-        [property: JsonPropertyName("nb_streams")]
+       [property: JsonPropertyName("nb_streams")]
         int? StreamsCount,
 
-        /// <summary>
-        /// Container and format tags/metadata, not stream-specific tags.
-        /// </summary>
-        [property: JsonPropertyName("tags")]
+       /// <summary>
+       /// Container and format tags/metadata, not stream-specific tags.
+       /// </summary>
+       [property: JsonPropertyName("tags")]
         Dictionary<string, string> Tags
 
-        // [property: JsonExtensionData]
-        // Dictionary<string, JsonElement> ExtensionData
-    );
+   // [property: JsonExtensionData]
+   // Dictionary<string, JsonElement> ExtensionData
+   );
 
     public record FFProbePacket
     (
@@ -123,8 +121,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
         [property: JsonPropertyName("stream_index")]
         int? StreamIndex
 
-        // [property: JsonExtensionData]
-        // Dictionary<string, JsonElement> ExtensionData
+    // [property: JsonExtensionData]
+    // Dictionary<string, JsonElement> ExtensionData
     );
 
     public record FFProbeStream
@@ -263,34 +261,10 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
         [property: JsonPropertyName("width")]
         int? Width
 
-        // [property: JsonExtensionData]
-        // Dictionary<string, JsonElement> ExtensionData
+    // [property: JsonExtensionData]
+    // Dictionary<string, JsonElement> ExtensionData
     );
 
-    #endregion
-
-    #region ProbePacket Model
-    public partial class ProbePacket
-    {
-        [JsonPropertyName("pts_time")]
-        public double? PtsTime { get; set; }
-
-        [JsonPropertyName("duration_time")]
-        public double? DurationTime { get; set; }
-
-        [JsonPropertyName("size")]
-        public long? Size { get; set; }
-
-        [JsonPropertyName("flags")]
-        public string Flags { get; set; }
-
-        [JsonPropertyName("dts_time")]
-        public double? DtsTime { get; set; }
-    }
-
-    #endregion
-
-    #region JsonConverters
     internal class NullableTimeSpanConverter : JsonConverter<TimeSpan?>
     {
         public override TimeSpan? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -363,7 +337,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             if (reader.TokenType == JsonTokenType.Number)
             {
                 if (reader.TryGetInt32(out var intValue))
-                {                    return intValue != 0 && intValue != -0;
+                {
+                    return intValue != 0 && intValue != -0;
                 }
                 if (reader.TryGetDouble(out var doubleValue))
                 {
@@ -385,6 +360,6 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             throw new NotImplementedException();
         }
     }
-    #endregion
+
 #nullable enable
 }

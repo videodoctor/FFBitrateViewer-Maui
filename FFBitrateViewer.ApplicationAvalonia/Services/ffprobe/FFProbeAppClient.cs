@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -45,7 +44,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
         public async Task<Version> GetVersionAsync()
         {
-            StringBuilder sb = new ();
+            StringBuilder sb = new();
             using StringWriter sw = new(sb);
 
             var command = $"{FFProbeFilePath} -version";
@@ -97,7 +96,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             return mediaInfo!;
         }
 
-        public async IAsyncEnumerable<ProbePacket> GetProbePackets(
+        public async IAsyncEnumerable<FFProbePacket> GetProbePackets(
             string mediaFilePath,
             int streamId = 0,
             int threadCount = 11,
@@ -134,14 +133,25 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
                 var csvDataReader = CsvDataReader.Create(textReader, csvDataReaderOptions);
                 await csvDataReader.ReadAsync(token);
 
-                yield return new ProbePacket
+                var entryType = csvDataReader.GetString(0);
+                if (string.Compare(entryType, "packet", true) == 0)
                 {
-                    PtsTime = double.TryParse(csvDataReader.GetString(1), out var pstTime) ? pstTime : default,
-                    DtsTime = double.TryParse(csvDataReader.GetString(2), out var dtsTime) ? dtsTime : default,
-                    DurationTime = double.TryParse(csvDataReader.GetString(3), out var durationTime) ? durationTime : default,
-                    Size = long.TryParse(csvDataReader.GetString(4), out var size) ? size : default,
-                    Flags = csvDataReader.GetString(5)
-                };
+                    throw new FFProbeAppClientException($"Entry Type:{entryType} is not supported");
+                }
+
+                yield return new FFProbePacket
+                (
+                    CodecType: default,
+                    DTS: default,
+                    DTSTime: double.TryParse(csvDataReader.GetString(2), out var dtsTime) ? dtsTime : default,
+                    Duration: default,
+                    DurationTime: double.TryParse(csvDataReader.GetString(3), out var durationTime) ? durationTime : default,
+                    Flags: csvDataReader.GetString(5),
+                    PTS: default,
+                    PTSTime: double.TryParse(csvDataReader.GetString(1), out var pstTime) ? pstTime : default,
+                    Size: int.TryParse(csvDataReader.GetString(4), out var size) ? size : default,
+                    StreamIndex: default
+                );
             }
 
             var exitCode = await commandTask;
