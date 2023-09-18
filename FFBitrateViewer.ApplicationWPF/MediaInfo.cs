@@ -19,23 +19,23 @@ namespace FFBitrateViewer
         }
 
 
-        public static PInt? Find(string item, Regex regex)
-        {
-            Match m = regex.Match(item);
-            if (m.Success && int.TryParse(m.Groups[1].Value, out int x) && int.TryParse(m.Groups[2].Value, out int y)) return new PInt(x, y);
-            return null;
-        }
+        // public static PInt? Find(string item, Regex regex)
+        // {
+        //     Match m = regex.Match(item);
+        //     if (m.Success && int.TryParse(m.Groups[1].Value, out int x) && int.TryParse(m.Groups[2].Value, out int y)) return new PInt(x, y);
+        //     return null;
+        // }
 
 
-        public static PInt? Find(List<string> items, Regex regex)
-        {
-            foreach (string item in items)
-            {
-                PInt? v = Find(item, regex);
-                if (v != null) return v;
-            }
-            return null;
-        }
+        // public static PInt? Find(List<string> items, Regex regex)
+        // {
+        //     foreach (string item in items)
+        //     {
+        //         PInt? v = Find(item, regex);
+        //         if (v != null) return v;
+        //     }
+        //     return null;
+        // }
 
 
         public override int GetHashCode()
@@ -63,8 +63,8 @@ namespace FFBitrateViewer
         public string? Unit  { get; set; }
 
 
-        public UInt(int value, string? unit = null) { 
-            Value = value; 
+        public UInt(int value, string? unit = null) {
+            Value = value;
             Unit  = unit;
         }
 

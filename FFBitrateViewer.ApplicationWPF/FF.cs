@@ -145,7 +145,7 @@ namespace FFBitrateViewer
                             if (string.IsNullOrEmpty(v)) continue;
 
                             PropInfo? info = null;
-                            switch (k) 
+                            switch (k)
                             {
                                 case "best_effort_timestamp_time":
                                     info = new('d', "BestEffortTimestampTime");

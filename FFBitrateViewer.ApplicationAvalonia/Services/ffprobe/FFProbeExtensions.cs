@@ -9,7 +9,7 @@ public static class FFProbeExtensions
         if (ffProbeOutput == null)
         { return null; }
 
-        if (ffProbeOutput?.Format?.Duration != null)
+        if (ffProbeOutput.Format?.Duration != null)
         { return ffProbeOutput.Format.Duration; }
 
         if (ffProbeOutput.Streams == null)

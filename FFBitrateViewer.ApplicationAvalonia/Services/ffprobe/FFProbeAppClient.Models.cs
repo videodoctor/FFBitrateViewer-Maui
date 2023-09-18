@@ -363,8 +363,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             if (reader.TokenType == JsonTokenType.Number)
             {
                 if (reader.TryGetInt32(out var intValue))
-                {
-                    return intValue != 0 && intValue != -0;
+                {                    return intValue != 0 && intValue != -0;
                 }
                 if (reader.TryGetDouble(out var doubleValue))
                 {
