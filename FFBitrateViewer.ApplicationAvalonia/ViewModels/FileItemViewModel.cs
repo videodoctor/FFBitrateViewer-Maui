@@ -58,7 +58,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
         private void InitializeViewModel(ref FileEntry fileEntry, ref FFProbeJsonOutput mediaInfo)
         {
-            Path = _fileEntry.Path;
+            Path = fileEntry.Path;
 
             StartTime = mediaInfo.Format?.StartTime ?? 0;
             Duration = mediaInfo.GetDuration();
