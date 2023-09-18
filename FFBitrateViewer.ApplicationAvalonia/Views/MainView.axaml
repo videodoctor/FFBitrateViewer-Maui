@@ -58,7 +58,7 @@
 			<Button Content="Remove selected"/>
 		</StackPanel>
 
-		<!--<DataGrid Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}"
+		<DataGrid Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}"
 				  CanUserReorderColumns="True"
 				  CanUserResizeColumns="True"
 				  CanUserSortColumns="False"
@@ -67,15 +67,16 @@
 			<DataGrid.Columns>
 				<DataGridTextColumn Header=""  Binding="{Binding IsSelected}"/>
 				<DataGridTextColumn Header="Path to file"  Binding="{Binding Path,Mode=OneTime}"/>
+				<DataGridTextColumn Header="Media Info" Binding="{Binding FirstVideoShortDesc,Mode=OneTime}"/>
 			</DataGrid.Columns>
-		</DataGrid>-->
+		</DataGrid>
 
-		<DataGrid Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}"
+		<!--<DataGrid Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}"
 				  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
 				  AutoGenerateColumns="True"
 				  GridLinesVisibility="All"
 				  BorderThickness="1" BorderBrush="Gray">
-		</DataGrid>
+		</DataGrid>-->
 		
 		<!--Button and check buttons-->
 		<StackPanel Grid.Row="3" Orientation="Horizontal">

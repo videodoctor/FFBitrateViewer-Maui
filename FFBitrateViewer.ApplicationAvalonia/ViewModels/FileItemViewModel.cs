@@ -34,9 +34,13 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         [ObservableProperty]
         private BitRate? _bitrate;
 
+        [ObservableProperty]
+        private string _firstVideoShortDesc = string.Empty;
+
         public List<VideoStream> VideoStreams { get; } = new();
         public List<AudioStream> AudioStreams { get; } = new();
         public List<SubtitleStream> SubtitleStreams { get; } = new();
+
         #endregion
 
         private readonly FileEntry _fileEntry;
@@ -50,38 +54,39 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             _fileEntry = fileEntry;
             _mediaInfo = mediaInfo;
 
-            InitializeViewModel(ref fileEntry, ref mediaInfo);
+            InitializeViewModel(ref _fileEntry, ref _mediaInfo);
         }
 
         private void InitializeViewModel(ref FileEntry fileEntry, ref FFProbeJsonOutput mediaInfo)
         {
             Path = _fileEntry.Path;
 
-            StartTime = _mediaInfo.Format?.StartTime ?? 0;
-            Duration = _mediaInfo.GetDuration();
-            Bitrate = _mediaInfo.Format?.BitRate == null ? Bitrate : new BitRate(_mediaInfo.Format.BitRate.Value);
+            StartTime = mediaInfo.Format?.StartTime ?? 0;
+            Duration = mediaInfo.GetDuration();
+            Bitrate = mediaInfo.Format?.BitRate == null ? Bitrate : new BitRate(mediaInfo.Format.BitRate.Value);
 
-            IEnumerable<FFProbeStream> streams =  _mediaInfo.Streams ?? Enumerable.Empty<FFProbeStream>();
+            IEnumerable<FFProbeStream> streams = mediaInfo.Streams ?? Enumerable.Empty<FFProbeStream>();
 
             foreach (var stream in streams)
             {
-                switch(stream.CodecType?.ToUpper()){
-                        case "VIDEO":
-                            // Attached pics are also added as Video Streams with CodecName = mjpeg (could be png?)
-                            if (stream.CodecName?.ToUpper() == "MJPEG")
-                            { continue;  }
-                            VideoStreams.Add(VideoStream.Build(stream));
-                            break;
-                        case "AUDIO":
-                            AudioStreams.Add(AudioStream.Build(stream));
-                            break;
-                        case "SUBTITLE":
-                            SubtitleStreams.Add(SubtitleStream.Build(stream));
-                            break;
+                switch (stream.CodecType?.ToUpper())
+                {
+                    case "VIDEO":
+                        // Attached pics are also added as Video Streams with CodecName = mjpeg (could be png?)
+                        if (stream.CodecName?.ToUpper() == "MJPEG")
+                        { continue; }
+                        VideoStreams.Add(VideoStream.Build(stream));
+                        break;
+                    case "AUDIO":
+                        AudioStreams.Add(AudioStream.Build(stream));
+                        break;
+                    case "SUBTITLE":
+                        SubtitleStreams.Add(SubtitleStream.Build(stream));
+                        break;
                 }
-
             }
 
+            FirstVideoShortDesc = VideoStreams.FirstOrDefault()?.ToString(VideoStreamToStringMode.SHORT) ?? string.Empty;
         }
     }
 
@@ -102,10 +107,10 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
     public record SampleRate(int Value) : UInt(Value, Unit.Hertz);
 
 
-    public record NDPair (string Value, int? Numerator, int? Denominator)
+    public record NDPair(string Value, int? Numerator, int? Denominator)
     {
         public static readonly NDPair Default = new(string.Empty, null, null);
-        private static readonly Regex NDPairRegex  = new(@"^(?<numerator>\d+)/(?<denominator>\d+)$", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
+        private static readonly Regex NDPairRegex = new(@"^(?<numerator>\d+)/(?<denominator>\d+)$", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
         public static NDPair Parse(string value)
         {
             ArgumentException.ThrowIfNullOrEmpty(value, nameof(value));
@@ -124,41 +129,47 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             return new NDPair(value, int.Parse(numeratorGroup.Value), int.Parse(denominatorGroup.Value));
         }
 
-        public double? ToDouble(){
+        public double? ToDouble()
+        {
             if (Numerator == null || Denominator == null)
             { return null; }
             return (double)Numerator / (double)Denominator;
         }
 
-        public override string ToString()
+        public string ToString(bool isNumberOnly)
         {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.Append(nameof(NDPair));
-                stringBuilder.Append(" { ");
-                if (PrintMembers(stringBuilder))
-                {
-                    stringBuilder.Append(' ');
-                }
-                stringBuilder.Append('}');
-                stringBuilder.AppendFormat("[ {0} / (1)= {2:F3} ]", Numerator, Denominator, ToDouble());
-                return stringBuilder.ToString();
+            if (isNumberOnly)
+            {
+                return $"{ToDouble():F3}";
+            }
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append(nameof(NDPair));
+            stringBuilder.Append(" { ");
+            if (PrintMembers(stringBuilder))
+            {
+                stringBuilder.Append(' ');
+            }
+            stringBuilder.Append('}');
+            stringBuilder.AppendFormat("[ {0} / (1)= {2:F3} ]", Numerator, Denominator, ToDouble());
+            return stringBuilder.ToString();
         }
 
     }
     public class BaseStream
     {
         public string? CodecName { get; set; }
-        public string? CodecTag{ get; set; }
-        public string? CodecTagString{ get; set; }
-        public double? Duration{ get; set; }
-        public long? DurationTS{ get; set; }
-        public NDPair? FrameRateAvg{ get; set; }
-        public NDPair? FrameRateR{ get; set; }
-        public string? Id{ get; set; }
-        public int? Index{ get; set; }
-        public long? StartPTS{ get; set; }
-        public double? StartTime{ get; set; }
-        public NDPair? TimeBase{ get; set; }
+        public string? CodecTag { get; set; }
+        public string? CodecTagString { get; set; }
+        public double? Duration { get; set; }
+        public long? DurationTS { get; set; }
+        public NDPair? FrameRateAvg { get; set; }
+        public NDPair? FrameRateR { get; set; }
+        public string? Id { get; set; }
+        public int? Index { get; set; }
+        public long? StartPTS { get; set; }
+        public double? StartTime { get; set; }
+        public NDPair? TimeBase { get; set; }
 
         public static BaseStream Build(FFProbeStream info)
         {
@@ -207,21 +218,21 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         private static readonly Regex PixelFormatRegex = GeneratedPixelFormatRegex();
 
         // true -- progressive, false -- interlaced, null -- undetected
-        public bool? Progressive{ get; set; }
+        public bool? Progressive { get; set; }
         // http://git.videolan.org/?p=ffmpeg.git;a=blob;f=libavutil/pixfmt.h;hb=HEAD
-        public string? PixelFormat{ get; set; }
-        public string? ColorSpace{ get; set; }
-        public string? ChromaSubsampling{ get; set; }
-        public string? ColorRange{ get; set; }
+        public string? PixelFormat { get; set; }
+        public string? ColorSpace { get; set; }
+        public string? ChromaSubsampling { get; set; }
+        public string? ColorRange { get; set; }
 
         // public static VideoStreamFormat Build(string colorRange,string pixelFormat,string fieldOrder)
         public static VideoStreamFormat Build(FFProbeStream info)
         {
             ArgumentNullException.ThrowIfNull(info);
 
-            string colorRange = info.ColorRange;
-            string pixelFormat = info.PixFmt;
-            string fieldOrder = info.FieldOrder;
+            string? colorRange = info.ColorRange;
+            string? pixelFormat = info.PixFmt;
+            string? fieldOrder = info.FieldOrder;
 
             VideoStreamFormat videoStreamFormat = new()
             {
@@ -240,8 +251,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             {
                 if (match.Groups.TryGetValue("ColorSpaceSet", out var colorSpaceSetGroup))
                 {
-                    videoStreamFormat.ColorSpace = colorSpaceSetGroup.Value.ToUpper() switch {
-                        "YUV" or "YUVJ" or "YUVY" or"YUYV" => "YUV",
+                    videoStreamFormat.ColorSpace = colorSpaceSetGroup.Value.ToUpper() switch
+                    {
+                        "YUV" or "YUVJ" or "YUVY" or "YUYV" => "YUV",
                         "BGR" or "GBR" or "RGB" => "RGB",
                         "YUVA" => "YUVA",
                         "ABGR" or "ARGB" or "BGRA" or "RGBA" => "RGBA",
@@ -251,7 +263,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
                 if (match.Groups.TryGetValue("ChromaSubsamplingSet", out var chromaSubsamplingSetGroup))
                 {
-                    videoStreamFormat.ChromaSubsampling = chromaSubsamplingSetGroup.Value switch {
+                    videoStreamFormat.ChromaSubsampling = chromaSubsamplingSetGroup.Value switch
+                    {
                         "420" or "422" or "440" or "444" => chromaSubsamplingSetGroup.Value,
                         _ => null // todo@
                     };
@@ -260,8 +273,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             }
 
             // Field Order
-            if (fieldOrder?.Length > 0) {
-                videoStreamFormat.Progressive = char.ToUpper(fieldOrder.Single()) switch
+            if (fieldOrder?.Length > 0)
+            {
+                videoStreamFormat.Progressive = char.ToUpper(fieldOrder.First()) switch
                 {
                     'P' => true,
                     'I' or 'B' or 'T' => false,
@@ -277,13 +291,13 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         {
             string? stringValue = mode switch
             {
-                null => string.IsNullOrEmpty(ColorRange) ? PixelFormat : string.Concat(PixelFormat, " (" , ColorRange , ")"),
+                null => string.IsNullOrEmpty(ColorRange) ? PixelFormat : string.Concat(PixelFormat, " (", ColorRange, ")"),
                 VideoStreamFormatToStringMode.CHROMA_SUBSAMPLING => ChromaSubsampling,
                 VideoStreamFormatToStringMode.COLOR_RANGE => ColorRange?.ToUpper(),
                 VideoStreamFormatToStringMode.COLOR_SPACE => ColorSpace,
-                VideoStreamFormatToStringMode.COLOR_SPACE_FULL => string.Concat(ColorSpace , ChromaSubsampling),
-                VideoStreamFormatToStringMode.FIELD_TYPE => Progressive.ToString(nullText: "?", trueText:"p", falseText: "i"),
-                VideoStreamFormatToStringMode.FIELD_TYPE_NAME => Progressive.ToString(trueText: "Progressive",falseText: "Interlaced"),
+                VideoStreamFormatToStringMode.COLOR_SPACE_FULL => string.Concat(ColorSpace, ChromaSubsampling),
+                VideoStreamFormatToStringMode.FIELD_TYPE => Progressive.ToString(nullText: "?", trueText: "p", falseText: "i"),
+                VideoStreamFormatToStringMode.FIELD_TYPE_NAME => Progressive.ToString(trueText: "Progressive", falseText: "Interlaced"),
                 VideoStreamFormatToStringMode.PIXEL_FORMAT => PixelFormat,
                 _ => null // todo@ exception
             };
@@ -298,16 +312,22 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
     {
         public string ToString(char separator)
         {
-            return string.Concat(X, separator , Y);
+            return string.Concat(X, separator, Y);
         }
+    }
+
+    public enum VideoStreamToStringMode
+    {
+        // FULL -- null
+        SHORT
     }
 
     public class VideoStream : BaseStream
     {
-        public BitRate? BitRate{ get; set; }
+        public BitRate? BitRate { get; set; }
         public bool IsBitrateCalculated { get; set; }
-        public string? Encoder{ get; set; }
-        public VideoStreamFormat? Format {get; set;}
+        public string? Encoder { get; set; }
+        public VideoStreamFormat? Format { get; set; }
         // public UDouble? FPS { get; set; }
         public string? Profile { get; set; }
         public PInt? Resolution { get; set; }
@@ -327,15 +347,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             { videoStream.BitRate = new BitRate(info.BitRate.Value); }
 
             if (info.Width != null && info.Height != null)
-            { videoStream.Resolution = new PInt(info.Width.Value,info.Height.Value); }
+            { videoStream.Resolution = new PInt(info.Width.Value, info.Height.Value); }
 
             return videoStream;
-        }
-
-        public enum VideoStreamToStringMode
-        {
-            // FULL -- null
-            SHORT
         }
 
         public string ToString(VideoStreamToStringMode? mode = null)
@@ -350,7 +364,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                     { sb.Append(Resolution.ToString('x')); }
 
                     if (FrameRateAvg?.Value != null)
-                    { sb.Append("-" + FrameRateAvg.ToString()); }
+                    { sb.Append("-" + FrameRateAvg.ToString(isNumberOnly: true)); }
 
                     sb.Append(Format?.ToString(VideoStreamFormatToStringMode.FIELD_TYPE));
                     result.Add(sb.ToString());
@@ -370,7 +384,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                     { sb.Append(Resolution.Y); }
 
                     if (FrameRateAvg?.Value != null)
-                    { sb.Append("-" + FrameRateAvg.ToString()); }
+                    { sb.Append("-" + FrameRateAvg.ToString(isNumberOnly: true)); }
 
                     sb.Append(Format?.ToString(VideoStreamFormatToStringMode.FIELD_TYPE));
                     if (sb.Length > 0)
@@ -410,10 +424,10 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             BaseStream.PopulateBaseStream(ref info, ref audioStream);
 
             if (info.BitRate != null)
-            { audioStream.BitRate   = new BitRate((int)info.BitRate); }
+            { audioStream.BitRate = new BitRate((int)info.BitRate); }
 
             if (info.ChannelLayout != null)
-            { audioStream.Channels  = info.ChannelLayout; }
+            { audioStream.Channels = info.ChannelLayout; }
 
             if (info.SampleRate != null)
             { audioStream.Frequency = new SampleRate((int)info.SampleRate); }
@@ -424,16 +438,16 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         public override string? ToString()
         {
             var result = new List<string>();
-            if (Encoder != null)   result.Add(Encoder);
-            if (Channels != null)  result.Add(Channels);
-            if (BitRate != null)   result.Add(BitRate.ToString());
+            if (Encoder != null) result.Add(Encoder);
+            if (Channels != null) result.Add(Channels);
+            if (BitRate != null) result.Add(BitRate.ToString());
             if (Frequency != null) result.Add(Frequency.ToString());
             return string.Join(", ", result);
         }
 
     }
 
-    public class SubtitleStream :  BaseStream
+    public class SubtitleStream : BaseStream
     {
         // todo@ override ToString
         public static new SubtitleStream Build(FFProbeStream info)
