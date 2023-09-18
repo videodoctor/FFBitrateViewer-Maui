@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
@@ -98,7 +99,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
         public async IAsyncEnumerable<ProbePacket> GetProbePackets(
             string mediaFilePath,
             int streamId = 0,
-            int threadCount = 11
+            int threadCount = 11,
+            CancellationToken token = default
         )
         {
             ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
@@ -111,14 +113,14 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
             var commandStdOuputChannel = Channel.CreateUnbounded<string>();
             var command = $@"{FFProbeFilePath} -hide_banner -threads {threadCount} -print_format csv -loglevel fatal -show_error -select_streams v:{streamId} -show_entries packet=dts_time,duration_time,pts_time,size,flags ""{mediaFilePath}""";
-            var commandTask = _oSProcessService.ExecuteAsync(command, standardOutputChannel: commandStdOuputChannel);
+            var commandTask = _oSProcessService.ExecuteAsync(command, standardOutputChannel: commandStdOuputChannel, token: token);
 
             var csvDataReaderOptions = new CsvDataReaderOptions
             { HasHeaders = false, };
 
             // NOTE: Because of command output can be quite large.
             //       We use Publisher/Consumer pattern thru System.Threading.Channel
-            await foreach (var csvLine in commandStdOuputChannel.Reader.ReadAllAsync())
+            await foreach (var csvLine in commandStdOuputChannel.Reader.ReadAllAsync(token))
             {
                 // Converts a CSV line to a Packet instance. Following is a sample line:
                 // [CSV format]
@@ -129,7 +131,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
                 // 0      1                 2            3                      4          5
                 using var textReader = new StringReader(csvLine);
                 var csvDataReader = CsvDataReader.Create(textReader, csvDataReaderOptions);
-                await csvDataReader.ReadAsync();
+                await csvDataReader.ReadAsync(token);
 
                 yield return new ProbePacket
                 {

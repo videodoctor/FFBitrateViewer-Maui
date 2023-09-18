@@ -23,7 +23,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             IDictionary<string, string?>? environmentOverrides = null,
             Channel<string>? standardOutputChannel = null,
             Channel<string>? standardErrorChannel = null,
-            CancellationToken cancellationToken = default
+            CancellationToken token = default
             )
         {
             standardOutputWriter ??= TextWriter.Null;
@@ -47,7 +47,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
 
-            await process.WaitForExitAsync(cancellationToken);
+            await process.WaitForExitAsync(token);
             _processes.Remove(process);
 
             process.OutputDataReceived -= OnProcessOutputDataReceived;

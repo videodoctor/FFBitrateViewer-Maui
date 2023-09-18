@@ -3,7 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Extensibility.OxyPlot;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,6 +15,10 @@ public partial class MainViewModel : ViewModelBase
 {
     [ObservableProperty]
     private string _version = string.Empty;
+
+    [ObservableProperty]
+
+    private bool _isPlotterOn = false;
 
     public ObservableCollection<FileItemViewModel> Files { get; } = new();
     public FFProbePlotModel PlotModel { get; } = new(string.Empty);
@@ -39,6 +45,22 @@ public partial class MainViewModel : ViewModelBase
             var mediaInfo = await _ffprobeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath);
             var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo);
             Files.Add(fileItemViewModel);
+        }
+    }
+
+    [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
+    private async Task ToggleOnOffPlotterPlotter(CancellationToken token)
+    {
+        var selectedFiles = Files.Where(f => f.IsSelected).ToImmutableArray();
+        for (int fileIndex = 0; fileIndex < selectedFiles.Length; fileIndex++)
+        {
+            token.ThrowIfCancellationRequested();
+
+            FileItemViewModel? file = selectedFiles[fileIndex];
+            await foreach (var probePacket in _ffprobeAppClient.GetProbePackets(file.Path.LocalPath))
+            {
+                token.ThrowIfCancellationRequested();
+            }
         }
     }
 

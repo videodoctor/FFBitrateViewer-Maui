@@ -64,10 +64,11 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             Duration = mediaInfo.GetDuration();
             Bitrate = mediaInfo.Format?.BitRate == null ? Bitrate : new BitRate(mediaInfo.Format.BitRate.Value);
 
-            IEnumerable<FFProbeStream> streams = mediaInfo.Streams ?? Enumerable.Empty<FFProbeStream>();
+            var streams = (mediaInfo.Streams ?? Enumerable.Empty<FFProbeStream>()).ToArray();
 
-            foreach (var stream in streams)
+            for (int streamIndex = 0; streamIndex < streams.Length; streamIndex++)
             {
+                FFProbeStream? stream = streams[streamIndex];
                 switch (stream.CodecType?.ToUpper())
                 {
                     case "VIDEO":

@@ -59,15 +59,16 @@
 		</StackPanel>
 
 		<DataGrid Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}"
-				  CanUserReorderColumns="True"
+				  CanUserReorderColumns="True" 
 				  CanUserResizeColumns="True"
 				  CanUserSortColumns="False"
 				  GridLinesVisibility="All"
 				  BorderThickness="1" BorderBrush="Gray">
 			<DataGrid.Columns>
-				<DataGridTextColumn Header=""  Binding="{Binding IsSelected}"/>
-				<DataGridTextColumn Header="Path to file"  Binding="{Binding Path,Mode=OneTime}"/>
-				<DataGridTextColumn Header="Media Info" Binding="{Binding FirstVideoShortDesc,Mode=OneTime}"/>
+				<!--<DataGridTextColumn Header="" Binding="{Binding IsSelected}"/>-->
+				<DataGridCheckBoxColumn Header="Is Active" Binding="{Binding IsSelected}" IsReadOnly="False"/>
+				<DataGridTextColumn Header="Path to file"  Binding="{Binding Path,Mode=OneTime}" IsReadOnly="True" />
+				<DataGridTextColumn Header="Media Info" Binding="{Binding FirstVideoShortDesc,Mode=OneTime}" IsReadOnly="True" />
 			</DataGrid.Columns>
 		</DataGrid>
 
@@ -80,8 +81,11 @@
 		
 		<!--Button and check buttons-->
 		<StackPanel Grid.Row="3" Orientation="Horizontal">
-			<ToggleButton>
-			</ToggleButton>
+			<Button Content="Start" Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"/>
+			<Button Content="Stop" Command="{Binding ToggleOnOffPlotterPlotterCancelCommand,Mode=OneTime}"/>
+			<!--<ToggleSwitch OnContent="Stop" OffContent="Start" IsChecked="{Binding IsPlotterOn,Mode=TwoWay}" 
+						  Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"
+						  />-->
 			<Label Content="Plot view:" VerticalAlignment="Center" />
 			<RadioButton GroupName="PotViewGroupName" Content="Frame based" />
 			<RadioButton GroupName="PotViewGroupName" Content="Second based" />
