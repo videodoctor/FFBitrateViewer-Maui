@@ -66,7 +66,6 @@ public class FFProbePlotModel : PlotModel
     //   FFFF00 Yellow
     //   9ACD32 YellowGreen
 
-
     public static List<SerieStyle> PlotStyles = new() {
         new SerieStyle(OxyColors.ForestGreen),
         new SerieStyle(OxyColors.Red),
@@ -103,7 +102,9 @@ public class FFProbePlotModel : PlotModel
     };
 
     public string Name { get; set; }
+
     public PlotController Controller { get; private set; }
+
     public string PlotViewType { get; set; }
 
     public FFProbePlotModel(string name) : base()
@@ -174,12 +175,10 @@ public class FFProbePlotModel : PlotModel
         Controller = controller;
     }
 
-
     public void Redraw()
     {
         InvalidatePlot(true);
     }
-
 
     public bool AxisMaximumSet(int index, double? value = null)
     {
@@ -204,18 +203,15 @@ public class FFProbePlotModel : PlotModel
         return false;
     }
 
-
     public static string AxisXStringFormatBuild(double? duration)
     {
         return (duration == null || (double)duration < 60) ? "m:ss" : (((double)duration < 60 * 60) ? "mm:ss" : "h:mm:ss");
     }
 
-
     public void AxisXStringFormatSet()
     {
         Axes[0].StringFormat = AxisXStringFormatBuild(Axes[0].Maximum);
     }
-
 
     public bool AxisYTitleAndUnitSet(string? plotViewType)
     {
@@ -238,7 +234,6 @@ public class FFProbePlotModel : PlotModel
         return result;
     }
 
-
     public static string? AxisYTitleBuild(string? plotType)
     {
         return (plotType?.ToUpper() ?? "") switch
@@ -249,7 +244,6 @@ public class FFProbePlotModel : PlotModel
             _ => ""
         };
     }
-
 
     public static string? AxisYUnitBuild(string? plotType)
     {
@@ -262,25 +256,21 @@ public class FFProbePlotModel : PlotModel
         };
     }
 
-
     public void AxesRedraw()
     {
         for (int axisIndex = 0; axisIndex < Axes.Count; ++axisIndex) AxisRedraw(axisIndex);
     }
-
 
     public void AxisRedraw(int idx)
     {
         ((FFProbePlotModel)Axes[idx].PlotModel).Redraw();
     }
 
-
     public bool IsEmpty()
     {
         foreach (var serie in Series) if (((StairStepSeries)serie).Points.Count > 0) return false;
         return true;
     }
-
 
     //public StairStepSeries SerieCreate(FileItem file, int? idx)
     public StairStepSeries SerieCreate(string fileName, bool isFileEnabled, int? idx)
@@ -300,13 +290,11 @@ public class FFProbePlotModel : PlotModel
         return serie;
     }
 
-
     public StairStepSeries? SerieGet(int idx)
     {
         //return idx >=0 && idx < Series.Count ? (LineSeries)Series[idx] : null;
         return idx >= 0 && idx < Series.Count ? (StairStepSeries)Series[idx] : null;
     }
-
 
     public void SerieSet(int? idx, StairStepSeries? serie)
     {
@@ -323,7 +311,6 @@ public class FFProbePlotModel : PlotModel
         SerieStyleApply((int)idx);
     }
 
-
     public void SerieRedraw(int idx, bool? visible = null, bool force = false)
     {
         var serie = SerieGet(idx);
@@ -333,7 +320,6 @@ public class FFProbePlotModel : PlotModel
         if (changed || force) ((FFProbePlotModel)serie.PlotModel).Redraw();
     }
 
-
     public bool SeriePointAdd(int idx, double x, int y, int? pos = null)
     {
         var serie = SerieGet(idx);
@@ -342,18 +328,15 @@ public class FFProbePlotModel : PlotModel
         return true;
     }
 
-
     public void SeriePointsAdd(int idx, List<DataPoint> dataPoints)
     {
         SerieGet(idx)?.Points.AddRange(dataPoints);
     }
 
-
     public void SeriePointsClear(int idx)
     {
         SerieGet(idx)?.Points.Clear();
     }
-
 
     private static void SerieStyleApply(StairStepSeries serie, SerieStyle style)
     {
@@ -365,13 +348,11 @@ public class FFProbePlotModel : PlotModel
         //serie.MarkerResolution   = 10;
     }
 
-
     public void SerieStyleApply(int idx)
     {
         var serie = SerieGet(idx);
         if (serie != null) SerieStyleApply(serie, PlotStyles[idx]); // todo@ check idx range
     }
-
 
     public void PlotViewTypeSet(string plotViewType)
     {
@@ -379,12 +360,10 @@ public class FFProbePlotModel : PlotModel
         foreach (var serie in Series) serie.TrackerFormatString = TrackerFormatStringBuild();
     }
 
-
     private string TrackerFormatStringBuild()
     {
         return "{0}" + System.Environment.NewLine + "Time={2:hh\\:mm\\:ss\\.fff}" + System.Environment.NewLine + "{3}={4:0} " + AxisYUnitBuild(PlotViewType);
     }
-
 
     //public static IExporter GetExporter(string? ext = null)
     //{
