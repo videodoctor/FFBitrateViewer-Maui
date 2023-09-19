@@ -134,7 +134,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
                 await csvDataReader.ReadAsync(token);
 
                 var entryType = csvDataReader.GetString(0);
-                if (string.Compare(entryType, "packet", true) == 0)
+                if (string.Compare(entryType, "packet", true) != 0)
                 {
                     throw new FFProbeAppClientException($"Entry Type:{entryType} is not supported");
                 }
