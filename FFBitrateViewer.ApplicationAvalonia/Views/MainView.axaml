@@ -116,7 +116,8 @@
 		<!--Plot view-->
 		<Grid Grid.Row="4" >
 			<!-- The OxyPlot control is binding to a PlotModel in the MainViewModel -->
-			<OxyPlot_Avalonia:PlotView Model="{Binding Path=PlotModel}" Controller="{Binding Path=PlotModel.Controller}" />
+			<OxyPlot_Avalonia:PlotView Model="{Binding Path=PlotData}" />
+				<!--Controller="{Binding Path=PlotModel.Controller}"-->
 			<!-- The OxyPlot control is binding to a PlotModel in the MainViewModel -->
 			<!--<OxyPlot_Avalonia:PlotView Model="{Binding Path=PlotModel}" Controller="{Binding Path=PlotModel.Controller}" Padding="0,1,0,0" Margin="0" />-->
 		</Grid>
