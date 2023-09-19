@@ -9,6 +9,7 @@ using System;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -132,21 +133,33 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             for (int fileInfoIndex = 0; fileInfoIndex < fileInfoEntries.Count; fileInfoIndex++)
             {
                 var fileInfo = fileInfoEntries[fileInfoIndex];
-                const bool isFileSelected = true;
-                var filePath = fileInfo.Path.LocalPath;
-                var mediaInfo = await _ffprobeAppClient.GetMediaInfoAsync(filePath);
-                var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = isFileSelected };
+                var mediaInfo = await _ffprobeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath);
+                var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = true };
 
                 // Add file to Data Grid
                 Files.Add(fileItemViewModel);
+            }
+            SelectedFile = Files.LastOrDefault();
+            PlotModelData!.InvalidatePlot(updateData: false);
+        }
+
+        [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
+        private async Task ToggleOnOffPlotterPlotter(CancellationToken token)
+        {
+            PlotModelData!.Series.Clear();
+
+            var selectedFiles = Files.Where(f => f.IsSelected).ToImmutableArray();
+            for (int fileIndex = 0; fileIndex < selectedFiles.Length; fileIndex++)
+            {
+                token.ThrowIfCancellationRequested();
+                FileItemViewModel file = selectedFiles[fileIndex];
 
                 // Add Series to data grid
-                int idx = Files.Count - 1;
-                PlotModelData!.Series.Add(new OxyPlot.Series.StairStepSeries
+                var serie = new OxyPlot.Series.StairStepSeries
                 {
-                    IsVisible = isFileSelected,
+                    IsVisible = true,
                     StrokeThickness = 1.5,
-                    Title = filePath,
+                    Title = file.Path.LocalPath,
                     TrackerFormatString = TrackerFormatStringBuild,
                     Decimator = Decimator.Decimate,
                     LineJoin = LineJoin.Miter,
@@ -155,25 +168,34 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                     LineStyle = LineStyle.Solid,
                     MarkerType = MarkerType.None,
                     //Color = style.Color; 
-                });
+                };
+                PlotModelData!.Series.Add(serie);
 
-            }
-            SelectedFile = Files.LastOrDefault();
-            PlotModelData!.InvalidatePlot(true);
-        }
-
-        [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
-        private async Task ToggleOnOffPlotterPlotter(CancellationToken token)
-        {
-            var selectedFiles = Files.Where(f => f.IsSelected).ToImmutableArray();
-            for (int fileIndex = 0; fileIndex < selectedFiles.Length; fileIndex++)
-            {
-                token.ThrowIfCancellationRequested();
-
-                FileItemViewModel? file = selectedFiles[fileIndex];
+                // Request ffprobe information to create data points for serie
                 await foreach (var probePacket in _ffprobeAppClient.GetProbePackets(file.Path.LocalPath, token: token))
                 {
                     token.ThrowIfCancellationRequested();
+                    // TODO: We need to keep track of max duration per file and amogn all files
+                    //       In order to adjust: axis.AbsoluteMaximum = axis.Maximum 
+
+                    //return new Frame()
+                    //{
+                    //    Duration = (double)packet.DurationTime,
+                    //    FrameType = packet.Flags?.IndexOf("K") >= 0 ? FramePictType.I : null,
+                    //    IsOrdered = false, // 'Packets' returned by FFProbe are ordered by DTS, not PTS so will need to order them later when adding onto list
+                    //    Size = (int)packet.Size,
+                    //    StartTime = (double)packet.PTSTime
+                    //};
+
+
+                    var dataPoint = _plotViewType switch
+                    {
+                        PlotViewType.FrameBased => new DataPoint((probePacket.PTSTime ?? 0) - file.StartTime, Convert.ToDouble(probePacket.Size) / 1000.0),
+                        //PlotViewType.SecondBased => new DataPoint(),
+                        _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
+                    };
+
+                    serie.Points.Add(dataPoint);
                 }
             }
         }
