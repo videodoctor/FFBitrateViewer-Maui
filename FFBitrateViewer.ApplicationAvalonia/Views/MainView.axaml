@@ -131,13 +131,13 @@
 						LegendMargin="0"
 						LegendPadding="0"
 						LegendBorderThickness="0"
+						LegendBorder="Black"
 						
 					/>
 					<!--
 					ShowInvisibleSeries="false"
 					LegendFont            = "Arial" // todo@ Chineese characters not rendered correctly
 					LegendBackground      = OxyColor.FromAColor(200, OxyColors.White),
-					LegendBorder          = OxyColors.Black,
 					-->
 				</OxyPlot_Avalonia:Plot.Legends>
 				<OxyPlot_Avalonia:Plot.Axes>

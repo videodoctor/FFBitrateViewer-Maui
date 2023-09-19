@@ -52,17 +52,35 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         [RelayCommand]
         private async Task OnLoaded(CancellationToken token)
         {
+
             if (PlotControllerData == null)
             { throw new ApplicationException($"Application failed connecting to {nameof(PlotControllerData)}"); }
 
             if (PlotModelData == null)
             { throw new ApplicationException($"Application failed connecting to {nameof(PlotModelData)}"); }
 
+            var version = await _ffprobeAppClient.GetVersionAsync();
+            Version = $"{System.IO.Path.GetFileName(_ffprobeAppClient.FFProbeFilePath)} v{version}";
+
+            // setting up Plot View
             PlotControllerData.UnbindMouseDown(OxyMouseButton.Left);
             PlotControllerData.BindMouseEnter(PlotCommands.HoverSnapTrack);
 
-            var version = await _ffprobeAppClient.GetVersionAsync();
-            Version = $"{System.IO.Path.GetFileName(_ffprobeAppClient.FFProbeFilePath)} v{version}";
+            // TODO: Move to XAML when possible
+            #region Move to XAML when possible 
+            var legend = PlotModelData.Legends.FirstOrDefault();
+            if (legend != null)
+            {
+                legend.ShowInvisibleSeries = false;
+                legend.LegendBackground = OxyColor.FromAColor(200, OxyColors.White);
+            }
+            foreach (var axis in PlotModelData.Axes)
+            {
+                axis.MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139);
+                axis.MinorGridlineColor = OxyColor.FromArgb(20, 0, 0, 139);
+            } 
+            #endregion
+
         }
 
         [RelayCommand]
