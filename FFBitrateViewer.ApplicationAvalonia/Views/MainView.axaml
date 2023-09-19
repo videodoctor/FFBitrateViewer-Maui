@@ -116,7 +116,7 @@
 		</StackPanel>
 
 		<!--Plot view-->
-		<Grid Grid.Row="4" Background="CornflowerBlue" >
+		<Grid Grid.Row="4">
 			<!-- The OxyPlot control is binding to a PlotModel in the MainViewModel -->
 			<OxyPlot_Avalonia:Plot x:Name="PlotControl">
 				<!--
