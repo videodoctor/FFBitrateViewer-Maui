@@ -20,6 +20,9 @@ public partial class MainViewModel : ViewModelBase
 
     private bool _isPlotterOn = false;
 
+    [ObservableProperty]
+    private FileItemViewModel? _selectedFile;
+
     public ObservableCollection<FileItemViewModel> Files { get; } = new();
     public FFProbePlotModel PlotModel { get; } = new(string.Empty);
 

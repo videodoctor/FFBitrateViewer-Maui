@@ -7,6 +7,7 @@
              x:Class="FFBitrateViewer.ApplicationAvalonia.Views.MainView"
              x:DataType="vm:MainViewModel"
 			 xmlns:OxyPlot_Avalonia="clr-namespace:OxyPlot.Avalonia;assembly=OxyPlot.Avalonia"
+			 xmlns:pgc="clr-namespace:Avalonia.PropertyGrid.Controls;assembly=Avalonia.PropertyGrid"
 			 xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
 			 x:Name="MainViewUserControl"
@@ -58,19 +59,32 @@
 			<Button Content="Remove selected"/>
 		</StackPanel>
 
-		<DataGrid Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}"
-				  CanUserReorderColumns="True" 
+		<Grid Grid.Row="2" ColumnDefinitions="0.8*,4,0.2*">
+
+			<DataGrid Grid.Column="0" ItemsSource="{Binding Files,Mode=OneTime}"
+				  CanUserReorderColumns="True"
 				  CanUserResizeColumns="True"
 				  CanUserSortColumns="False"
 				  GridLinesVisibility="All"
-				  BorderThickness="1" BorderBrush="Gray">
-			<DataGrid.Columns>
-				<!--<DataGridTextColumn Header="" Binding="{Binding IsSelected}"/>-->
-				<DataGridCheckBoxColumn Header="Is Active" Binding="{Binding IsSelected}" IsReadOnly="False"/>
-				<DataGridTextColumn Header="Path to file"  Binding="{Binding Path,Mode=OneTime}" IsReadOnly="True" />
-				<DataGridTextColumn Header="Media Info" Binding="{Binding FirstVideoShortDesc,Mode=OneTime}" IsReadOnly="True" />
-			</DataGrid.Columns>
-		</DataGrid>
+				  BorderThickness="1" BorderBrush="Gray"
+				  SelectionMode="Single" SelectedItem="{Binding SelectedFile,Mode=TwoWay}"
+					  >
+				<DataGrid.Columns>
+					<!--<DataGridTextColumn Header="" Binding="{Binding IsSelected}"/>-->
+					<DataGridCheckBoxColumn Header="Is Active" Binding="{Binding IsSelected}" IsReadOnly="False"/>
+					<DataGridTextColumn Header="Path to file"  Binding="{Binding Path,Mode=OneTime}" IsReadOnly="True" />
+					<DataGridTextColumn Header="Media Info" Binding="{Binding FirstVideoShortDesc,Mode=OneTime}" IsReadOnly="True" />
+				</DataGrid.Columns>
+			</DataGrid>
+
+			<GridSplitter Grid.Column="1" ResizeDirection="Columns"/>
+
+
+			<ScrollViewer Grid.Column="2">
+				<pgc:PropertyGrid SelectedObject="{Binding SelectedFile}" />
+			</ScrollViewer>
+
+		</Grid>
 
 		<!--<DataGrid Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}"
 				  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
