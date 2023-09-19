@@ -9,7 +9,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
+namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
+{
 
 public partial class MainViewModel : ViewModelBase
 {
@@ -21,10 +22,16 @@ public partial class MainViewModel : ViewModelBase
     private bool _isPlotterOn = false;
 
     [ObservableProperty]
+        private bool _hasToAdjustFrameStartTime = false;
+
+        [ObservableProperty]
     private FileItemViewModel? _selectedFile;
 
     public ObservableCollection<FileItemViewModel> Files { get; } = new();
     public FFProbePlotModel PlotModel { get; } = new(string.Empty);
+
+
+        private PlotViewType _plotViewType = PlotViewType.FrameBased;
 
     private readonly AppProcessService _appProcessService = new();
     private readonly FileDialogService _fileDialogService = new();
@@ -39,6 +46,12 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
+        private void SetPlotViewType(PlotViewType plotViewType)
+        {
+            _plotViewType = plotViewType;
+        }
+
+        [RelayCommand]
     private async Task AddFiles(CancellationToken token)
     {
         var fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false);
@@ -83,4 +96,11 @@ public partial class MainViewModel : ViewModelBase
         _appProcessService.Exit();
     }
 
+}
+
+    public enum PlotViewType : int
+    {
+        FrameBased,
+        SecondBased
+    }
 }

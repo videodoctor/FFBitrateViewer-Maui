@@ -101,10 +101,16 @@
 						  Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"
 						  />-->
 			<Label Content="Plot view:" VerticalAlignment="Center" />
-			<RadioButton GroupName="PotViewGroupName" Content="Frame based" />
-			<RadioButton GroupName="PotViewGroupName" Content="Second based" />
+			<RadioButton GroupName="PotViewGroupName" Content="Frame based" IsChecked="True"
+						 Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
+						 CommandParameter="{x:Static vm:PlotViewType.FrameBased}"
+						 />
+			<RadioButton GroupName="PotViewGroupName" Content="Second based" IsChecked="False"
+						 Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
+						 CommandParameter="{x:Static vm:PlotViewType.SecondBased}"
+						 />
 			<Label Content="Adjust frame start time" VerticalAlignment="Center"/>
-			<CheckBox></CheckBox>
+			<CheckBox IsChecked="{Binding HasToAdjustFrameStartTime}"></CheckBox>
 		</StackPanel>
 
 		<!--Plot view-->
