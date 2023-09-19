@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Styling;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
@@ -96,7 +97,10 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                     Decimator = Decimator.Decimate,
                     LineJoin = LineJoin.Miter,
                     VerticalStrokeThickness = 0.5,
-                    VerticalLineStyle = LineStyle.Dash
+                    VerticalLineStyle = LineStyle.Dash,
+                    LineStyle = LineStyle.Solid,
+                    MarkerType = MarkerType.None,
+                    //Color = style.Color; 
                 });
 
             }
