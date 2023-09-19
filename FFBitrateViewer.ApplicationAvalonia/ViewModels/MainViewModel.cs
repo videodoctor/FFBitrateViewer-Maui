@@ -111,7 +111,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                     IsVisible = isFileSelected,
                     StrokeThickness = 1.5,
                     Title = filePath,
-                    TrackerFormatString = $@"{{0}}{Environment.NewLine}Time={{2:hh:mm:ss.fff}}{Environment.NewLine}{{3}}={{4:0}} {PlotViewTypeLabel}",
+                    TrackerFormatString = $@"{{0}}{Environment.NewLine}Time={{2:hh\:mm\:ss\.fff}}{Environment.NewLine}{{3}}={{4:0}} {PlotViewTypeLabel}",
                     Decimator = Decimator.Decimate,
                     LineJoin = LineJoin.Miter,
                     VerticalStrokeThickness = 0.5,
