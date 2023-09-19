@@ -30,9 +30,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
         public ObservableCollection<FileItemViewModel> Files { get; } = new();
 
-        public IPlotModel? PlotModelData { get; set; }
-
-        public IPlotController? PlotControllerData { get; set; }
+        public PlotModel? PlotModelData { get; set; }
+        public PlotController? PlotControllerData { get; set; }
 
         private PlotViewType _plotViewType = PlotViewType.FrameBased;
 
@@ -46,6 +45,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         {
             var version = await _ffprobeAppClient.GetVersionAsync();
             Version = $"{System.IO.Path.GetFileName(_ffprobeAppClient.FFProbeFilePath)} v{version}";
+
+            PlotControllerData.UnbindMouseDown(OxyMouseButton.Left);
+            PlotControllerData.BindMouseEnter(PlotCommands.HoverSnapTrack);
         }
 
         [RelayCommand]
@@ -71,6 +73,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
                 // Add Series to data grid
                 int idx = Files.Count - 1;
+
                 //PlotData. .SerieSet(null, PlotModel.SerieCreate(filePath, isFileSelected, idx));
                 //PlotModel.Redraw();
             }
