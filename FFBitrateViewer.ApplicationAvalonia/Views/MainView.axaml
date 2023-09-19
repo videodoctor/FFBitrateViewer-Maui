@@ -116,7 +116,11 @@
 		<!--Plot view-->
 		<Grid Grid.Row="4" Background="CornflowerBlue" >
 			<!-- The OxyPlot control is binding to a PlotModel in the MainViewModel -->
-			<OxyPlot_Avalonia:Plot>
+			<OxyPlot_Avalonia:Plot x:Name="PlotControl">
+				<!--
+				ActualModel="{Binding PlotModelData,Mode=OneWayToSource}"
+				ActualController="{Binding PlotControllerData,Mode=OneWayToSource}"
+				-->
 				<OxyPlot_Avalonia:Plot.Legends>
 					<OxyPlot_Avalonia:Legend
 						LegendPosition="BottomRight"
