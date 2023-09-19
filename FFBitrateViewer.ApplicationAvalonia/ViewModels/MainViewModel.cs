@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
 using OxyPlot;
+using OxyPlot.Legends;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -28,8 +29,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         private FileItemViewModel? _selectedFile;
 
         public ObservableCollection<FileItemViewModel> Files { get; } = new();
-        
-        public PlotModel PlotData { get; } = new();
+
+        public PlotModel PlotModelData { get; } = BuildPlotModel();
+        public PlotController PlotControllerData = BuildPlotController();
 
         private PlotViewType _plotViewType = PlotViewType.FrameBased;
 
@@ -68,7 +70,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
                 // Add Series to data grid
                 int idx = Files.Count - 1;
-                //PlotModel.SerieSet(null, PlotModel.SerieCreate(filePath, isFileSelected, idx));
+                //PlotData. .SerieSet(null, PlotModel.SerieCreate(filePath, isFileSelected, idx));
                 //PlotModel.Redraw();
             }
             SelectedFile = Files.LastOrDefault();
@@ -95,6 +97,26 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         {
             _appProcessService.Exit();
         }
+
+        private static PlotModel BuildPlotModel()
+        {
+            PlotModel plotModel = new();
+            return plotModel;
+        }
+
+        private static PlotController BuildPlotController()
+        {
+            // Customizing controller to show Graph ToolTip on mouse hover instead of mouse click
+            // https://stackoverflow.com/a/34899746/4655944
+
+            PlotController plotController = new();
+            plotController.UnbindMouseDown(OxyMouseButton.Left);
+            plotController.BindMouseEnter(PlotCommands.HoverSnapTrack);
+
+            return plotController;
+        }
+
+
 
     }
 

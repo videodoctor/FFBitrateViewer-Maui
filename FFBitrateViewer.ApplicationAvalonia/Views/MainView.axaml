@@ -92,7 +92,7 @@
 				  GridLinesVisibility="All"
 				  BorderThickness="1" BorderBrush="Gray">
 		</DataGrid>-->
-		
+
 		<!--Button and check buttons-->
 		<StackPanel Grid.Row="3" Orientation="Horizontal">
 			<Button Content="Start" Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"/>
@@ -114,10 +114,65 @@
 		</StackPanel>
 
 		<!--Plot view-->
-		<Grid Grid.Row="4" >
+		<Grid Grid.Row="4" Background="CornflowerBlue" >
 			<!-- The OxyPlot control is binding to a PlotModel in the MainViewModel -->
-			<OxyPlot_Avalonia:PlotView Model="{Binding Path=PlotData}" />
-				<!--Controller="{Binding Path=PlotModel.Controller}"-->
+			<OxyPlot_Avalonia:Plot>
+				<OxyPlot_Avalonia:Plot.Legends>
+					<OxyPlot_Avalonia:Legend
+						LegendPosition="BottomRight"
+						LegendPlacement="Outside"
+						LegendOrientation="Horizontal"
+						LegendMargin="0"
+						LegendPadding="0"
+						LegendBorderThickness="0"
+						
+					/>
+					<!--
+					ShowInvisibleSeries="false"
+					LegendFont            = "Arial" // todo@ Chineese characters not rendered correctly
+					LegendBackground      = OxyColor.FromAColor(200, OxyColors.White),
+					LegendBorder          = OxyColors.Black,
+					-->
+				</OxyPlot_Avalonia:Plot.Legends>
+				<OxyPlot_Avalonia:Plot.Axes>
+					<OxyPlot_Avalonia:TimeSpanAxis
+						AbsoluteMaximum="1"
+						AbsoluteMinimum="0"
+						Maximum="1"
+						Minimum="0"
+						MaximumPadding="0"
+						MinimumPadding="0"
+						MinimumRange="0.5"
+						MajorGridlineStyle="Solid"
+						MinorGridlineStyle="Dot"
+						Position="Bottom"
+						StringFormat="h:mm:ss"
+					/>
+					<!--
+					MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139),
+					MinorGridlineColor = OxyColor.FromArgb(20, 0, 0, 139),
+					-->
+					<OxyPlot_Avalonia:LinearAxis
+						AbsoluteMaximum="1"
+						AbsoluteMinimum="0"
+						Maximum="1"
+						Minimum="0"
+						MaximumPadding="0"
+						MinimumPadding="0"
+						MaximumDataMargin="5"
+						MinimumRange="1"
+						MajorGridlineStyle="Solid"
+						MinorGridlineStyle="Dot"
+						Position="Left"
+						Angle="270"
+						/>
+					<!--
+					MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139),
+					MinorGridlineColor = OxyColor.FromArgb(20, 0, 0, 139),
+					-->
+				</OxyPlot_Avalonia:Plot.Axes>
+			</OxyPlot_Avalonia:Plot>
+			<!--Controller="{Binding Path=PlotModel.Controller}"-->
 			<!-- The OxyPlot control is binding to a PlotModel in the MainViewModel -->
 			<!--<OxyPlot_Avalonia:PlotView Model="{Binding Path=PlotModel}" Controller="{Binding Path=PlotModel.Controller}" Padding="0,1,0,0" Margin="0" />-->
 		</Grid>
