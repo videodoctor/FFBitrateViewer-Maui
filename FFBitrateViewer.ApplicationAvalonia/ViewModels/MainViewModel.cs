@@ -55,6 +55,12 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
         private string TrackerFormatStringBuild => $@"{{0}}{Environment.NewLine}Time={{2:hh\:mm\:ss\.fff}}{Environment.NewLine}{{3}}={{4:0}} {AxisYUnitBuild}";
 
+        private string AxisXStringFormatBuild(double? duration) =>
+              (duration == null || duration.Value < 60) ? "m:ss"
+            : (duration.Value < 60 * 60) ? "mm:ss"
+            : "h:mm:ss"
+            ;
+
         private readonly AppProcessService _appProcessService = new();
         private readonly FileDialogService _fileDialogService = new();
         private readonly FFProbeAppClient _ffprobeAppClient = new();
@@ -91,11 +97,23 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                 axis.MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139);
                 axis.MinorGridlineColor = OxyColor.FromArgb(20, 0, 0, 139);
 
+                axis.AbsoluteMaximum = axis.Maximum = 1;
+                if (axisIndex == 0)
+                {
+                    axis.AbsoluteMaximum = axis.Maximum = 10;
+                    axis.StringFormat = AxisXStringFormatBuild(axis.Maximum);
+                }
                 if (axisIndex == 1)
                 {
                     axis.Title = AxisYTitleBuild;
                     axis.Unit = AxisYUnitBuild;
                 }
+
+            }
+            for (int serieIndex = 0; serieIndex < PlotModelData.Series.Count; serieIndex++)
+            {
+                OxyPlot.Series.Series? serie = PlotModelData.Series[serieIndex];
+                serie.TrackerFormatString = TrackerFormatStringBuild;
             }
             #endregion
 
