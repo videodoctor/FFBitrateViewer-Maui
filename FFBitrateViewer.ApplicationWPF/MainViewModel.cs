@@ -30,7 +30,7 @@ namespace FFBitrateViewer
         public CancellationTokenSource? cancellationTokenSource;
         private readonly Channel<bool> filesMediaInfoNotificationChannel = Channel.CreateUnbounded<bool>();
         private readonly ConcurrentQueue<FilesMediaInfoQueueItem> filesMediaInfoQueue = new();
-        private Task? filesBitRateInfoGetTask;
+        private readonly Task? filesBitRateInfoGetTask;
 
         public VersionInfo? VersionInfo { get { return Get<VersionInfo>(); } private set { Set(value); } }
         public ObservableCollection<FileItem> Files { get; private set; }
