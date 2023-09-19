@@ -4,6 +4,7 @@ using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
 using OxyPlot;
 using OxyPlot.Legends;
+using System;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -34,6 +35,13 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         public PlotController? PlotControllerData { get; set; }
 
         private PlotViewType _plotViewType = PlotViewType.FrameBased;
+        private string PlotViewTypeLabel => _plotViewType switch
+        {
+            PlotViewType.FrameBased => "kb",
+            PlotViewType.SecondBased => "kb/s",
+            PlotViewType.GOPBased => "kb/GOP",
+            _ => throw new NotImplementedException($"Label for PlotViewTypeLabel equals to {PlotViewTypeLabel} is not implemented.")
+        };
 
         private readonly AppProcessService _appProcessService = new();
         private readonly FileDialogService _fileDialogService = new();
@@ -73,11 +81,21 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
                 // Add Series to data grid
                 int idx = Files.Count - 1;
+                PlotModelData?.Series.Add(new OxyPlot.Series.StairStepSeries
+                {
+                    IsVisible = isFileSelected,
+                    StrokeThickness = 1.5,
+                    Title = filePath,
+                    TrackerFormatString = $@"{{0}}{Environment.NewLine}Time={{2:hh:mm:ss.fff}}{Environment.NewLine}{{3}}={{4:0}} {PlotViewTypeLabel}",
+                    Decimator = Decimator.Decimate,
+                    LineJoin = LineJoin.Miter,
+                    VerticalStrokeThickness = 0.5,
+                    VerticalLineStyle = LineStyle.Dash
+                });
 
-                //PlotData. .SerieSet(null, PlotModel.SerieCreate(filePath, isFileSelected, idx));
-                //PlotModel.Redraw();
             }
             SelectedFile = Files.LastOrDefault();
+            PlotModelData?.InvalidatePlot(true);
         }
 
         [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
@@ -107,6 +125,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
     public enum PlotViewType : int
     {
         FrameBased,
-        SecondBased
+        SecondBased,
+        GOPBased,
     }
 }
