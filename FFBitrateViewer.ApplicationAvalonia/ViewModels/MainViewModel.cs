@@ -45,10 +45,20 @@ public partial class MainViewModel : ViewModelBase
         for (int fileInfoIndex = 0; fileInfoIndex < fileInfoEntries.Count; fileInfoIndex++)
         {
             var fileInfo = fileInfoEntries[fileInfoIndex];
-            var mediaInfo = await _ffprobeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath);
-            var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo);
+            const bool isFileSelected = true;
+            var filePath = fileInfo.Path.LocalPath;
+            var mediaInfo = await _ffprobeAppClient.GetMediaInfoAsync(filePath);
+            var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = isFileSelected };
+
+            // Add file to Data Grid
             Files.Add(fileItemViewModel);
+
+            // Add Series to data grid
+            int idx = Files.Count - 1;
+            PlotModel.SerieSet(null, PlotModel.SerieCreate(filePath, isFileSelected, idx));
+            PlotModel.Redraw();
         }
+        SelectedFile = Files.LastOrDefault();
     }
 
     [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
