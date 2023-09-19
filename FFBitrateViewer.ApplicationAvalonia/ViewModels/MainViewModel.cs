@@ -51,11 +51,17 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         [RelayCommand]
         private async Task OnLoaded(CancellationToken token)
         {
-            var version = await _ffprobeAppClient.GetVersionAsync();
-            Version = $"{System.IO.Path.GetFileName(_ffprobeAppClient.FFProbeFilePath)} v{version}";
+            if (PlotControllerData == null)
+            { throw new ApplicationException($"Application failed connecting to {nameof(PlotControllerData)}"); }
+
+            if (PlotModelData == null)
+            { throw new ApplicationException($"Application failed connecting to {nameof(PlotModelData)}"); }
 
             PlotControllerData.UnbindMouseDown(OxyMouseButton.Left);
             PlotControllerData.BindMouseEnter(PlotCommands.HoverSnapTrack);
+
+            var version = await _ffprobeAppClient.GetVersionAsync();
+            Version = $"{System.IO.Path.GetFileName(_ffprobeAppClient.FFProbeFilePath)} v{version}";
         }
 
         [RelayCommand]
