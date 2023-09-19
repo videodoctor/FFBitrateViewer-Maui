@@ -36,13 +36,24 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         public PlotController? PlotControllerData { get; set; }
 
         private PlotViewType _plotViewType = PlotViewType.FrameBased;
-        private string PlotViewTypeLabel => _plotViewType switch
+
+        private string AxisYUnitBuild => _plotViewType switch
         {
             PlotViewType.FrameBased => "kb",
             PlotViewType.SecondBased => "kb/s",
             PlotViewType.GOPBased => "kb/GOP",
-            _ => throw new NotImplementedException($"Label for PlotViewTypeLabel equals to {PlotViewTypeLabel} is not implemented.")
+            _ => throw new NotImplementedException($"Text for {nameof(AxisYUnitBuild)} equals to {_plotViewType} is not implemented.")
         };
+
+        private string AxisYTitleBuild => _plotViewType switch
+        {
+            PlotViewType.FrameBased => "Frame size",
+            PlotViewType.SecondBased => "Bit rate",
+            PlotViewType.GOPBased => "Bit rate",
+            _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
+        };
+
+        private string TrackerFormatStringBuild => $@"{{0}}{Environment.NewLine}Time={{2:hh\:mm\:ss\.fff}}{Environment.NewLine}{{3}}={{4:0}} {AxisYUnitBuild}";
 
         private readonly AppProcessService _appProcessService = new();
         private readonly FileDialogService _fileDialogService = new();
@@ -74,11 +85,18 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                 legend.ShowInvisibleSeries = false;
                 legend.LegendBackground = OxyColor.FromAColor(200, OxyColors.White);
             }
-            foreach (var axis in PlotModelData.Axes)
+            for (int axisIndex = 0; axisIndex < PlotModelData.Axes.Count; axisIndex++)
             {
+                OxyPlot.Axes.Axis? axis = PlotModelData.Axes[axisIndex];
                 axis.MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139);
                 axis.MinorGridlineColor = OxyColor.FromArgb(20, 0, 0, 139);
-            } 
+
+                if (axisIndex == 1)
+                {
+                    axis.Title = AxisYTitleBuild;
+                    axis.Unit = AxisYUnitBuild;
+                }
+            }
             #endregion
 
         }
@@ -111,7 +129,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                     IsVisible = isFileSelected,
                     StrokeThickness = 1.5,
                     Title = filePath,
-                    TrackerFormatString = $@"{{0}}{Environment.NewLine}Time={{2:hh\:mm\:ss\.fff}}{Environment.NewLine}{{3}}={{4:0}} {PlotViewTypeLabel}",
+                    TrackerFormatString = TrackerFormatStringBuild,
                     Decimator = Decimator.Decimate,
                     LineJoin = LineJoin.Miter,
                     VerticalStrokeThickness = 0.5,
