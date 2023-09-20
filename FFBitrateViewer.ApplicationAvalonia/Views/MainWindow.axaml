@@ -6,6 +6,8 @@
         xmlns:views="clr-namespace:FFBitrateViewer.ApplicationAvalonia.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="FFBitrateViewer.ApplicationAvalonia.Views.MainWindow"
+		Height="620" MinHeight="540"
+        Width="960" MinWidth="700"
         Icon="/Assets/avalonia-logo.ico"
         Title="FFBitrateViewer.ApplicationAvalonia">
         <views:MainView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
