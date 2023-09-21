@@ -68,25 +68,37 @@ namespace FFBitrateViewer
         }
 
 
-        public void FramesGet(CancellationToken cancellationToken, Action<int?, Frame>? action = null)
+        public void FramesGet(CancellationToken cancellationToken, Action<int?, Frame>? action = null, string? filePath = null)
         {
             if (string.IsNullOrEmpty(FS)) return;
             IsDataLoading = true;
+            filePath ??= Path.Combine(Environment.CurrentDirectory, "frames.xxx");
+            filePath = Path.ChangeExtension(filePath, ".json");
+            using StreamWriter sw = new(File.Create(filePath));
+            sw.WriteLine('{');
 
+            sw.WriteLine(@"""frames"" : [");
             FF.FramesGet(FS, cancellationToken, o =>
             {
                 if (o is Frame frame)
                 {
                     var pos = Frames.Add(frame);
                     action?.Invoke(pos, frame);
+                    sw.WriteLine($"{Newtonsoft.Json.JsonConvert.SerializeObject(frame)},");
                 }
             });
+            sw.WriteLine("],");
 
             BitRatesCalc();
+            sw.WriteLine($@"""BitRateAvg"" : ""{BitRateAvg?.ToString(' ')}"",");
+            sw.WriteLine($@"""BitRateMax"" : ""{BitRateMax?.ToString(' ')}"",");
 
             FramesCount = Frames.Items.Count;
+            sw.WriteLine($@"""FramesCount"" : {FramesCount}");
 
             IsDataLoading = false;
+
+            sw.Write('}');
         }
 
 

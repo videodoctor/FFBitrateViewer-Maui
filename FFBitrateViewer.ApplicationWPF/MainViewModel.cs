@@ -275,7 +275,7 @@ namespace FFBitrateViewer
                         if (!file.IsExistsAndEnabled) continue;
                         file.FramesClear();
                         PlotSerieClear(idx);
-                        file.FramesGet(cancellationToken, (pos, frame) => { });
+                        file.FramesGet(cancellationToken, (pos, frame) => { }, file.FS);
 
                         if (PlotModel != null)
                         {
