@@ -98,7 +98,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
         double? DTSTime,
 
         [property: JsonPropertyName("duration")]
-        int? Duration,
+        double? Duration,
 
         [property: JsonPropertyName("duration_time")]
         double? DurationTime,

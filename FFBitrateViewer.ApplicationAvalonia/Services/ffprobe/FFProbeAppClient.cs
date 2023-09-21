@@ -124,9 +124,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             {
                 // Converts a CSV line to a Packet instance. Following is a sample line:
                 // [CSV format]
-                // packet,0.088000,N/A,0.033000,15368,K__
-                // [COMPAT format]
-                // packet|pts_time=0.088000|dts_time=N/A|duration_time=0.033000|size=15368|flags=K__
+                // packet,0.000000,N/A,0.016000,1186,K__
                 // [indexesfor the reader]
                 // 0      1                 2            3                      4          5
                 using var textReader = new StringReader(csvLine);
@@ -138,18 +136,29 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
                 {
                     throw new FFProbeAppClientException($"Entry Type:{entryType} is not supported");
                 }
+                //Index     Sample(csv)     ffprobe (Frame)
+                //0         packet,         
+                //1         0.000000,       PTSTime (Frame:StartTime)
+                //2         N / A,          
+                //3         0.016000,       DuratonTime (Frame:Duration)
+                //4         1186,           Size (Frame:Size)
+                //5         K__             Flag (Frame:Flags)
 
                 yield return new FFProbePacket
                 (
+                    // from CSV
+                    PTSTime: double.TryParse(csvDataReader.GetString(1), out var pstTime) ? pstTime : default,
+                    // csvDataReader.GetString(2)
+                    DurationTime: double.TryParse(csvDataReader.GetString(3), out var durationTime) ? durationTime : default,
+                    Size: int.TryParse(csvDataReader.GetString(4), out var size) ? size : default,
+                    Flags: csvDataReader.GetString(5),
+
+                    // defaul
                     CodecType: default,
                     DTS: default,
-                    DTSTime: double.TryParse(csvDataReader.GetString(2), out var dtsTime) ? dtsTime : default,
+                    DTSTime: default,
                     Duration: default,
-                    DurationTime: double.TryParse(csvDataReader.GetString(3), out var durationTime) ? durationTime : default,
-                    Flags: csvDataReader.GetString(5),
                     PTS: default,
-                    PTSTime: double.TryParse(csvDataReader.GetString(1), out var pstTime) ? pstTime : default,
-                    Size: int.TryParse(csvDataReader.GetString(4), out var size) ? size : default,
                     StreamIndex: default
                 );
             }
