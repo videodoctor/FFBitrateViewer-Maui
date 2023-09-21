@@ -1,15 +1,11 @@
-﻿using Avalonia.Styling;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
 using OxyPlot;
-using OxyPlot.Legends;
 using System;
-using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
