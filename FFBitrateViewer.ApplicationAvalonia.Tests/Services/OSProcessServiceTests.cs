@@ -1,6 +1,8 @@
 ﻿using FFBitrateViewer.ApplicationAvalonia.Services;
+using System.CommandLine.Parsing;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Channels;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Tests.Services
 {
@@ -47,6 +49,33 @@ namespace FFBitrateViewer.ApplicationAvalonia.Tests.Services
             // assert
             Assert.That(exitCode, Is.EqualTo(0));
             Assert.That(sb.ToString(), Is.EqualTo(unicodeMessage));
+        }
+
+        [Test]
+        public async Task CaptureUnicodeInStandardOutputChannel()
+        {
+            // arrange
+            var unicodeMessage = "Hello World 🌍 「世界、こんにちは。」";
+            var command = $@"dotnet {TestAppFilePath} echo ""{unicodeMessage}""";
+
+            // act
+            var commandStdOuputChannel = Channel.CreateUnbounded<string>();
+            var exitCode = await _OSProcessService.ExecuteAsync(
+                command,
+                standardOutputChannel: commandStdOuputChannel,
+                standardOutputEncoding: Encoding.Unicode
+            );
+
+            var sb = new StringBuilder();
+            await foreach (var data in commandStdOuputChannel.Reader.ReadAllAsync())
+            {
+                sb.Append(data);
+            }
+
+            // assert
+            Assert.That(exitCode, Is.EqualTo(0));
+            Assert.That(sb.ToString(), Is.EqualTo(unicodeMessage));
+
         }
 
         [Test]
