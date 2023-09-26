@@ -37,7 +37,11 @@ namespace FFBitrateViewer.ApplicationAvalonia.Tests.Services
 
             // act
             var sb = new StringBuilder();
-            var exitCode = await _OSProcessService.ExecuteAsync(command, standardOutputWriter: new StringWriter(sb));
+            var exitCode = await _OSProcessService.ExecuteAsync(
+                command, 
+                standardOutputWriter: new StringWriter(sb),
+                standardOutputEncoding: Encoding.Unicode
+                );
 
             // assert
             Assert.That(exitCode, Is.EqualTo(0));
