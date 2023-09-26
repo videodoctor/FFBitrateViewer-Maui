@@ -1,4 +1,5 @@
 ﻿using FFBitrateViewer.ApplicationAvalonia.Services;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Tests.Services
@@ -76,6 +77,20 @@ namespace FFBitrateViewer.ApplicationAvalonia.Tests.Services
             // assert
             Assert.That(taskCanceledException, Is.Not.Null);
             Assert.That(task.IsCanceled, Is.True);
+        }
+
+        [Test]
+        public void WhichFindDotNetCommand()
+        {
+            // arrange
+            var command = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "dotnet.exe" : "dotnet";
+
+            // act
+            var foundFilePaths = _OSProcessService.Which(command);
+
+            // assert
+            Assert.That(foundFilePaths, Is.Not.Null);
+            Assert.That(foundFilePaths.Any(), Is.True);
         }
     }
 }
