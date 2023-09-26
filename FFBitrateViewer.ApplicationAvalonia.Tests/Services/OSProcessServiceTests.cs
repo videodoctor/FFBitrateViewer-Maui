@@ -1,4 +1,5 @@
 ﻿using FFBitrateViewer.ApplicationAvalonia.Services;
+using System.Text;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Tests.Services
 {
@@ -25,6 +26,22 @@ namespace FFBitrateViewer.ApplicationAvalonia.Tests.Services
 
             // assert
             Assert.That(exitCode, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task CaptureUnicodeInStandardOutputWriter()
+        {
+            // arrange
+            var unicodeMessage = "Hello World 🌍 「世界、こんにちは。」";
+            var command = $@"dotnet {TestAppFilePath} echo ""{unicodeMessage}""";
+
+            // act
+            var sb = new StringBuilder();
+            var exitCode = await _OSProcessService.ExecuteAsync(command, standardOutputWriter: new StringWriter(sb));
+
+            // assert
+            Assert.That(exitCode, Is.EqualTo(0));
+            Assert.That(sb.ToString(), Is.EqualTo(unicodeMessage));
         }
 
         [Test]

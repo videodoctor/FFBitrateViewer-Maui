@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -23,6 +24,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             IDictionary<string, string?>? environmentOverrides = null,
             Channel<string>? standardOutputChannel = null,
             Channel<string>? standardErrorChannel = null,
+            Encoding? standardOutputEncoding = null,
+            Encoding? standardErrorEncoding = null,
+            Encoding? standardInputEncoding = null,
             CancellationToken token = default
             )
         {
@@ -30,7 +34,13 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             standardErrorWriter ??= TextWriter.Null;
             environmentOverrides ??= new Dictionary<string, string?>();
 
-            var process = GetNewProcessInstance(command, workingDirectory);
+            var process = GetNewProcessInstance(
+                command, 
+                workingDirectory,
+                standardOutputEncoding,
+                standardErrorEncoding,
+                standardInputEncoding
+            );
 
             _processes[process] = (standardOutputWriter, standardErrorWriter, standardOutputChannel, standardErrorChannel);
             foreach (var envVar in environmentOverrides)
@@ -99,7 +109,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
                 textWriter.Flush();
                 return;
             }
-            textWriter.WriteLine(dataReceivedEventArgs.Data);
+            textWriter.Write(dataReceivedEventArgs.Data);
 
             if (channel != null)
             {
@@ -115,7 +125,13 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             await WriteReceivedData(e, stdOutWriter, stdOutChannel);
         }
 
-        private Process GetNewProcessInstance(string command, string? workingDirectory = null)
+        private Process GetNewProcessInstance(
+            string command, 
+            string?  workingDirectory = null,
+            Encoding? standardOutputEncoding = null,
+            Encoding? standardErrorEncoding = null,
+            Encoding? standardInputEncoding = null
+        )
         {
             workingDirectory ??= Environment.CurrentDirectory;
 
@@ -126,6 +142,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             process.StartInfo.RedirectStandardInput = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.StandardOutputEncoding = standardOutputEncoding ??  Encoding.Unicode;
+            process.StartInfo.StandardErrorEncoding = standardErrorEncoding ??  Encoding.Unicode;
+            process.StartInfo.StandardInputEncoding = standardInputEncoding ?? Encoding.Unicode;
 
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -149,7 +168,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
                     process.StartInfo.ArgumentList.Add("Hidden");
                     process.StartInfo.ArgumentList.Add("-EncodedCommand");
 
-                    process.StartInfo.ArgumentList.Add(Convert.ToBase64String(System.Text.Encoding.Unicode.GetBytes($"{command}; exit $LASTEXITCODE")));
+                    process.StartInfo.ArgumentList.Add(Convert.ToBase64String(Encoding.Unicode.GetBytes($"{command}; exit $LASTEXITCODE")));
                 }
                 else if (cmdExeFilePaths.Any())
                 {
