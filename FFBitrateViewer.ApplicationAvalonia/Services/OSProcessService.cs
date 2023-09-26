@@ -148,7 +148,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
                     process.StartInfo.ArgumentList.Add("-WindowStyle");
                     process.StartInfo.ArgumentList.Add("Hidden");
                     process.StartInfo.ArgumentList.Add("-EncodedCommand");
-                    process.StartInfo.ArgumentList.Add(Convert.ToBase64String(System.Text.Encoding.Unicode.GetBytes(command)));
+
+                    process.StartInfo.ArgumentList.Add(Convert.ToBase64String(System.Text.Encoding.Unicode.GetBytes($"{command}; exit $LASTEXITCODE")));
                 }
                 else if (cmdExeFilePaths.Any())
                 {
