@@ -113,7 +113,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
             var commandStdOuputChannel = Channel.CreateUnbounded<string>();
             var command = $@"{FFProbeFilePath} -hide_banner -threads {threadCount} -print_format csv -loglevel fatal -show_error -select_streams v:{streamId} -show_entries packet=dts_time,duration_time,pts_time,size,flags ""{mediaFilePath}""";
-            var commandTask = _oSProcessService.ExecuteAsync(command, standardOutputChannel: commandStdOuputChannel, token: token);
+            var commandTask = _oSProcessService.ExecuteAsync(command, standardOutputChannel: commandStdOuputChannel, cancellationToken: token);
 
             var csvDataReaderOptions = new CsvDataReaderOptions
             { HasHeaders = false, };

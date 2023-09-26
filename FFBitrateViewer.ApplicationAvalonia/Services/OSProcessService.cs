@@ -27,7 +27,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             Encoding? standardOutputEncoding = null,
             Encoding? standardErrorEncoding = null,
             Encoding? standardInputEncoding = null,
-            CancellationToken token = default
+            CancellationToken cancellationToken = default
             )
         {
             standardOutputWriter ??= TextWriter.Null;
@@ -47,7 +47,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
                 standardErrorWriter, 
                 standardOutputChannel, 
                 standardErrorChannel,
-                token);
+                cancellationToken);
             foreach (var envVar in environmentOverrides)
             { process.StartInfo.Environment[envVar.Key] = environmentOverrides[envVar.Key]; }
 
@@ -62,7 +62,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
 
-            await process.WaitForExitAsync(token);
+            await process.WaitForExitAsync(cancellationToken);
             _processes.Remove(process);
 
             process.OutputDataReceived -= OnProcessOutputDataReceived;
@@ -103,14 +103,14 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
         private async void OnProcessErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             var process = (Process)sender;
-            var (_, stdErrWriter, _, stdErrChannel, token) = _processes[process];
+            var (_, stdErrWriter, _, stdErrChannel, cancellationToken) = _processes[process];
             
-            token.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
 
-            await WriteReceivedData(e, stdErrWriter, stdErrChannel, token);
+            await WriteReceivedData(e, stdErrWriter, stdErrChannel, cancellationToken);
         }
 
-        private static async Task WriteReceivedData(DataReceivedEventArgs dataReceivedEventArgs, TextWriter textWriter, Channel<string>? channel, CancellationToken token)
+        private static async Task WriteReceivedData(DataReceivedEventArgs dataReceivedEventArgs, TextWriter textWriter, Channel<string>? channel, CancellationToken cancellationToken)
         {
             if (dataReceivedEventArgs.Data == null)
             {
@@ -124,15 +124,15 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
                 await channel.Writer.WriteAsync(dataReceivedEventArgs.Data);
             }
 
-            token.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
         }
 
         private async void OnProcessOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             var process = (Process)sender;
-            var (stdOutWriter, _, stdOutChannel, _, token) = _processes[process];
-            token.ThrowIfCancellationRequested();
-            await WriteReceivedData(e, stdOutWriter, stdOutChannel, token);
+            var (stdOutWriter, _, stdOutChannel, _, cancellationToken) = _processes[process];
+            cancellationToken.ThrowIfCancellationRequested();
+            await WriteReceivedData(e, stdOutWriter, stdOutChannel, cancellationToken);
         }
 
         private Process GetNewProcessInstance(
