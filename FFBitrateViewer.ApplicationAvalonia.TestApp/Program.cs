@@ -22,9 +22,16 @@ public class Program
         exitCommand.AddArgument(exitCodeArgument);
         exitCommand.SetHandler(Environment.Exit, exitCodeArgument);
 
+        // sleep command
+        var sleepCommand = new Command("sleep", "Sleeps for the specified number of seconds");
+        var sleepSecondsArgument = new Argument<int>(name: "seconds", description: "Number of seconds to sleep", getDefaultValue: () => 1);
+        sleepCommand.AddArgument(sleepSecondsArgument);
+        sleepCommand.SetHandler(async (seconds) => await Task.Delay(TimeSpan.FromSeconds(seconds)), sleepSecondsArgument);
+
         var rootCommand = new RootCommand {
             echoCommand,
-            exitCommand
+            exitCommand,
+            sleepCommand
         };
         await rootCommand.InvokeAsync(args);
     }
