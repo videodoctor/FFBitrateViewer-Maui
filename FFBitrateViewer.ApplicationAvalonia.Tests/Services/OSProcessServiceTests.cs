@@ -38,7 +38,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Tests.Services
             // act
             var sb = new StringBuilder();
             var exitCode = await _OSProcessService.ExecuteAsync(
-                command, 
+                command,
                 standardOutputWriter: new StringWriter(sb),
                 standardOutputEncoding: Encoding.Unicode
                 );
@@ -59,6 +59,23 @@ namespace FFBitrateViewer.ApplicationAvalonia.Tests.Services
 
             // assert
             Assert.That(exitCode, Is.EqualTo(42));
+        }
+
+        [Test]
+        public void CancellationProcessStopsProcessing()
+        {
+            // arrange
+            var command = $"dotnet {TestAppFilePath} sleep 60";
+            var cancellationTokenSource = new CancellationTokenSource();
+
+            // act
+            var task = _OSProcessService.ExecuteAsync(command, cancellationToken: cancellationTokenSource.Token);
+            cancellationTokenSource.CancelAfter(1000);
+            var taskCanceledException = Assert.ThrowsAsync<TaskCanceledException>(async () => await task);
+
+            // assert
+            Assert.That(taskCanceledException, Is.Not.Null);
+            Assert.That(task.IsCanceled, Is.True);
         }
     }
 }
