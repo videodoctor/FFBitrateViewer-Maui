@@ -142,9 +142,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             process.StartInfo.RedirectStandardInput = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.StandardOutputEncoding = standardOutputEncoding ??  Encoding.Unicode;
-            process.StartInfo.StandardErrorEncoding = standardErrorEncoding ??  Encoding.Unicode;
-            process.StartInfo.StandardInputEncoding = standardInputEncoding ?? Encoding.Unicode;
+            process.StartInfo.StandardOutputEncoding = standardOutputEncoding;
+            process.StartInfo.StandardErrorEncoding = standardErrorEncoding;
+            process.StartInfo.StandardInputEncoding = standardInputEncoding;
 
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -168,6 +168,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
                     process.StartInfo.ArgumentList.Add("Hidden");
                     process.StartInfo.ArgumentList.Add("-EncodedCommand");
 
+                    // NOTE: Appending exit $LASTEXITCODE to the command to get the exit code of the command
+                    // https://stackoverflow.com/questions/50200325/returning-an-exit-code-from-a-powershell-script
                     process.StartInfo.ArgumentList.Add(Convert.ToBase64String(Encoding.Unicode.GetBytes($"{command}; exit $LASTEXITCODE")));
                 }
                 else if (cmdExeFilePaths.Any())
