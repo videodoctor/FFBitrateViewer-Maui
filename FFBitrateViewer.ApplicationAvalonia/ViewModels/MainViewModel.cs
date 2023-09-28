@@ -5,6 +5,7 @@ using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
 using OxyPlot;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -142,19 +143,16 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
         private async Task ToggleOnOffPlotterPlotter(CancellationToken token)
         {
-            await Task.Yield();
+            PlotModelData!.Series.Clear();
 
-            ThreadPool.QueueUserWorkItem(async _ =>
+            for (int fileIndex = 0; fileIndex < Files.Count; fileIndex++)
             {
-                PlotModelData!.Series.Clear();
+                var file = Files[fileIndex];
+                if (!file.IsSelected) { continue; }
+                await ProcessFileAsync(file, token);
+            }
 
-                var tasks = Files
-                    .Where(f => f.IsSelected)
-                    .Select(file => ProcessFileAsync(file, token));
-
-                await Task.WhenAll(tasks);
-                PlotModelData!.InvalidatePlot(updateData: true);
-            });
+            PlotModelData!.InvalidatePlot(updateData: true);
 
         }
 
@@ -165,7 +163,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             {
                 IsVisible = true,
                 StrokeThickness = 1.5,
-                Title = file.Path.LocalPath,
+                Title = Path.GetFileName(file.Path.LocalPath),
                 TrackerFormatString = TrackerFormatStringBuild,
                 Decimator = Decimator.Decimate,
                 LineJoin = LineJoin.Miter,
@@ -175,7 +173,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                 MarkerType = MarkerType.None,
                 //Color = style.Color; 
             };
-            
+
 
             // Request ffprobe information to create data points for serie
             await foreach (var probePacket in _ffprobeAppClient.GetProbePackets(file.Path.LocalPath, token: token))
