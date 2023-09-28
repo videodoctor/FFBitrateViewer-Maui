@@ -122,7 +122,7 @@ internal class OSProcessServiceTests
     }
 
     [Test]
-    public async Task EnvironmentOverrides()
+    public async Task OverridesEnvironmentVariables()
     {
         // arrange
         var command = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "echo $env:PATH" : "echo $PATH";
@@ -134,7 +134,7 @@ internal class OSProcessServiceTests
         var exitCode = await _OSProcessService.ExecuteAsync(
             command,
             standardOutputWriter: sw,
-            environmentOverrides: new Dictionary<string, string?> {
+            environmentVariablesOverrides: new Dictionary<string, string?> {
                 { "PATH", customPath }
             });
 
