@@ -32,7 +32,7 @@ public class Program
         var envCountCommand = new Command("count", "Command to count environmental variables");
         envCountCommand.SetHandler(() => Console.WriteLine(Environment.GetEnvironmentVariables().Count));
         var envNamesCommand = new Command("names", "Command to list environmental variable names");
-        envNamesCommand.SetHandler(() => Console.WriteLine(string.Join(Environment.NewLine, Environment.GetEnvironmentVariables().Keys)));
+        envNamesCommand.SetHandler(() => Console.WriteLine(string.Join(Environment.NewLine, Environment.GetEnvironmentVariables().Keys.OfType<string>())));
         var envCommand = new Command("env", "Command to related to environmental variables") {
             envCountCommand,
             envNamesCommand

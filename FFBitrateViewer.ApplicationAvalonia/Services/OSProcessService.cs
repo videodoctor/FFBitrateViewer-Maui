@@ -26,7 +26,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             Encoding? standardOutputEncoding = null,
             Encoding? standardErrorEncoding = null,
             Encoding? standardInputEncoding = null,
-            IEnumerable<string>? surrenderableEnvironmentalVariables = null,
+            IEnumerable<string>? retainedEnvironmentalVariables = null,
             IDictionary<string, string?>? surrogateEnvironmentalVariables = null,
             CancellationToken cancellationToken = default
             )
@@ -50,10 +50,10 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
                 standardErrorChannel,
                 cancellationToken);
 
-            if (surrenderableEnvironmentalVariables != null)
+            if (retainedEnvironmentalVariables != null)
             {
                 var keysToRemove = process.StartInfo.Environment.Keys
-                    .Where(key => !surrenderableEnvironmentalVariables.Contains(key));
+                    .Where(key => !retainedEnvironmentalVariables.Contains(key));
                 foreach (var key in keysToRemove)
                 {
                     process.StartInfo.Environment.Remove(key);
