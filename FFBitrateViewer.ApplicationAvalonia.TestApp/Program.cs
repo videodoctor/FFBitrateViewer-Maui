@@ -7,14 +7,14 @@ public class Program
     private static async Task Main(string[] args)
     {
         // enabling unicode code characters for input/output
-        Console.OutputEncoding = Encoding.Unicode;
-        Console.InputEncoding = Encoding.Unicode;
+        Console.OutputEncoding = Encoding.UTF8;
+        Console.InputEncoding = Encoding.UTF8;
 
         // echo command
         var echoCommand = new Command("echo", "Echos the first argument");
         var echoMessageArgument = new Argument<string>(name: "message", description: "Message to echo", getDefaultValue: () => string.Empty);
         echoCommand.AddArgument(echoMessageArgument);
-        echoCommand.SetHandler(Console.WriteLine, echoMessageArgument);
+        echoCommand.SetHandler(msg => Console.WriteLine("{0}", msg), echoMessageArgument);
 
         // exit command
         var exitCommand = new Command("exit", "Exits the application");
@@ -28,10 +28,22 @@ public class Program
         sleepCommand.AddArgument(sleepSecondsArgument);
         sleepCommand.SetHandler(async (seconds) => await Task.Delay(TimeSpan.FromSeconds(seconds)), sleepSecondsArgument);
 
+        // env command
+        var envCountCommand = new Command("count", "Command to count environmental variables");
+        envCountCommand.SetHandler(() => Console.WriteLine(Environment.GetEnvironmentVariables().Count));
+        var envNamesCommand = new Command("names", "Command to list environmental variable names");
+        envNamesCommand.SetHandler(() => Console.WriteLine(string.Join(Environment.NewLine, Environment.GetEnvironmentVariables().Keys)));
+        var envCommand = new Command("env", "Command to related to environmental variables") {
+            envCountCommand,
+            envNamesCommand
+        };
+
+
         var rootCommand = new RootCommand {
             echoCommand,
             exitCommand,
-            sleepCommand
+            sleepCommand,
+            envCommand
         };
         await rootCommand.InvokeAsync(args);
     }
