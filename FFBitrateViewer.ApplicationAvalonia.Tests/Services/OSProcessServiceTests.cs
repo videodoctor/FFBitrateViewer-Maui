@@ -120,4 +120,26 @@ internal class OSProcessServiceTests
         Assert.That(foundFilePaths, Is.Not.Null);
         Assert.That(foundFilePaths.Any(), Is.True);
     }
+
+    [Test]
+    public async Task EnvironmentOverrides()
+    {
+        // arrange
+        var command = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "echo $env:PATH" : "echo $PATH";
+        var customPath = $"{Path.PathSeparator}:.{Path.DirectorySeparatorChar}";
+
+        // act
+        var sb = new StringBuilder();
+        using var sw = new StringWriter(sb);
+        var exitCode = await _OSProcessService.ExecuteAsync(
+            command,
+            standardOutputWriter: sw,
+            environmentOverrides: new Dictionary<string, string?> {
+                { "PATH", customPath }
+            });
+
+        // assert
+        Assert.That(exitCode, Is.EqualTo(0));
+        Assert.That(sb.ToString().Trim(), Is.EqualTo(customPath));
+    }
 }
