@@ -26,13 +26,14 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             Encoding? standardOutputEncoding = null,
             Encoding? standardErrorEncoding = null,
             Encoding? standardInputEncoding = null,
-            IDictionary<string, string?>? environmentVariablesOverrides = null,
+            IEnumerable<string>? surrenderableEnvironmentalVariables = null,
+            IDictionary<string, string?>? surrogateEnvironmentalVariables = null,
             CancellationToken cancellationToken = default
             )
         {
             standardOutputWriter ??= TextWriter.Null;
             standardErrorWriter ??= TextWriter.Null;
-            environmentVariablesOverrides ??= new Dictionary<string, string?>();
+            surrogateEnvironmentalVariables ??= new Dictionary<string, string?>();
 
             var process = GetNewProcessInstance(
                 command, 
@@ -49,8 +50,18 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
                 standardErrorChannel,
                 cancellationToken);
 
-            foreach (var envVar in environmentVariablesOverrides)
-            { process.StartInfo.Environment[envVar.Key] = environmentVariablesOverrides[envVar.Key]; }
+            if (surrenderableEnvironmentalVariables != null)
+            {
+                var keysToRemove = process.StartInfo.Environment.Keys
+                    .Where(key => !surrenderableEnvironmentalVariables.Contains(key));
+                foreach (var key in keysToRemove)
+                {
+                    process.StartInfo.Environment.Remove(key);
+                }
+            }
+
+            foreach (var envVar in surrogateEnvironmentalVariables)
+            { process.StartInfo.Environment[envVar.Key] = surrogateEnvironmentalVariables[envVar.Key]; }
 
             process.OutputDataReceived += OnProcessOutputDataReceived;
             process.ErrorDataReceived += OnProcessErrorDataReceived;

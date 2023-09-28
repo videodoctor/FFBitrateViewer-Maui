@@ -42,7 +42,7 @@ internal class OSProcessServiceTests
         var exitCode = await _OSProcessService.ExecuteAsync(
             command,
             standardOutputWriter: new StringWriter(sb),
-            standardOutputEncoding: Encoding.Unicode
+            standardOutputEncoding: Encoding.UTF8
             );
 
         // assert
@@ -62,7 +62,7 @@ internal class OSProcessServiceTests
         var exitCode = await _OSProcessService.ExecuteAsync(
             command,
             standardOutputChannel: commandStdOuputChannel,
-            standardOutputEncoding: Encoding.Unicode
+            standardOutputEncoding: Encoding.UTF8
         );
 
         var sb = new StringBuilder();
@@ -134,7 +134,7 @@ internal class OSProcessServiceTests
         var exitCode = await _OSProcessService.ExecuteAsync(
             command,
             standardOutputWriter: sw,
-            environmentVariablesOverrides: new Dictionary<string, string?> {
+            surrogateEnvironmentalVariables: new Dictionary<string, string?> {
                 { "PATH", customPath }
             });
 
@@ -142,4 +142,5 @@ internal class OSProcessServiceTests
         Assert.That(exitCode, Is.EqualTo(0));
         Assert.That(sb.ToString().Trim(), Is.EqualTo(customPath));
     }
+
 }
