@@ -36,6 +36,14 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         [ObservableProperty]
         private string _firstVideoShortDesc = string.Empty;
 
+        [ObservableProperty]
+        private double _bitRateAverage = double.NaN;
+
+        [ObservableProperty]
+        private double _bitRageMaximum = double.NaN;
+
+        public List<FFProbePacket> Frames { get; } = new();
+
         public List<VideoStream> VideoStreams { get; } = new();
         public List<AudioStream> AudioStreams { get; } = new();
         public List<SubtitleStream> SubtitleStreams { get; } = new();
@@ -87,6 +95,26 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             }
 
             FirstVideoShortDesc = VideoStreams.FirstOrDefault()?.ToString(VideoStreamToStringMode.SHORT) ?? string.Empty;
+        }
+
+        public void RefreshBitRateAverage(bool isAdjustmentStartTime = false, double startTime = 0.0)
+        {
+            var bitRateAverage = GetAverageBitRate(isAdjustmentStartTime, startTime);
+            if (double.IsNaN(bitRateAverage))
+            { return; }
+            BitRateAverage = double.Round(bitRateAverage / 1000);
+        }
+
+        public double GetAverageBitRate(bool isAdjustmentStartTime = false, double startTime = 0.0)
+        {
+            if (Frames.Count == 0)
+            { return double.NaN; }
+
+            double adjustment = isAdjustmentStartTime ? startTime : 0;
+            double duration = Frames[^1].PTSTime ?? 0 + Frames[^1].DurationTime ?? 0 - adjustment;
+
+            var bitrateAverage = Frames.Sum(f => f.Size) / duration * 8;
+            return bitrateAverage ?? double.NaN;
         }
     }
 
