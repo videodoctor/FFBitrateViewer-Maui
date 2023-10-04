@@ -40,9 +40,11 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         private double _bitRateAverage = double.NaN;
 
         [ObservableProperty]
-        private double _bitRageMaximum = double.NaN;
+        private double _bitRateMaximum = double.NaN;
 
         public List<FFProbePacket> Frames { get; } = new();
+
+        //public List<double> BitRates { get; } = new();
 
         public List<VideoStream> VideoStreams { get; } = new();
         public List<AudioStream> AudioStreams { get; } = new();
@@ -99,22 +101,125 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
         public void RefreshBitRateAverage(bool isAdjustmentStartTime = false, double startTime = 0.0)
         {
-            var bitRateAverage = GetAverageBitRate(isAdjustmentStartTime, startTime);
+            var bitRateAverage = GetAverageBitRate(
+                Frames,
+                isAdjustmentStartTime,
+                startTime
+            );
+
             if (double.IsNaN(bitRateAverage))
             { return; }
+
             BitRateAverage = double.Round(bitRateAverage / 1000);
         }
 
-        public double GetAverageBitRate(bool isAdjustmentStartTime = false, double startTime = 0.0)
+        public double GetAverageBitRate(
+            IList<FFProbePacket> frames,
+            bool isAdjustmentStartTime = false,
+            double startTime = 0.0)
         {
-            if (Frames.Count == 0)
+            if (frames.Count == 0)
             { return double.NaN; }
 
             double adjustment = isAdjustmentStartTime ? startTime : 0;
-            double duration = Frames[^1].PTSTime ?? 0 + Frames[^1].DurationTime ?? 0 - adjustment;
+            double duration = frames[^1].PTSTime ?? 0 + frames[^1].DurationTime ?? 0 - adjustment;
 
-            var bitrateAverage = Frames.Sum(f => f.Size) / duration * 8;
+            var bitrateAverage = frames.Sum(f => f.Size) / duration * 8;
             return bitrateAverage ?? double.NaN;
+        }
+
+        public void RefreshBitRateMaximum(
+            double intervalDuration = 1,
+            double intervalStartTime = 0
+        )
+        {
+            var bitrates = GetBitRates(Frames, intervalDuration, intervalStartTime);
+
+            if (bitrates.Count == 0)
+            { return; }
+
+            BitRateMaximum = bitrates.Max() / 1000;
+        }
+
+        public ICollection<int> GetBitRates(
+            IList<FFProbePacket> frames,
+            double intervalDuration = 1,
+            double intervalStartTime = 0
+        )
+        {
+            if (frames.Count == 0 || intervalDuration == 0)
+            { return Array.Empty<int>(); }
+
+            int bitrate;
+            double intervalSize = 0;
+            double nextIntervalSize = 0;
+
+            var indexes = new List<int>();
+            var bitrates = new List<int>();
+
+            for (int frameNumber = 0; frameNumber < frames.Count; ++frameNumber)
+            {
+                bitrates.Add(0);
+                var frame = frames[frameNumber];
+                double duration = frame.DurationTime ?? 0;
+                double size = frame.Size ?? 0;
+                double startTime = frame.PTSTime ?? 0;
+
+                // The packet is longer than interval
+                if (duration > intervalDuration)
+                {
+                    // => 2
+                    int fullIntervalsCount = (int)double.Truncate(duration / intervalDuration);
+                    // => x * 10 / 25
+                    int sizePerFullInterval = (int)double.Round(size * intervalDuration / duration);
+                    // => 5
+                    duration %= intervalDuration;
+                    size -= fullIntervalsCount * sizePerFullInterval;
+                    startTime += fullIntervalsCount * intervalDuration;
+
+                    // todo@ Show it somehow
+                    //if (sizePerFullInterval > max) max = sizePerFullInterval; 
+                }
+
+                if (startTime > (intervalStartTime + intervalDuration))
+                {
+                    // A new interval is just started
+                    // Updating BitRate for frames in prev. interval
+                    bitrate = (int)double.Round(intervalSize / intervalDuration * 8);
+                    foreach (var index in indexes)
+                    { bitrates[index] = bitrate; }
+                    //{ frames[index].BitRate = bitrate; }
+                    indexes.Clear();
+
+                    //if (intervalSize > max) max = intervalSize;
+                    intervalStartTime += intervalDuration;
+                    intervalSize = nextIntervalSize;
+                }
+
+                if ((startTime + duration) < (intervalStartTime + intervalDuration))
+                {
+                    // The packet is ended in the current interval, so its size is fully accounted to current interval
+                    intervalSize += size;
+                    nextIntervalSize = 0;
+                }
+                else
+                {
+                    // The packet is ended in the next interval, so only part of the packet's size is accounted to size of the current interval
+                    int sizeForPart = (int)double.Round(size * ((intervalStartTime + intervalDuration) - startTime) / intervalDuration);
+                    intervalSize += sizeForPart;
+                    nextIntervalSize = size - sizeForPart;
+                }
+                indexes.Add(frameNumber);
+            }
+
+            //if (intervalSize > max) max = intervalSize; // last part
+            bitrate = (int)double.Round(intervalSize / intervalDuration * 8);
+            foreach (var index in indexes)
+            { bitrates[index] = bitrate; }
+            //{ frames[index].BitRate = bitrate; }
+            indexes.Clear();
+
+            return bitrates;
         }
     }
 

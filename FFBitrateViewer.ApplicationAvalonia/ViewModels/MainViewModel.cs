@@ -205,6 +205,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                 serie.Points.Add(dataPoint);
             }
             file.RefreshBitRateAverage();
+            file.RefreshBitRateMaximum();
             PlotModelData!.Series.Add(serie);
         }
 
