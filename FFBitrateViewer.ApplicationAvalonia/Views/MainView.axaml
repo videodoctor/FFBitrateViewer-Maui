@@ -132,6 +132,7 @@
 						LegendPadding="0"
 						LegendBorderThickness="0"
 						LegendBorder="Black"
+						LegendBackground="Gray"
 						
 					/>
 					<!--
@@ -142,9 +143,9 @@
 				</OxyPlot_Avalonia:Plot.Legends>
 				<OxyPlot_Avalonia:Plot.Axes>
 					<OxyPlot_Avalonia:TimeSpanAxis
-						AbsoluteMaximum="1"
+						AbsoluteMaximum="10"
 						AbsoluteMinimum="0"
-						Maximum="1"
+						Maximum="10"
 						Minimum="0"
 						MaximumPadding="0"
 						MinimumPadding="0"
@@ -152,7 +153,9 @@
 						MajorGridlineStyle="Solid"
 						MinorGridlineStyle="Dot"
 						Position="Bottom"
-						StringFormat="h:mm:ss"
+						StringFormat="mm:ss"
+						MajorGridlineColor="CornFlowerBlue"
+						MinorGridlineColor="LightBlue"
 					/>
 					<!--
 					MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139),
@@ -171,6 +174,8 @@
 						MinorGridlineStyle="Dot"
 						Position="Left"
 						Angle="270"
+						MajorGridlineColor="CornFlowerBlue"
+						MinorGridlineColor="LightBlue"
 						/>
 					<!--
 					MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139),
