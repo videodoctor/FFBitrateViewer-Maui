@@ -4,6 +4,7 @@ using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
 using OxyPlot;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -145,18 +146,36 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         {
             PlotModelData!.Series.Clear();
 
+            double maxDuration = -1.0;
+            var series = new List<OxyPlot.Series.StairStepSeries>(Files.Count);
             for (int fileIndex = 0; fileIndex < Files.Count; fileIndex++)
             {
                 var file = Files[fileIndex];
                 if (!file.IsSelected) { continue; }
-                await ProcessFileAsync(file, token);
+                var serie = await GetSerie(file, token);
+                series.Add(serie);
+
+                // Computes axis x based on max duration
+                var fileDuration = file.GetDuration();
+                if (fileDuration != null && fileDuration.Value > maxDuration)
+                { maxDuration = fileDuration.Value; }
             }
 
+            // Adjust axis x based on max duration
+            if (maxDuration > 0)
+            {
+                var axisX = PlotModelData.Axes[0];
+                axisX.AbsoluteMaximum = axisX.Maximum = maxDuration;
+                axisX.StringFormat = AxisXStringFormatBuild(maxDuration);
+            }
+
+
+            series.ForEach(PlotModelData!.Series.Add);
             PlotModelData!.InvalidatePlot(updateData: true);
 
         }
 
-        private async Task ProcessFileAsync(FileItemViewModel file, CancellationToken token)
+        private async Task<OxyPlot.Series.StairStepSeries> GetSerie(FileItemViewModel file, CancellationToken token)
         {
             // Add Series to data grid
             var fileName = Path.GetFileName(file.Path.LocalPath);
@@ -204,9 +223,11 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
                 serie.Points.Add(dataPoint);
             }
+
             file.RefreshBitRateAverage();
             file.RefreshBitRateMaximum();
-            PlotModelData!.Series.Add(serie);
+
+            return serie;
         }
 
         [RelayCommand]

@@ -122,10 +122,63 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             { return double.NaN; }
 
             double adjustment = isAdjustmentStartTime ? startTime : 0;
-            double duration = frames[^1].PTSTime ?? 0 + frames[^1].DurationTime ?? 0 - adjustment;
+            var duration = GetDurationFromFrames(frames, adjustment);
 
             var bitrateAverage = frames.Sum(f => f.Size) / duration * 8;
             return bitrateAverage ?? double.NaN;
+        }
+
+        private double? GetDurationFromFrames(IList<FFProbePacket> frames, double adjustment = 0)
+        {
+            if (frames.Count == 0)
+            { return null; }
+            return frames[^1].PTSTime ?? 0 + frames[^1].DurationTime ?? 0 - adjustment;
+        }
+
+        public double? GetDurationFromStream(IList<VideoStream> videoStreams)
+        {
+            if (videoStreams.Count == 0 || videoStreams[0] == null)
+            { return null; }
+            var video0 = videoStreams[0];
+            return (video0.Duration > 0) ? (video0.Duration - (video0.StartTime ?? 0)) : null;
+        }
+
+        public double? GetDurationFromFileInfo(FFProbeJsonOutput mediaInfo)
+        {
+            if (mediaInfo == null)
+            { return null; }
+
+            var mediaInfoDuration = GetDurationFromStreams(mediaInfo);
+            var startTime = mediaInfo.Format?.StartTime ?? 0;
+
+            return (mediaInfoDuration > 0) ? (mediaInfoDuration - startTime) : null;
+        }
+
+        public double? GetDurationFromStreams(FFProbeJsonOutput ffProbeOutput)
+        {
+            if (ffProbeOutput == null)
+            { return null; }
+
+            if (ffProbeOutput.Format?.Duration != null)
+            { return ffProbeOutput.Format.Duration.Value; }
+
+            if (ffProbeOutput.Streams != null)
+            {
+                // todo@ should start is taken into consideration?
+                var durationQuery = from stream in ffProbeOutput.Streams
+                                    where stream.StartTime != null && stream.Duration != null
+                                    let endTime = stream.StartTime + stream.Duration
+                                    select endTime;
+
+                return durationQuery.FirstOrDefault();
+            }
+
+            return null;
+        }
+
+        public double? GetDuration()
+        {
+            return GetDurationFromFrames(Frames) ?? GetDurationFromStream(VideoStreams) ?? GetDurationFromFileInfo(_mediaInfo);
         }
 
         public void RefreshBitRateMaximum(
@@ -221,6 +274,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
             return bitrates;
         }
+
     }
 
     [Flags]
