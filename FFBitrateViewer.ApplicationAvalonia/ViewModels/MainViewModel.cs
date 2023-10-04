@@ -146,7 +146,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         {
             PlotModelData!.Series.Clear();
 
-            double maxDuration = -1.0;
+            double maxX = -1.0;
+            double maxY = -1.0;
             var series = new List<OxyPlot.Series.StairStepSeries>(Files.Count);
             for (int fileIndex = 0; fileIndex < Files.Count; fileIndex++)
             {
@@ -157,16 +158,33 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
                 // Computes axis x based on max duration
                 var fileDuration = file.GetDuration();
-                if (fileDuration != null && fileDuration.Value > maxDuration)
-                { maxDuration = fileDuration.Value; }
+                if (fileDuration != null && fileDuration.Value > maxX)
+                { maxX = fileDuration.Value; }
+
+                // Computes axis y based on Frames or Time
+                double? fileMaxY = _plotViewType switch
+                {
+                    PlotViewType.FrameBased => file.Frames.Max(f => f.Size),
+                    PlotViewType.SecondBased => file.GetBitRateMaximum(),
+                    _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
+                } / 1000;
+                if (fileMaxY != null && fileMaxY.Value > maxY)
+                { maxY = fileMaxY.Value; }
             }
 
             // Adjust axis x based on max duration
-            if (maxDuration > 0)
+            if (maxX > 0)
             {
                 var axisX = PlotModelData.Axes[0];
-                axisX.AbsoluteMaximum = axisX.Maximum = maxDuration;
-                axisX.StringFormat = AxisXStringFormatBuild(maxDuration);
+                axisX.AbsoluteMaximum = axisX.Maximum = maxX;
+                axisX.StringFormat = AxisXStringFormatBuild(maxX);
+            }
+
+            // Adjust axis y based on Frames or Time
+            if (maxY > 0)
+            {
+                var axisY = PlotModelData.Axes[1];
+                axisY.AbsoluteMaximum = axisY.Maximum = maxY;
             }
 
 

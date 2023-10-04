@@ -186,21 +186,33 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             double intervalStartTime = 0
         )
         {
-            var bitrates = GetBitRates(Frames, intervalDuration, intervalStartTime);
-
-            if (bitrates.Count == 0)
+            var bitRateMaximum = GetBitRateMaximum(intervalDuration, intervalStartTime);
+            
+            if (bitRateMaximum == null)
             { return; }
 
-            BitRateMaximum = bitrates.Max() / 1000;
+            BitRateMaximum = bitRateMaximum.Value / 1000;
         }
 
-        public ICollection<int> GetBitRates(
-            IList<FFProbePacket> frames,
+        public double? GetBitRateMaximum(
             double intervalDuration = 1,
             double intervalStartTime = 0
         )
         {
-            if (frames.Count == 0 || intervalDuration == 0)
+            var bitrates = GetBitRates(intervalDuration, intervalStartTime);
+            
+            if (bitrates == null || bitrates.Count == 0)
+            { return null; }
+
+            return bitrates.Max();
+        }
+
+        public ICollection<int> GetBitRates(
+            double intervalDuration = 1,
+            double intervalStartTime = 0
+        )
+        {
+            if (Frames.Count == 0 || intervalDuration == 0)
             { return Array.Empty<int>(); }
 
             int bitrate;
@@ -210,10 +222,10 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             var indexes = new List<int>();
             var bitrates = new List<int>();
 
-            for (int frameNumber = 0; frameNumber < frames.Count; ++frameNumber)
+            for (int frameNumber = 0; frameNumber < Frames.Count; ++frameNumber)
             {
                 bitrates.Add(0);
-                var frame = frames[frameNumber];
+                var frame = Frames[frameNumber];
                 double duration = frame.DurationTime ?? 0;
                 double size = frame.Size ?? 0;
                 double startTime = frame.PTSTime ?? 0;
