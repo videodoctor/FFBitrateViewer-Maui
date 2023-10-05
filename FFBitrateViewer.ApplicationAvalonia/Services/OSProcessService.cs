@@ -126,14 +126,14 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
         {
             if (dataReceivedEventArgs.Data == null)
             {
-                textWriter.Flush();
+                await textWriter.FlushAsync();
                 return;
             }
             textWriter.Write(dataReceivedEventArgs.Data);
 
             if (channel != null)
             {
-                await channel.Writer.WriteAsync(dataReceivedEventArgs.Data);
+                await channel.Writer.WriteAsync(dataReceivedEventArgs.Data, cancellationToken);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
