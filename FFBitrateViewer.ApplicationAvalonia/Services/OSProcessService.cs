@@ -74,7 +74,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
 
-            await process.WaitForExitAsync(cancellationToken);
+            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
             _processes.Remove(process);
 
             process.OutputDataReceived -= OnProcessOutputDataReceived;
@@ -83,8 +83,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             standardOutputChannel?.Writer.TryComplete();
             standardErrorChannel?.Writer.TryComplete();
 
-            await standardOutputWriter.FlushAsync();
-            await standardErrorWriter.FlushAsync();
+            await standardOutputWriter.FlushAsync().ConfigureAwait(false);
+            await standardErrorWriter.FlushAsync().ConfigureAwait(false);
 
             return process.ExitCode;
         }
@@ -119,21 +119,21 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             
             cancellationToken.ThrowIfCancellationRequested();
 
-            await WriteReceivedData(e, stdErrWriter, stdErrChannel, cancellationToken);
+            await WriteReceivedData(e, stdErrWriter, stdErrChannel, cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task WriteReceivedData(DataReceivedEventArgs dataReceivedEventArgs, TextWriter textWriter, Channel<string>? channel, CancellationToken cancellationToken)
         {
             if (dataReceivedEventArgs.Data == null)
             {
-                await textWriter.FlushAsync();
+                await textWriter.FlushAsync().ConfigureAwait(false);
                 return;
             }
             textWriter.Write(dataReceivedEventArgs.Data);
 
             if (channel != null)
             {
-                await channel.Writer.WriteAsync(dataReceivedEventArgs.Data, cancellationToken);
+                await channel.Writer.WriteAsync(dataReceivedEventArgs.Data, cancellationToken).ConfigureAwait(false);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -144,7 +144,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
             var process = (Process)sender;
             var (stdOutWriter, _, stdOutChannel, _, cancellationToken) = _processes[process];
             cancellationToken.ThrowIfCancellationRequested();
-            await WriteReceivedData(e, stdOutWriter, stdOutChannel, cancellationToken);
+            await WriteReceivedData(e, stdOutWriter, stdOutChannel, cancellationToken).ConfigureAwait(false);
         }
 
         private Process GetNewProcessInstance(
