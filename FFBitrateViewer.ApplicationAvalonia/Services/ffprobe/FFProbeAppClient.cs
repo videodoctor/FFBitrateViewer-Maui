@@ -153,7 +153,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
                     Size: int.TryParse(csvDataReader.GetString(4), out var size) ? size : default,
                     Flags: csvDataReader.GetString(5),
 
-                    // defaul
+                    // default
                     CodecType: default,
                     DTS: default,
                     DTSTime: default,
