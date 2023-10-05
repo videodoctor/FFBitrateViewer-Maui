@@ -47,12 +47,15 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         //public List<double> BitRates { get; } = new();
 
         public List<VideoStream> VideoStreams { get; } = new();
+        
         public List<AudioStream> AudioStreams { get; } = new();
+        
         public List<SubtitleStream> SubtitleStreams { get; } = new();
 
         #endregion
 
         private readonly FileEntry _fileEntry;
+        
         private readonly FFProbeJsonOutput _mediaInfo;
 
         public FileItemViewModel(FileEntry fileEntry, FFProbeJsonOutput mediaInfo)
