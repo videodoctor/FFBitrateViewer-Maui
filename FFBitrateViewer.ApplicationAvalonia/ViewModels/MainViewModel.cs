@@ -75,7 +75,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             if (PlotModelData == null)
             { throw new ApplicationException($"Application failed connecting to {nameof(PlotModelData)}"); }
 
-            var version = await _ffprobeAppClient.GetVersionAsync();
+            var version = await _ffprobeAppClient.GetVersionAsync(token).ConfigureAwait(false);
             Version = $"{System.IO.Path.GetFileName(_ffprobeAppClient.FFProbeFilePath)} v{version}";
 
             // setting up Plot View
@@ -127,18 +127,25 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         [RelayCommand]
         private async Task AddFiles(CancellationToken token)
         {
-            var fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false);
-            for (int fileInfoIndex = 0; fileInfoIndex < fileInfoEntries.Count; fileInfoIndex++)
+            // TODO: Check if we really need to use Task.Run
+            await Task.Run(async () =>
             {
-                var fileInfo = fileInfoEntries[fileInfoIndex];
-                var mediaInfo = await _ffprobeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath);
-                var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = true };
+                var fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false).ConfigureAwait(false);
+                for (int fileInfoIndex = 0; fileInfoIndex < fileInfoEntries.Count; fileInfoIndex++)
+                {
+                    var fileInfo = fileInfoEntries[fileInfoIndex];
+                    var mediaInfo = await _ffprobeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath).ConfigureAwait(false);
+                    var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = true };
 
-                // Add file to Data Grid
-                Files.Add(fileItemViewModel);
-            }
-            SelectedFile = Files.LastOrDefault();
-            PlotModelData!.InvalidatePlot(updateData: true);
+                    // Add file to Data Grid
+                    _appProcessService.ExecutionOnUIThread(() =>
+                    {
+                        Files.Add(fileItemViewModel);
+                    });
+                }
+                SelectedFile = Files.LastOrDefault();
+                PlotModelData!.InvalidatePlot(updateData: true);
+            }, token).ConfigureAwait(false);
         }
 
         [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
@@ -153,7 +160,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             {
                 var file = Files[fileIndex];
                 if (!file.IsSelected) { continue; }
-                var serie = await GetSerie(file, token);
+                var serie = await GetSerie(file, token).ConfigureAwait(false);
                 series.Add(serie);
 
                 // Computes axis x based on max duration
@@ -242,8 +249,12 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                 serie.Points.Add(dataPoint);
             }
 
-            file.RefreshBitRateAverage();
-            file.RefreshBitRateMaximum();
+            _appProcessService.ExecutionOnUIThread(() =>
+            {
+                file.RefreshBitRateAverage();
+                file.RefreshBitRateMaximum();
+            });
+            
 
             return serie;
         }

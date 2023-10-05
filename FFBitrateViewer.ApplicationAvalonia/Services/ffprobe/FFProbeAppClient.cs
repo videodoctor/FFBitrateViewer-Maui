@@ -42,13 +42,13 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
         }
 
-        public async Task<Version> GetVersionAsync()
+        public async Task<Version> GetVersionAsync(CancellationToken cancellationToken)
         {
             StringBuilder sb = new();
             using StringWriter sw = new(sb);
 
             var command = $"{FFProbeFilePath} -version";
-            var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: sw).ConfigureAwait(false);
+            var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: sw, cancellationToken: cancellationToken).ConfigureAwait(false);
             if (exitCode != 0)
             { throw new FFProbeAppClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
 
