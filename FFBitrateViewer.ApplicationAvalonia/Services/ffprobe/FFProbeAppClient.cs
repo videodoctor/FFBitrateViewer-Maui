@@ -48,7 +48,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             using StringWriter sw = new(sb);
 
             var command = $"{FFProbeFilePath} -version";
-            var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: sw);
+            var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: sw).ConfigureAwait(false);
             if (exitCode != 0)
             { throw new FFProbeAppClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
 
@@ -74,7 +74,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
             using var memoryStream = new MemoryStream();
             using var streamWriter = new StreamWriter(memoryStream);
-            var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: streamWriter);
+            var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: streamWriter).ConfigureAwait(false);
             if (exitCode != 0)
             { throw new FFProbeAppClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
 
@@ -91,7 +91,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             {
                 NumberHandling = JsonNumberHandling.AllowReadingFromString
             };
-            var mediaInfo = await JsonSerializer.DeserializeAsync<FFProbeJsonOutput>(memoryStream, jsonSerializerOptions);
+            var mediaInfo = await JsonSerializer.DeserializeAsync<FFProbeJsonOutput>(memoryStream, jsonSerializerOptions).ConfigureAwait(false);
 
             return mediaInfo!;
         }
@@ -113,7 +113,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
             var commandStdOuputChannel = Channel.CreateUnbounded<string>();
             var command = $@"{FFProbeFilePath} -hide_banner -threads {threadCount} -print_format csv -loglevel fatal -show_error -select_streams v:{streamId} -show_entries packet=dts_time,duration_time,pts_time,size,flags ""{mediaFilePath}""";
-            var commandTask = _oSProcessService.ExecuteAsync(command, standardOutputChannel: commandStdOuputChannel, cancellationToken: token);
+            var commandTask = _oSProcessService.ExecuteAsync(command, standardOutputChannel: commandStdOuputChannel, cancellationToken: token).ConfigureAwait(false);
 
             var csvDataReaderOptions = new CsvDataReaderOptions
             { HasHeaders = false, };
@@ -129,7 +129,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
                 // 0      1                 2            3                      4          5
                 using var textReader = new StringReader(csvLine);
                 var csvDataReader = CsvDataReader.Create(textReader, csvDataReaderOptions);
-                await csvDataReader.ReadAsync(token);
+                await csvDataReader.ReadAsync(token).ConfigureAwait(false);
 
                 var entryType = csvDataReader.GetString(0);
                 if (string.Compare(entryType, "packet", true) != 0)
