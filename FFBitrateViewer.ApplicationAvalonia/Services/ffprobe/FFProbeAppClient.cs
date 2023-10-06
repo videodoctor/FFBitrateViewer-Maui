@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
+namespace FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 
 /// <summary>
 /// FFProbeAppClient is a wrapper for ffprobe command line tool.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
+namespace FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 
 [Serializable]
 public class FFProbeAppClientException : ApplicationException

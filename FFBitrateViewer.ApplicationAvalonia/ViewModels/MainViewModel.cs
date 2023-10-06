@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Models;
 using FFBitrateViewer.ApplicationAvalonia.Services;
-using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
+using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 using OxyPlot;
 using OxyPlot.Series;
 using System;

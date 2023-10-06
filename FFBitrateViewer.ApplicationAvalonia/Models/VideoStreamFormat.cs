@@ -1,5 +1,5 @@
 ﻿using FFBitrateViewer.ApplicationAvalonia.Extensions;
-using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
+using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
+namespace FFBitrateViewer.ApplicationAvalonia.Services.FFProbe
 {
 
 #nullable disable

@@ -1,4 +1,4 @@
-﻿using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
+﻿using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 
 
 namespace FFBitrateViewer.ApplicationAvalonia.Models;

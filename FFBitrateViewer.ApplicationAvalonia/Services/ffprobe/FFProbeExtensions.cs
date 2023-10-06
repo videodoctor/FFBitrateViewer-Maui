@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
+namespace FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 
 public static class FFProbeExtensions
 {

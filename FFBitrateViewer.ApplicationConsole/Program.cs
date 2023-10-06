@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using FFBitrateViewer.ApplicationAvalonia.Services;
-using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
+using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 
 var oSProcessService = new OSProcessService();
 await oSProcessService.ExecuteAsync(@"echo ""`env`""", standardOutputWriter: Console.Out);
