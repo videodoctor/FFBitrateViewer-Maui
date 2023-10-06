@@ -9,290 +9,275 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-namespace FFBitrateViewer.ApplicationAvalonia.Services
+namespace FFBitrateViewer.ApplicationAvalonia.Services;
+
+/// <summary>
+/// OSProcessService is a wrapper for OS process creation.
+/// </summary>
+public class OSProcessService
 {
+
+    private readonly Dictionary<Process, (TextWriter, TextWriter, Channel<string>?, Channel<string>?, CancellationToken)> _processes = new();
+
     /// <summary>
-    /// OSProcessService is a wrapper for OS process creation.
+    /// Executes a command in a new process.
     /// </summary>
-    public class OSProcessService
-    {
-
-        private readonly Dictionary<Process, (TextWriter, TextWriter, Channel<string>?, Channel<string>?, CancellationToken)> _processes = new();
-
-        /// <summary>
-        /// Executes a command in a new process.
-        /// </summary>
-        /// <param name="command">The command to execute</param>
-        /// <param name="workingDirectory">Working directory when executing the command</param>
-        /// <param name="standardOutputWriter">TextWriter for the standard output</param>
-        /// <param name="standardErrorWriter">TextWriter for the error output</param>
-        /// <param name="standardOutputChannel">Channel (publisher/subscriber) for standard output</param>
-        /// <param name="standardErrorChannel">Channel (publisher/subscriber) for error output</param>
-        /// <param name="standardOutputEncoding">Text encoding to be used in the standard output</param>
-        /// <param name="standardErrorEncoding">Text encoding to be used in the error output</param>
-        /// <param name="standardInputEncoding">Text encoding to be used in the standard input</param>
-        /// <param name="retainedEnvironmentalVariables">When provided only specified variables are passed to child process (By default all variables are passed)</param>
-        /// <param name="surrogateEnvironmentalVariables">When provided specified variables are overridden with new values</param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        /// <exception cref="OSProcessServiceException"></exception>
-        public async Task<int> ExecuteAsync(
-            string command,
-            string? workingDirectory = null,
-            TextWriter? standardOutputWriter = null,
-            TextWriter? standardErrorWriter = null,
-            Channel<string>? standardOutputChannel = null,
-            Channel<string>? standardErrorChannel = null,
-            Encoding? standardOutputEncoding = null,
-            Encoding? standardErrorEncoding = null,
-            Encoding? standardInputEncoding = null,
-            IEnumerable<string>? retainedEnvironmentalVariables = null,
-            IDictionary<string, string?>? surrogateEnvironmentalVariables = null,
-            CancellationToken cancellationToken = default
-            )
-        {
-            standardOutputWriter ??= TextWriter.Null;
-            standardErrorWriter ??= TextWriter.Null;
-            surrogateEnvironmentalVariables ??= new Dictionary<string, string?>();
-
-            var process = GetNewProcessInstance(
-                command, 
-                workingDirectory,
-                standardOutputEncoding,
-                standardErrorEncoding,
-                standardInputEncoding
-            );
-
-            _processes[process] = (
-                standardOutputWriter, 
-                standardErrorWriter, 
-                standardOutputChannel, 
-                standardErrorChannel,
-                cancellationToken);
-
-            if (retainedEnvironmentalVariables != null)
-            {
-                var keysToRemove = process.StartInfo.Environment.Keys
-                    .Where(key => !retainedEnvironmentalVariables.Contains(key));
-                foreach (var key in keysToRemove)
-                {
-                    process.StartInfo.Environment.Remove(key);
-                }
-            }
-
-            foreach (var envVar in surrogateEnvironmentalVariables)
-            { process.StartInfo.Environment[envVar.Key] = surrogateEnvironmentalVariables[envVar.Key]; }
-
-            process.OutputDataReceived += OnProcessOutputDataReceived;
-            process.ErrorDataReceived += OnProcessErrorDataReceived;
-
-            var hasProcessStarted = process.Start();
-            if (!hasProcessStarted)
-            {
-                throw new OSProcessServiceException($"Failed to execute command: {command}");
-            }
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-
-            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
-            _processes.Remove(process);
-
-            process.OutputDataReceived -= OnProcessOutputDataReceived;
-            process.ErrorDataReceived -= OnProcessErrorDataReceived;
-
-            standardOutputChannel?.Writer.TryComplete();
-            standardErrorChannel?.Writer.TryComplete();
-
-            await standardOutputWriter.FlushAsync().ConfigureAwait(false);
-            await standardErrorWriter.FlushAsync().ConfigureAwait(false);
-
-            return process.ExitCode;
-        }
-
-        public IEnumerable<string> Which(
-            string executableFileName,
-            params string[] additionalLookupPaths)
-        {
-            ArgumentException.ThrowIfNullOrEmpty(executableFileName, nameof(executableFileName));
-
-            additionalLookupPaths ??= new string[] { Environment.CurrentDirectory };
-
-            var environmentPath = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
-
-            IEnumerable<string> lookupPaths = environmentPath.Split(Path.PathSeparator);
-            lookupPaths = lookupPaths.Concat(additionalLookupPaths);
-
-            foreach (var path in lookupPaths)
-            {
-                var fullPath = Path.Combine(path, executableFileName);
-                if (File.Exists(fullPath))
-                {
-                    yield return fullPath;
-                }
-            }
-        }
-
-        private async void OnProcessErrorDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            var process = (Process)sender;
-            var (_, stdErrWriter, _, stdErrChannel, cancellationToken) = _processes[process];
-            
-            cancellationToken.ThrowIfCancellationRequested();
-
-            await WriteReceivedData(e, stdErrWriter, stdErrChannel, cancellationToken).ConfigureAwait(false);
-        }
-
-        private static async Task WriteReceivedData(DataReceivedEventArgs dataReceivedEventArgs, TextWriter textWriter, Channel<string>? channel, CancellationToken cancellationToken)
-        {
-            if (dataReceivedEventArgs.Data == null)
-            {
-                await textWriter.FlushAsync().ConfigureAwait(false);
-                return;
-            }
-            textWriter.Write(dataReceivedEventArgs.Data);
-
-            if (channel != null)
-            {
-                await channel.Writer.WriteAsync(dataReceivedEventArgs.Data, cancellationToken).ConfigureAwait(false);
-            }
-
-            cancellationToken.ThrowIfCancellationRequested();
-        }
-
-        private async void OnProcessOutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            var process = (Process)sender;
-            var (stdOutWriter, _, stdOutChannel, _, cancellationToken) = _processes[process];
-            cancellationToken.ThrowIfCancellationRequested();
-            await WriteReceivedData(e, stdOutWriter, stdOutChannel, cancellationToken).ConfigureAwait(false);
-        }
-
-        private Process GetNewProcessInstance(
-            string command, 
-            string?  workingDirectory = null,
-            Encoding? standardOutputEncoding = null,
-            Encoding? standardErrorEncoding = null,
-            Encoding? standardInputEncoding = null
+    /// <param name="command">The command to execute</param>
+    /// <param name="workingDirectory">Working directory when executing the command</param>
+    /// <param name="standardOutputWriter">TextWriter for the standard output</param>
+    /// <param name="standardErrorWriter">TextWriter for the error output</param>
+    /// <param name="standardOutputChannel">Channel (publisher/subscriber) for standard output</param>
+    /// <param name="standardErrorChannel">Channel (publisher/subscriber) for error output</param>
+    /// <param name="standardOutputEncoding">Text encoding to be used in the standard output</param>
+    /// <param name="standardErrorEncoding">Text encoding to be used in the error output</param>
+    /// <param name="standardInputEncoding">Text encoding to be used in the standard input</param>
+    /// <param name="retainedEnvironmentalVariables">When provided only specified variables are passed to child process (By default all variables are passed)</param>
+    /// <param name="surrogateEnvironmentalVariables">When provided specified variables are overridden with new values</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// <exception cref="OSProcessServiceException"></exception>
+    public async Task<int> ExecuteAsync(
+        string command,
+        string? workingDirectory = null,
+        TextWriter? standardOutputWriter = null,
+        TextWriter? standardErrorWriter = null,
+        Channel<string>? standardOutputChannel = null,
+        Channel<string>? standardErrorChannel = null,
+        Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null,
+        Encoding? standardInputEncoding = null,
+        IEnumerable<string>? retainedEnvironmentalVariables = null,
+        IDictionary<string, string?>? surrogateEnvironmentalVariables = null,
+        CancellationToken cancellationToken = default
         )
+    {
+        standardOutputWriter ??= TextWriter.Null;
+        standardErrorWriter ??= TextWriter.Null;
+        surrogateEnvironmentalVariables ??= new Dictionary<string, string?>();
+
+        var process = GetNewProcessInstance(
+            command, 
+            workingDirectory,
+            standardOutputEncoding,
+            standardErrorEncoding,
+            standardInputEncoding
+        );
+
+        _processes[process] = (
+            standardOutputWriter, 
+            standardErrorWriter, 
+            standardOutputChannel, 
+            standardErrorChannel,
+            cancellationToken);
+
+        if (retainedEnvironmentalVariables != null)
         {
-            workingDirectory ??= Environment.CurrentDirectory;
-
-            var process = new Process();
-            process.StartInfo.WorkingDirectory = workingDirectory;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardInput = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.StandardOutputEncoding = standardOutputEncoding;
-            process.StartInfo.StandardErrorEncoding = standardErrorEncoding;
-            process.StartInfo.StandardInputEncoding = standardInputEncoding;
-
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            var keysToRemove = process.StartInfo.Environment.Keys
+                .Where(key => !retainedEnvironmentalVariables.Contains(key));
+            foreach (var key in keysToRemove)
             {
-                // Default Shells (with %SystemRoot% == C:\WINDOWS )
-                // %SystemRoot%\System32\cmd.exe /U /C ...
-                // %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -NoLogo -Mta -NoProfile -NonInteractive -WindowStyle Hidden -EncodedCommand -Command ...
-                const string PWSH_FILE_NAME = @"powershell.exe";
-                const string CMD_FILE_NAME = @"cmd.exe";
-
-                var powershellExeFilePaths = Which(PWSH_FILE_NAME).ToList();
-                var cmdExeFilePaths = Which(CMD_FILE_NAME).ToList();
-                if (powershellExeFilePaths.Any())
-                {
-                    process.StartInfo.FileName = powershellExeFilePaths.First();
-                    process.StartInfo.ArgumentList.Add("-NoLogo");
-                    process.StartInfo.ArgumentList.Add("-Mta");
-                    process.StartInfo.ArgumentList.Add("-NoProfile");
-                    process.StartInfo.ArgumentList.Add("-NonInteractive");
-                    process.StartInfo.ArgumentList.Add("-WindowStyle");
-                    process.StartInfo.ArgumentList.Add("Hidden");
-                    process.StartInfo.ArgumentList.Add("-EncodedCommand");
-
-                    // NOTE: Appending exit $LASTEXITCODE to the command to get the exit code of the command
-                    // https://stackoverflow.com/questions/50200325/returning-an-exit-code-from-a-powershell-script
-                    process.StartInfo.ArgumentList.Add(Convert.ToBase64String(Encoding.Unicode.GetBytes($"{command}; exit $LASTEXITCODE")));
-                }
-                else if (cmdExeFilePaths.Any())
-                {
-                    process.StartInfo.FileName = cmdExeFilePaths.First();
-                    process.StartInfo.ArgumentList.Add("/U");
-                    process.StartInfo.ArgumentList.Add("/C");
-                    process.StartInfo.ArgumentList.Add(command);
-                }
-                else
-                {
-                    throw new OSProcessServiceException($"Neither {PWSH_FILE_NAME} or {CMD_FILE_NAME} were not found in PATH.");
-                }
-
+                process.StartInfo.Environment.Remove(key);
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                // Normally in MacOS default shell is: zsh
-                const string ZSH_FILE_NAME = @"zsh";
-                var zshFilePaths = Which(ZSH_FILE_NAME).ToList();
-                if (zshFilePaths.Any())
-                {
-                    process.StartInfo.FileName = zshFilePaths.First();
-                    process.StartInfo.ArgumentList.Add("-l");
-                    process.StartInfo.ArgumentList.Add("-c");
-                    process.StartInfo.ArgumentList.Add(command);
-                }
-                else
-                {
-                    throw new OSProcessServiceException($"{ZSH_FILE_NAME} was not found in PATH.");
-                }
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                // Linux has many shells:
-                //
-                //  - Bourne Shell (sh) The Bourne shell was the first default shell on Unix systems, released in 1979. ...
-                //  - C Shell (csh) ...
-                //  - TENEX C Shell (tcsh) ...
-                //  - KornShell (ksh) ...
-                //  - Debian Almquist Shell (dash) ...
-                //  - Bourne Again Shell (bash) ...
-                //  - Z Shell (zsh) ...
-                //  - Friendly Interactive Shell (fish)
-                //  - Powershell (pwsh)
-                //
-                // Modern distros already includes sh (Bourne Shell)
+        }
 
-                const string SH_FILE_NAME = @"sh";
-                var shFilePaths = Which(SH_FILE_NAME).ToList();
-                if (shFilePaths.Any())
-                {
-                    process.StartInfo.FileName = shFilePaths.First();
-                    process.StartInfo.ArgumentList.Add("-c");
-                    process.StartInfo.ArgumentList.Add(command);
-                }
-                else
-                {
-                    throw new OSProcessServiceException($"{SH_FILE_NAME} was not found in PATH.");
-                }
+        foreach (var envVar in surrogateEnvironmentalVariables)
+        { process.StartInfo.Environment[envVar.Key] = surrogateEnvironmentalVariables[envVar.Key]; }
+
+        process.OutputDataReceived += OnProcessOutputDataReceived;
+        process.ErrorDataReceived += OnProcessErrorDataReceived;
+
+        var hasProcessStarted = process.Start();
+        if (!hasProcessStarted)
+        {
+            throw new OSProcessServiceException($"Failed to execute command: {command}");
+        }
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+
+        await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+        _processes.Remove(process);
+
+        process.OutputDataReceived -= OnProcessOutputDataReceived;
+        process.ErrorDataReceived -= OnProcessErrorDataReceived;
+
+        standardOutputChannel?.Writer.TryComplete();
+        standardErrorChannel?.Writer.TryComplete();
+
+        await standardOutputWriter.FlushAsync().ConfigureAwait(false);
+        await standardErrorWriter.FlushAsync().ConfigureAwait(false);
+
+        return process.ExitCode;
+    }
+
+    public IEnumerable<string> Which(
+        string executableFileName,
+        params string[] additionalLookupPaths)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(executableFileName, nameof(executableFileName));
+
+        additionalLookupPaths ??= new string[] { Environment.CurrentDirectory };
+
+        var environmentPath = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+
+        IEnumerable<string> lookupPaths = environmentPath.Split(Path.PathSeparator);
+        lookupPaths = lookupPaths.Concat(additionalLookupPaths);
+
+        foreach (var path in lookupPaths)
+        {
+            var fullPath = Path.Combine(path, executableFileName);
+            if (File.Exists(fullPath))
+            {
+                yield return fullPath;
+            }
+        }
+    }
+
+    private async void OnProcessErrorDataReceived(object sender, DataReceivedEventArgs e)
+    {
+        var process = (Process)sender;
+        var (_, stdErrWriter, _, stdErrChannel, cancellationToken) = _processes[process];
+        
+        cancellationToken.ThrowIfCancellationRequested();
+
+        await WriteReceivedData(e, stdErrWriter, stdErrChannel, cancellationToken).ConfigureAwait(false);
+    }
+
+    private static async Task WriteReceivedData(DataReceivedEventArgs dataReceivedEventArgs, TextWriter textWriter, Channel<string>? channel, CancellationToken cancellationToken)
+    {
+        if (dataReceivedEventArgs.Data == null)
+        {
+            await textWriter.FlushAsync().ConfigureAwait(false);
+            return;
+        }
+        textWriter.Write(dataReceivedEventArgs.Data);
+
+        if (channel != null)
+        {
+            await channel.Writer.WriteAsync(dataReceivedEventArgs.Data, cancellationToken).ConfigureAwait(false);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+    }
+
+    private async void OnProcessOutputDataReceived(object sender, DataReceivedEventArgs e)
+    {
+        var process = (Process)sender;
+        var (stdOutWriter, _, stdOutChannel, _, cancellationToken) = _processes[process];
+        cancellationToken.ThrowIfCancellationRequested();
+        await WriteReceivedData(e, stdOutWriter, stdOutChannel, cancellationToken).ConfigureAwait(false);
+    }
+
+    private Process GetNewProcessInstance(
+        string command, 
+        string?  workingDirectory = null,
+        Encoding? standardOutputEncoding = null,
+        Encoding? standardErrorEncoding = null,
+        Encoding? standardInputEncoding = null
+    )
+    {
+        workingDirectory ??= Environment.CurrentDirectory;
+
+        var process = new Process();
+        process.StartInfo.WorkingDirectory = workingDirectory;
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.CreateNoWindow = true;
+        process.StartInfo.RedirectStandardInput = true;
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        process.StartInfo.StandardOutputEncoding = standardOutputEncoding;
+        process.StartInfo.StandardErrorEncoding = standardErrorEncoding;
+        process.StartInfo.StandardInputEncoding = standardInputEncoding;
+
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            // Default Shells (with %SystemRoot% == C:\WINDOWS )
+            // %SystemRoot%\System32\cmd.exe /U /C ...
+            // %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -NoLogo -Mta -NoProfile -NonInteractive -WindowStyle Hidden -EncodedCommand -Command ...
+            const string PWSH_FILE_NAME = @"powershell.exe";
+            const string CMD_FILE_NAME = @"cmd.exe";
+
+            var powershellExeFilePaths = Which(PWSH_FILE_NAME).ToList();
+            var cmdExeFilePaths = Which(CMD_FILE_NAME).ToList();
+            if (powershellExeFilePaths.Any())
+            {
+                process.StartInfo.FileName = powershellExeFilePaths.First();
+                process.StartInfo.ArgumentList.Add("-NoLogo");
+                process.StartInfo.ArgumentList.Add("-Mta");
+                process.StartInfo.ArgumentList.Add("-NoProfile");
+                process.StartInfo.ArgumentList.Add("-NonInteractive");
+                process.StartInfo.ArgumentList.Add("-WindowStyle");
+                process.StartInfo.ArgumentList.Add("Hidden");
+                process.StartInfo.ArgumentList.Add("-EncodedCommand");
+
+                // NOTE: Appending exit $LASTEXITCODE to the command to get the exit code of the command
+                // https://stackoverflow.com/questions/50200325/returning-an-exit-code-from-a-powershell-script
+                process.StartInfo.ArgumentList.Add(Convert.ToBase64String(Encoding.Unicode.GetBytes($"{command}; exit $LASTEXITCODE")));
+            }
+            else if (cmdExeFilePaths.Any())
+            {
+                process.StartInfo.FileName = cmdExeFilePaths.First();
+                process.StartInfo.ArgumentList.Add("/U");
+                process.StartInfo.ArgumentList.Add("/C");
+                process.StartInfo.ArgumentList.Add(command);
             }
             else
             {
-                throw new OSProcessServiceException($"Process creation in: {RuntimeInformation.OSDescription} is not supported.");
+                throw new OSProcessServiceException($"Neither {PWSH_FILE_NAME} or {CMD_FILE_NAME} were not found in PATH.");
             }
 
-            return process;
         }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            // Normally in MacOS default shell is: zsh
+            const string ZSH_FILE_NAME = @"zsh";
+            var zshFilePaths = Which(ZSH_FILE_NAME).ToList();
+            if (zshFilePaths.Any())
+            {
+                process.StartInfo.FileName = zshFilePaths.First();
+                process.StartInfo.ArgumentList.Add("-l");
+                process.StartInfo.ArgumentList.Add("-c");
+                process.StartInfo.ArgumentList.Add(command);
+            }
+            else
+            {
+                throw new OSProcessServiceException($"{ZSH_FILE_NAME} was not found in PATH.");
+            }
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            // Linux has many shells:
+            //
+            //  - Bourne Shell (sh) The Bourne shell was the first default shell on Unix systems, released in 1979. ...
+            //  - C Shell (csh) ...
+            //  - TENEX C Shell (tcsh) ...
+            //  - KornShell (ksh) ...
+            //  - Debian Almquist Shell (dash) ...
+            //  - Bourne Again Shell (bash) ...
+            //  - Z Shell (zsh) ...
+            //  - Friendly Interactive Shell (fish)
+            //  - Powershell (pwsh)
+            //
+            // Modern distros already includes sh (Bourne Shell)
+
+            const string SH_FILE_NAME = @"sh";
+            var shFilePaths = Which(SH_FILE_NAME).ToList();
+            if (shFilePaths.Any())
+            {
+                process.StartInfo.FileName = shFilePaths.First();
+                process.StartInfo.ArgumentList.Add("-c");
+                process.StartInfo.ArgumentList.Add(command);
+            }
+            else
+            {
+                throw new OSProcessServiceException($"{SH_FILE_NAME} was not found in PATH.");
+            }
+        }
+        else
+        {
+            throw new OSProcessServiceException($"Process creation in: {RuntimeInformation.OSDescription} is not supported.");
+        }
+
+        return process;
     }
-
-
-
-    [Serializable]
-    public class OSProcessServiceException : ApplicationException
-    {
-        public OSProcessServiceException() { }
-        public OSProcessServiceException(string message) : base(message) { }
-        public OSProcessServiceException(string message, Exception inner) : base(message, inner) { }
-        protected OSProcessServiceException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-    }
-
 }
