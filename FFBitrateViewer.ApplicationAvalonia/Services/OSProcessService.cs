@@ -11,11 +11,31 @@ using System.Threading.Tasks;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Services
 {
+    /// <summary>
+    /// OSProcessService is a wrapper for OS process creation.
+    /// </summary>
     public class OSProcessService
     {
 
         private readonly Dictionary<Process, (TextWriter, TextWriter, Channel<string>?, Channel<string>?, CancellationToken)> _processes = new();
 
+        /// <summary>
+        /// Executes a command in a new process.
+        /// </summary>
+        /// <param name="command">The command to execute</param>
+        /// <param name="workingDirectory">Working directory when executing the command</param>
+        /// <param name="standardOutputWriter">TextWriter for the standard output</param>
+        /// <param name="standardErrorWriter">TextWriter for the error output</param>
+        /// <param name="standardOutputChannel">Channel (publisher/subscriber) for standard output</param>
+        /// <param name="standardErrorChannel">Channel (publisher/subscriber) for error output</param>
+        /// <param name="standardOutputEncoding">Text encoding to be used in the standard output</param>
+        /// <param name="standardErrorEncoding">Text encoding to be used in the error output</param>
+        /// <param name="standardInputEncoding">Text encoding to be used in the standard input</param>
+        /// <param name="retainedEnvironmentalVariables">When provided only specified variables are passed to child process (By default all variables are passed)</param>
+        /// <param name="surrogateEnvironmentalVariables">When provided specified variables are overridden with new values</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="OSProcessServiceException"></exception>
         public async Task<int> ExecuteAsync(
             string command,
             string? workingDirectory = null,

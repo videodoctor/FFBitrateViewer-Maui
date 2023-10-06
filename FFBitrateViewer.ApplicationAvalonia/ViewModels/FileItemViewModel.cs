@@ -44,8 +44,6 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
         public List<FFProbePacket> Frames { get; } = new();
 
-        //public List<double> BitRates { get; } = new();
-
         public List<VideoStream> VideoStreams { get; } = new();
         
         public List<AudioStream> AudioStreams { get; } = new();

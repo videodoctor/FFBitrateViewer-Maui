@@ -15,6 +15,9 @@ using System.Threading.Tasks;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 {
+    /// <summary>
+    /// FFProbeAppClient is a wrapper for ffprobe command line tool.
+    /// </summary>
     public class FFProbeAppClient
     {
         // ffprobe can produce different output as exlpained in
@@ -60,6 +63,15 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             return version;
         }
 
+        /// <summary>
+        /// Returns a list of streams for the given media file.
+        /// </summary>
+        /// <param name="mediaFilePath"></param>
+        /// <param name="threadCount"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="FFProbeAppClientException"></exception>
         public async Task<FFProbeJsonOutput> GetMediaInfoAsync(string mediaFilePath, int threadCount = 11)
         {
             ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
@@ -96,6 +108,17 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
             return mediaInfo!;
         }
 
+        /// <summary>
+        /// Returns a list of packets for the given media file.
+        /// </summary>
+        /// <param name="mediaFilePath"></param>
+        /// <param name="streamId"></param>
+        /// <param name="threadCount"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="FFProbeAppClientException"></exception>
         public async IAsyncEnumerable<FFProbePacket> GetProbePackets(
             string mediaFilePath,
             int streamId = 0,
