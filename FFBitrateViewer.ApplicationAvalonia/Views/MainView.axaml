@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:FFBitrateViewer.ApplicationAvalonia.ViewModels"
+			 xmlns:m="clr-namespace:FFBitrateViewer.ApplicationAvalonia.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FFBitrateViewer.ApplicationAvalonia.Views.MainView"
              x:DataType="vm:MainViewModel"
@@ -107,11 +108,11 @@
 			<Label Content="Plot view:" VerticalAlignment="Center" />
 			<RadioButton GroupName="PotViewGroupName" Content="Frame based" IsChecked="True"
 						 Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
-						 CommandParameter="{x:Static vm:PlotViewType.FrameBased}"
+						 CommandParameter="{x:Static m:PlotViewType.FrameBased}"
 						 />
 			<RadioButton GroupName="PotViewGroupName" Content="Second based" IsChecked="False"
 						 Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
-						 CommandParameter="{x:Static vm:PlotViewType.SecondBased}"
+						 CommandParameter="{x:Static m:PlotViewType.SecondBased}"
 						 />
 			<Label Content="Adjust frame start time" VerticalAlignment="Center"/>
 			<CheckBox IsChecked="{Binding HasToAdjustFrameStartTime}"></CheckBox>
