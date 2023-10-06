@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
+using FFBitrateViewer.ApplicationAvalonia.ViewModels;
 using OxyPlot;
 using OxyPlot.Series;
 using System;
@@ -153,46 +154,24 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         private async Task ToggleOnOffPlotterPlotter(CancellationToken token)
         {
 
-            double maxX = -1.0;
-            double maxY = -1.0;
-
             PlotModelData!.Series.Clear();
 
+            //await Task.Run(async () =>
+            // {
             token.ThrowIfCancellationRequested();
 
-            await Files
-                .ToAsyncEnumerable()
+            var tasks = Files
                 .Where(file => file.IsSelected)
-                .ForEachAwaitAsync(async file =>
-                {
-                    token.ThrowIfCancellationRequested();
+                .Select(file => SetUpFrameAndSerie(file, token));
+            var fileAxis = await Task.WhenAll(tasks).ConfigureAwait(false);
 
-                    var fileName = Path.GetFileName(file.Path.LocalPath);
-                    var serie = GetNewSerie(fileName);
-
-                    // Request ffprobe information to create data points for serie
-                    await _ffprobeAppClient
-                        .GetProbePackets(file.Path.LocalPath, token: token)
-                        .ForEachAsync(probePacket =>
-                        {
-                            file.Frames.Add(probePacket);
-                            serie.Points.Add(GetDataPoint(probePacket, file, _plotViewType));
-                        }, token).ConfigureAwait(false);
-
-                    // Refresh BitRateAverage and BitRateMaximum
-                    file.RefreshBitRateAverage();
-                    file.RefreshBitRateMaximum();
-
-                    // Computes axis x based on max duration
-                    maxX = GetMaxXBasedOnDuration(file, maxX);
-
-                    // Computes axis y based on Frames or Time
-                    maxY = GetMaxYBasedOnFrameOrTime(file, maxY);
-
-                    PlotModelData!.Series.Add(serie);
-
-                }, token)
-                .ConfigureAwait(false);
+            (var maxX, var maxY) = fileAxis.Aggregate((MaxX: -1.0, MaxY: -1.0), (accumulated, current) =>
+            {
+                return (
+                    Math.Max(accumulated.MaxX, current.AxisX ?? -1.0),
+                    Math.Max(accumulated.MaxY, current.AxisY ?? -1.0)
+                );
+            });
 
             // Adjust axis x based on max duration
             if (maxX > 0)
@@ -209,8 +188,52 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                 axisY.AbsoluteMaximum = axisY.Maximum = maxY;
             }
 
+
+            //}, token)
+            //   .ConfigureAwait(false);
             PlotModelData!.InvalidatePlot(updateData: true);
 
+
+        }
+
+        private Task<(double? AxisX, double? AxisY)> SetUpFrameAndSerie(FileItemViewModel file, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            var fileName = Path.GetFileName(file.Path.LocalPath);
+            var serie = GetNewSerie(fileName);
+
+            // Request ffprobe information to create data points for serie
+            return _ffprobeAppClient
+                .GetProbePackets(file.Path.LocalPath, token: token)
+                .ForEachAsync(probePacket =>
+                {
+                    token.ThrowIfCancellationRequested();
+
+                    file.Frames.Add(probePacket);
+                    serie.Points.Add(GetDataPoint(probePacket, file, _plotViewType));
+
+                }, token)
+                .ContinueWith(_ =>
+                {
+                    token.ThrowIfCancellationRequested();
+                    // Computes axis x based on max duration
+                    var axisX = GetAxisXForFile(file);
+
+                    // Computes axis y based on Frames or Time
+                    var axisY = GetAxisYForFile(file);
+
+                    // Refresh BitRateAverage and BitRateMaximum
+                    _appProcessService.ExecutionOnUIThread(() =>
+                    {
+                        file.RefreshBitRateAverage();
+                        file.RefreshBitRateMaximum();
+                        PlotModelData!.Series.Add(serie);
+                    });
+
+                    return (axisX, axisY);
+
+                }, token);
         }
 
         private StairStepSeries GetNewSerie(string fileName)
@@ -237,28 +260,16 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                 _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
             };
 
-        private double GetMaxYBasedOnFrameOrTime(FileItemViewModel file, double maxY)
-        {
-            double? fileMaxY = _plotViewType switch
+        private double? GetAxisYForFile(FileItemViewModel file)
+            => _plotViewType switch
             {
                 PlotViewType.FrameBased => file.Frames.Max(f => f.Size),
                 PlotViewType.SecondBased => file.GetBitRateMaximum(),
                 _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
             } / 1000;
-            if (fileMaxY != null && fileMaxY.Value > maxY)
-            { maxY = fileMaxY.Value; }
 
-            return maxY;
-        }
-
-        private static double GetMaxXBasedOnDuration(FileItemViewModel file, double maxX)
-        {
-            var fileDuration = file.GetDuration();
-            if (fileDuration != null && fileDuration.Value > maxX)
-            { maxX = fileDuration.Value; }
-
-            return maxX;
-        }
+        private static double? GetAxisXForFile(FileItemViewModel file)
+            => file.GetDuration();
 
         [RelayCommand]
         private void Exit()
