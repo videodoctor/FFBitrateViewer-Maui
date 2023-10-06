@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.ffprobe;
 using OxyPlot;
+using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -151,29 +152,52 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
         [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
         private async Task ToggleOnOffPlotterPlotter(CancellationToken token)
         {
-            PlotModelData!.Series.Clear();
 
             double maxX = -1.0;
             double maxY = -1.0;
-            var series = new List<OxyPlot.Series.StairStepSeries>(Files.Count);
-            for (int fileIndex = 0; fileIndex < Files.Count; fileIndex++)
-            {
-                var file = Files[fileIndex];
-                if (!file.IsSelected) { continue; }
-                var serie = await GetSerie(file, token).ConfigureAwait(false);
-                series.Add(serie);
 
-                // Computes axis x based on max duration
-                maxX = GetMaxXBasedOnDuration(file, maxX);
+            PlotModelData!.Series.Clear();
 
-                // Computes axis y based on Frames or Time
-                maxY = GetMaxYBasedOnFrameOrTime(file, maxY);
-            }
+            token.ThrowIfCancellationRequested();
+
+            await Files
+                .ToAsyncEnumerable()
+                .Where(file => file.IsSelected)
+                .ForEachAwaitAsync(async file =>
+                {
+                    token.ThrowIfCancellationRequested();
+
+                    var fileName = Path.GetFileName(file.Path.LocalPath);
+                    var serie = GetNewSerie(fileName);
+
+                    // Request ffprobe information to create data points for serie
+                    await _ffprobeAppClient
+                        .GetProbePackets(file.Path.LocalPath, token: token)
+                        .ForEachAsync(probePacket =>
+                        {
+                            file.Frames.Add(probePacket);
+                            serie.Points.Add(GetDataPoint(probePacket, file, _plotViewType));
+                        }, token).ConfigureAwait(false);
+
+                    // Refresh BitRateAverage and BitRateMaximum
+                    file.RefreshBitRateAverage();
+                    file.RefreshBitRateMaximum();
+
+                    // Computes axis x based on max duration
+                    maxX = GetMaxXBasedOnDuration(file, maxX);
+
+                    // Computes axis y based on Frames or Time
+                    maxY = GetMaxYBasedOnFrameOrTime(file, maxY);
+
+                    PlotModelData!.Series.Add(serie);
+
+                }, token)
+                .ConfigureAwait(false);
 
             // Adjust axis x based on max duration
             if (maxX > 0)
             {
-                var axisX = PlotModelData.Axes[0];
+                var axisX = PlotModelData!.Axes[0];
                 axisX.AbsoluteMaximum = axisX.Maximum = maxX;
                 axisX.StringFormat = AxisXStringFormatBuild(maxX);
             }
@@ -181,15 +205,37 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             // Adjust axis y based on Frames or Time
             if (maxY > 0)
             {
-                var axisY = PlotModelData.Axes[1];
+                var axisY = PlotModelData!.Axes[1];
                 axisY.AbsoluteMaximum = axisY.Maximum = maxY;
             }
 
-
-            series.ForEach(PlotModelData!.Series.Add);
             PlotModelData!.InvalidatePlot(updateData: true);
 
         }
+
+        private StairStepSeries GetNewSerie(string fileName)
+            => new()
+            {
+                IsVisible = true,
+                StrokeThickness = 1.5,
+                Title = fileName,
+                TrackerFormatString = TrackerFormatStringBuild,
+                Decimator = Decimator.Decimate,
+                LineJoin = LineJoin.Miter,
+                VerticalStrokeThickness = 0.5,
+                VerticalLineStyle = LineStyle.Dash,
+                LineStyle = LineStyle.Solid,
+                MarkerType = MarkerType.None,
+                //Color = style.Color; 
+            };
+
+        private DataPoint GetDataPoint(FFProbePacket probePacket, FileItemViewModel file, PlotViewType plotViewType)
+            => plotViewType switch
+            {
+                PlotViewType.FrameBased => new DataPoint((probePacket.PTSTime ?? 0) - file.StartTime, Convert.ToDouble(probePacket.Size) / 1000.0),
+                //PlotViewType.SecondBased => new DataPoint(),
+                _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
+            };
 
         private double GetMaxYBasedOnFrameOrTime(FileItemViewModel file, double maxY)
         {
@@ -212,65 +258,6 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             { maxX = fileDuration.Value; }
 
             return maxX;
-        }
-
-        private async Task<OxyPlot.Series.StairStepSeries> GetSerie(FileItemViewModel file, CancellationToken token)
-        {
-            // Add Series to data grid
-            var fileName = Path.GetFileName(file.Path.LocalPath);
-            var serie = new OxyPlot.Series.StairStepSeries
-            {
-                IsVisible = true,
-                StrokeThickness = 1.5,
-                Title = fileName,
-                TrackerFormatString = TrackerFormatStringBuild,
-                Decimator = Decimator.Decimate,
-                LineJoin = LineJoin.Miter,
-                VerticalStrokeThickness = 0.5,
-                VerticalLineStyle = LineStyle.Dash,
-                LineStyle = LineStyle.Solid,
-                MarkerType = MarkerType.None,
-                //Color = style.Color; 
-            };
-
-
-            // Request ffprobe information to create data points for serie
-            await foreach (var probePacket in _ffprobeAppClient.GetProbePackets(file.Path.LocalPath, token: token))
-            {
-                token.ThrowIfCancellationRequested();
-
-                // TODO: We need to keep track of max duration per file and amogn all files
-                //       In order to adjust: axis.AbsoluteMaximum = axis.Maximum 
-
-                //return new Frame()
-                //{
-                //    Duration = (double)packet.DurationTime,
-                //    FrameType = packet.Flags?.IndexOf("K") >= 0 ? FramePictType.I : null,
-                //    IsOrdered = false, // 'Packets' returned by FFProbe are ordered by DTS, not PTS so will need to order them later when adding onto list
-                //    Size = (int)packet.Size,
-                //    StartTime = (double)packet.PTSTime
-                //};
-
-                file.Frames.Add(probePacket);
-
-                var dataPoint = _plotViewType switch
-                {
-                    PlotViewType.FrameBased => new DataPoint((probePacket.PTSTime ?? 0) - file.StartTime, Convert.ToDouble(probePacket.Size) / 1000.0),
-                    //PlotViewType.SecondBased => new DataPoint(),
-                    _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
-                };
-
-                serie.Points.Add(dataPoint);
-            }
-
-            _appProcessService.ExecutionOnUIThread(() =>
-            {
-                file.RefreshBitRateAverage();
-                file.RefreshBitRateMaximum();
-            });
-            
-
-            return serie;
         }
 
         [RelayCommand]
