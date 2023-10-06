@@ -42,7 +42,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
 
         }
 
-        public async Task<Version> GetVersionAsync(CancellationToken cancellationToken)
+        public async Task<Version> GetVersionAsync(CancellationToken cancellationToken = default)
         {
             StringBuilder sb = new();
             using StringWriter sw = new(sb);
