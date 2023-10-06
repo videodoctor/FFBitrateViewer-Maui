@@ -116,7 +116,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.ffprobe
         double? PTSTime,
 
         [property: JsonPropertyName("size")]
-        int? Size,
+        long? Size,
 
         [property: JsonPropertyName("stream_index")]
         int? StreamIndex
