@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
+namespace FFBitrateViewer.ApplicationAvalonia.Models;
 
 [Flags]
 public enum Unit

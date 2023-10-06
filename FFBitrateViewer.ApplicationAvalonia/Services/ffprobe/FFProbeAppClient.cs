@@ -28,6 +28,9 @@ public class FFProbeAppClient
 
     private readonly OSProcessService _oSProcessService = new();
 
+    /// <summary>
+    /// Returns the full path of ffprobe executable.
+    /// </summary>
     public string FFProbeFilePath { get => _ffprobeFilePath ??= WhichFFProbeFilePath(); }
 
     private string? _ffprobeFilePath;
@@ -44,6 +47,12 @@ public class FFProbeAppClient
 
     }
 
+    /// <summary>
+    /// Returns the version of ffprobe.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// <exception cref="FFProbeAppClientException"></exception>
     public async Task<Version> GetVersionAsync(CancellationToken cancellationToken = default)
     {
         StringBuilder sb = new();

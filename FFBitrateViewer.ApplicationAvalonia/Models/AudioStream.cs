@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 
-namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
+namespace FFBitrateViewer.ApplicationAvalonia.Models;
 
 public class AudioStream : BaseStream
 {

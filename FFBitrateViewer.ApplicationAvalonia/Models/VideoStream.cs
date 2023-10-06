@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 
-namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
+namespace FFBitrateViewer.ApplicationAvalonia.Models;
 
 public class VideoStream : BaseStream
 {

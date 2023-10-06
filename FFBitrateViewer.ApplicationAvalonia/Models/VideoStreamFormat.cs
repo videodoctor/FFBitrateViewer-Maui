@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 
-namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
+namespace FFBitrateViewer.ApplicationAvalonia.Models;
 
 public partial class VideoStreamFormat
 {

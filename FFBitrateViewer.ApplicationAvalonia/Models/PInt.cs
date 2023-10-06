@@ -1,4 +1,4 @@
-﻿namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
+﻿namespace FFBitrateViewer.ApplicationAvalonia.Models;
 
 public record PInt(int X, int Y)
 {
