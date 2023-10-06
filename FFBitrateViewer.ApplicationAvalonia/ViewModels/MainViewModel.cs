@@ -164,19 +164,10 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                 series.Add(serie);
 
                 // Computes axis x based on max duration
-                var fileDuration = file.GetDuration();
-                if (fileDuration != null && fileDuration.Value > maxX)
-                { maxX = fileDuration.Value; }
+                maxX = GetMaxXBasedOnDuration(file, maxX);
 
                 // Computes axis y based on Frames or Time
-                double? fileMaxY = _plotViewType switch
-                {
-                    PlotViewType.FrameBased => file.Frames.Max(f => f.Size),
-                    PlotViewType.SecondBased => file.GetBitRateMaximum(),
-                    _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
-                } / 1000;
-                if (fileMaxY != null && fileMaxY.Value > maxY)
-                { maxY = fileMaxY.Value; }
+                maxY = GetMaxYBasedOnFrameOrTime(file, maxY);
             }
 
             // Adjust axis x based on max duration
@@ -198,6 +189,29 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             series.ForEach(PlotModelData!.Series.Add);
             PlotModelData!.InvalidatePlot(updateData: true);
 
+        }
+
+        private double GetMaxYBasedOnFrameOrTime(FileItemViewModel file, double maxY)
+        {
+            double? fileMaxY = _plotViewType switch
+            {
+                PlotViewType.FrameBased => file.Frames.Max(f => f.Size),
+                PlotViewType.SecondBased => file.GetBitRateMaximum(),
+                _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
+            } / 1000;
+            if (fileMaxY != null && fileMaxY.Value > maxY)
+            { maxY = fileMaxY.Value; }
+
+            return maxY;
+        }
+
+        private static double GetMaxXBasedOnDuration(FileItemViewModel file, double maxX)
+        {
+            var fileDuration = file.GetDuration();
+            if (fileDuration != null && fileDuration.Value > maxX)
+            { maxX = fileDuration.Value; }
+
+            return maxX;
         }
 
         private async Task<OxyPlot.Series.StairStepSeries> GetSerie(FileItemViewModel file, CancellationToken token)
