@@ -140,7 +140,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                     var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = true };
 
                     // Add file to Data Grid
-                    _appProcessService.ExecutionOnUIThread(() =>
+                    _appProcessService.FireAndForget(() =>
                     {
                         Files.Add(fileItemViewModel);
                     });
@@ -156,22 +156,24 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
 
             PlotModelData!.Series.Clear();
 
-            //await Task.Run(async () =>
-            // {
-            token.ThrowIfCancellationRequested();
+            await Task.Run(async () =>
+            {
+
+                token.ThrowIfCancellationRequested();
 
             var tasks = Files
                 .Where(file => file.IsSelected)
-                .Select(file => SetUpFrameAndSerie(file, token));
+                .Select(file => PopulateFramesAndSeries(file, token));
             var fileAxis = await Task.WhenAll(tasks).ConfigureAwait(false);
 
-            (var maxX, var maxY) = fileAxis.Aggregate((MaxX: -1.0, MaxY: -1.0), (accumulated, current) =>
-            {
-                return (
-                    Math.Max(accumulated.MaxX, current.AxisX ?? -1.0),
-                    Math.Max(accumulated.MaxY, current.AxisY ?? -1.0)
+            (var maxX, var maxY) =
+                fileAxis.Aggregate(
+                    seed: (MaxX: -1.0, MaxY: -1.0),
+                    func: (accumulated, current) => (
+                        Math.Max(accumulated.MaxX, current.AxisX ?? -1.0),
+                        Math.Max(accumulated.MaxY, current.AxisY ?? -1.0)
+                    )
                 );
-            });
 
             // Adjust axis x based on max duration
             if (maxX > 0)
@@ -189,19 +191,17 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
             }
 
 
-            //}, token)
-            //   .ConfigureAwait(false);
+            }, token).ConfigureAwait(false);
+
             PlotModelData!.InvalidatePlot(updateData: true);
-
-
         }
 
-        private Task<(double? AxisX, double? AxisY)> SetUpFrameAndSerie(FileItemViewModel file, CancellationToken token)
+        private Task<(double? AxisX, double? AxisY)> PopulateFramesAndSeries(FileItemViewModel file, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
             var fileName = Path.GetFileName(file.Path.LocalPath);
-            var serie = GetNewSerie(fileName);
+            var series = GetNewSerie(fileName);
 
             // Request ffprobe information to create data points for serie
             return _ffprobeAppClient
@@ -211,7 +211,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                     token.ThrowIfCancellationRequested();
 
                     file.Frames.Add(probePacket);
-                    serie.Points.Add(GetDataPoint(probePacket, file, _plotViewType));
+                    series.Points.Add(GetDataPoint(probePacket, file, _plotViewType));
 
                 }, token)
                 .ContinueWith(_ =>
@@ -224,11 +224,11 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels
                     var axisY = GetAxisYForFile(file);
 
                     // Refresh BitRateAverage and BitRateMaximum
-                    _appProcessService.ExecutionOnUIThread(() =>
+                    _appProcessService.FireAndForget(() =>
                     {
                         file.RefreshBitRateAverage();
                         file.RefreshBitRateMaximum();
-                        PlotModelData!.Series.Add(serie);
+                        PlotModelData!.Series.Add(series);
                     });
 
                     return (axisX, axisY);
