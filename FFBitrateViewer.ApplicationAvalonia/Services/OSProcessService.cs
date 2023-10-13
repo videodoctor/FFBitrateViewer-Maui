@@ -56,7 +56,7 @@ public class OSProcessService
         surrogateEnvironmentalVariables ??= new Dictionary<string, string?>();
 
         var process = GetNewProcessInstance(
-            command, 
+            command,
             workingDirectory,
             standardOutputEncoding,
             standardErrorEncoding,
@@ -64,9 +64,9 @@ public class OSProcessService
         );
 
         _processes[process] = (
-            standardOutputWriter, 
-            standardErrorWriter, 
-            standardOutputChannel, 
+            standardOutputWriter,
+            standardErrorWriter,
+            standardOutputChannel,
             standardErrorChannel,
             cancellationToken);
 
@@ -136,7 +136,7 @@ public class OSProcessService
     {
         var process = (Process)sender;
         var (_, stdErrWriter, _, stdErrChannel, cancellationToken) = _processes[process];
-        
+
         cancellationToken.ThrowIfCancellationRequested();
 
         await WriteReceivedData(e, stdErrWriter, stdErrChannel, cancellationToken).ConfigureAwait(false);
@@ -168,8 +168,8 @@ public class OSProcessService
     }
 
     private Process GetNewProcessInstance(
-        string command, 
-        string?  workingDirectory = null,
+        string command,
+        string? workingDirectory = null,
         Encoding? standardOutputEncoding = null,
         Encoding? standardErrorEncoding = null,
         Encoding? standardInputEncoding = null
@@ -189,91 +189,23 @@ public class OSProcessService
         process.StartInfo.StandardInputEncoding = standardInputEncoding;
 
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        var commandComposers = OSShellCommandComposer.GetCommandComposers();
+        foreach (var commandComposer in commandComposers)
         {
-            // Default Shells (with %SystemRoot% == C:\WINDOWS )
-            // %SystemRoot%\System32\cmd.exe /U /C ...
-            // %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -NoLogo -Mta -NoProfile -NonInteractive -WindowStyle Hidden -EncodedCommand -Command ...
-            const string PWSH_FILE_NAME = @"powershell.exe";
-            const string CMD_FILE_NAME = @"cmd.exe";
+            var (executable, arguments) = commandComposer.GetCommandLine(command);
 
-            var powershellExeFilePaths = Which(PWSH_FILE_NAME).ToList();
-            var cmdExeFilePaths = Which(CMD_FILE_NAME).ToList();
-            if (powershellExeFilePaths.Any())
-            {
-                process.StartInfo.FileName = powershellExeFilePaths.First();
-                process.StartInfo.ArgumentList.Add("-NoLogo");
-                process.StartInfo.ArgumentList.Add("-Mta");
-                process.StartInfo.ArgumentList.Add("-NoProfile");
-                process.StartInfo.ArgumentList.Add("-NonInteractive");
-                process.StartInfo.ArgumentList.Add("-WindowStyle");
-                process.StartInfo.ArgumentList.Add("Hidden");
-                process.StartInfo.ArgumentList.Add("-EncodedCommand");
+            if (!File.Exists(executable))
+            { executable = Which(executable).FirstOrDefault(); }
 
-                // NOTE: Appending exit $LASTEXITCODE to the command to get the exit code of the command
-                // https://stackoverflow.com/questions/50200325/returning-an-exit-code-from-a-powershell-script
-                process.StartInfo.ArgumentList.Add(Convert.ToBase64String(Encoding.Unicode.GetBytes($"{command}; exit $LASTEXITCODE")));
-            }
-            else if (cmdExeFilePaths.Any())
-            {
-                process.StartInfo.FileName = cmdExeFilePaths.First();
-                process.StartInfo.ArgumentList.Add("/U");
-                process.StartInfo.ArgumentList.Add("/C");
-                process.StartInfo.ArgumentList.Add(command);
-            }
-            else
-            {
-                throw new OSProcessServiceException($"Neither {PWSH_FILE_NAME} or {CMD_FILE_NAME} were not found in PATH.");
-            }
+            if (executable == null)
+            { continue; }
 
+            process.StartInfo.FileName = executable;
+            arguments.ForEach(process.StartInfo.ArgumentList.Add);
+            break;
         }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            // Normally in MacOS default shell is: zsh
-            const string ZSH_FILE_NAME = @"zsh";
-            var zshFilePaths = Which(ZSH_FILE_NAME).ToList();
-            if (zshFilePaths.Any())
-            {
-                process.StartInfo.FileName = zshFilePaths.First();
-                process.StartInfo.ArgumentList.Add("-l");
-                process.StartInfo.ArgumentList.Add("-c");
-                process.StartInfo.ArgumentList.Add(command);
-            }
-            else
-            {
-                throw new OSProcessServiceException($"{ZSH_FILE_NAME} was not found in PATH.");
-            }
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            // Linux has many shells:
-            //
-            //  - Bourne Shell (sh) The Bourne shell was the first default shell on Unix systems, released in 1979. ...
-            //  - C Shell (csh) ...
-            //  - TENEX C Shell (tcsh) ...
-            //  - KornShell (ksh) ...
-            //  - Debian Almquist Shell (dash) ...
-            //  - Bourne Again Shell (bash) ...
-            //  - Z Shell (zsh) ...
-            //  - Friendly Interactive Shell (fish)
-            //  - Powershell (pwsh)
-            //
-            // Modern distros already includes sh (Bourne Shell)
 
-            const string SH_FILE_NAME = @"sh";
-            var shFilePaths = Which(SH_FILE_NAME).ToList();
-            if (shFilePaths.Any())
-            {
-                process.StartInfo.FileName = shFilePaths.First();
-                process.StartInfo.ArgumentList.Add("-c");
-                process.StartInfo.ArgumentList.Add(command);
-            }
-            else
-            {
-                throw new OSProcessServiceException($"{SH_FILE_NAME} was not found in PATH.");
-            }
-        }
-        else
+        if (string.IsNullOrEmpty(process.StartInfo.FileName))
         {
             throw new OSProcessServiceException($"Process creation in: {RuntimeInformation.OSDescription} is not supported.");
         }
