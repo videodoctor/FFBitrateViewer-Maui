@@ -13,6 +13,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+                yield return new PwShellCommandComposer();
                 yield return new PowerShellCommandComposer();
                 yield return new CmdShellCommandComposer();
             }
@@ -45,10 +46,27 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
 
     internal sealed record PowerShellCommandComposer : OSShellCommandComposer
     {
-        // Default Shells (with %SystemRoot% == C:\WINDOWS )
-        // %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -NoLogo -Mta -NoProfile -NonInteractive -WindowStyle Hidden -EncodedCommand -Command ...
+        // Default Shells (with ${env:SystemRoot} == C:\WINDOWS )
+        // ${env:SystemRoot}\System32\WindowsPowerShell\v1.0\powershell.exe -NoLogo -Mta -NoProfile -NonInteractive -WindowStyle Hidden -EncodedCommand -Command ...
         public override (string executable, List<string> arguments) GetCommandLine(string command)
             => ("powershell.exe", new List<string> {
+                "-NoLogo",
+                "-Mta",
+                "-NoProfile",
+                "-NonInteractive",
+                "-WindowStyle", "Hidden",
+                "-EncodedCommand",
+                // NOTE: Appending exit $LASTEXITCODE to the command to get the exit code of the command
+                // https://stackoverflow.com/questions/50200325/returning-an-exit-code-from-a-powershell-script
+                Convert.ToBase64String(Encoding.Unicode.GetBytes($"{command}; exit $LASTEXITCODE"))
+            });
+    }
+
+    internal sealed record PwShellCommandComposer : OSShellCommandComposer
+    {
+        // ${env:ProgramFiles}\PowerShell\7\pwsh.exe -NoLogo -Mta -NoProfile -NonInteractive -WindowStyle Hidden -EncodedCommand -Command ...
+        public override (string executable, List<string> arguments) GetCommandLine(string command)
+            => ("pwsh.exe", new List<string> {
                 "-NoLogo",
                 "-Mta",
                 "-NoProfile",
