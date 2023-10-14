@@ -18,7 +18,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 /// <summary>
 /// FFProbeAppClient is a wrapper for ffprobe command line tool.
 /// </summary>
-public class FFProbeAppClient
+public class FFProbeClient
 {
     // ffprobe can produce different output as exlpained in
     // https://ffmpeg.org/ffprobe.html . Thus we use CSV for
@@ -31,19 +31,19 @@ public class FFProbeAppClient
     /// <summary>
     /// Returns the full path of ffprobe executable.
     /// </summary>
-    public string FFProbeFilePath { get => _ffprobeFilePath ??= WhichFFProbeFilePath(); }
+    public string FFProbeFilePath { get => _fFProbeFilePath ??= WhichFFProbe(); }
 
-    private string? _ffprobeFilePath;
+    private string? _fFProbeFilePath;
 
-    private string WhichFFProbeFilePath()
+    private string WhichFFProbe()
     {
-        var ffProbeFileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ffprobe.exe" : "ffprobe";
-        var ffprobeFilePaths = _processService.Which(ffProbeFileName);
-        if (!ffprobeFilePaths.Any())
+        var fFProbeFileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ffprobe.exe" : "ffprobe";
+        var fFProbeFilePaths = _processService.Which(fFProbeFileName);
+        if (!fFProbeFilePaths.Any())
         {
-            throw new FFProbeAppClientException($"Executable {ffProbeFileName} was not found.");
+            throw new FFProbeClientException($"Executable {fFProbeFileName} was not found.");
         }
-        return ffprobeFilePaths.First();
+        return fFProbeFilePaths.First();
 
     }
 
@@ -52,7 +52,7 @@ public class FFProbeAppClient
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <exception cref="FFProbeAppClientException"></exception>
+    /// <exception cref="FFProbeClientException"></exception>
     public async Task<Version> GetVersionAsync(CancellationToken cancellationToken = default)
     {
         StringBuilder sb = new();
@@ -61,12 +61,12 @@ public class FFProbeAppClient
         var command = $"{FFProbeFilePath} -version";
         var exitCode = await _processService.ExecuteAsync(command, standardOutputWriter: sw, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (exitCode != 0)
-        { throw new FFProbeAppClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
+        { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
 
         var versionText = sb.ToString().Split(" ").Last().Trim();
         if (!Version.TryParse(versionText, out var version))
         {
-            throw new FFProbeAppClientException($"Failed extracting ffprobe version with command: {command}");
+            throw new FFProbeClientException($"Failed extracting ffprobe version with command: {command}");
         }
         return version;
     }
@@ -79,7 +79,7 @@ public class FFProbeAppClient
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     /// <exception cref="FileNotFoundException"></exception>
-    /// <exception cref="FFProbeAppClientException"></exception>
+    /// <exception cref="FFProbeClientException"></exception>
     public async Task<FFProbeJsonOutput> GetMediaInfoAsync(string mediaFilePath, int threadCount = 11)
     {
         ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
@@ -96,7 +96,7 @@ public class FFProbeAppClient
         using var streamWriter = new StreamWriter(memoryStream);
         var exitCode = await _processService.ExecuteAsync(command, standardOutputWriter: streamWriter).ConfigureAwait(false);
         if (exitCode != 0)
-        { throw new FFProbeAppClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
+        { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
 
 #if DEBUG
         memoryStream.Seek(0, SeekOrigin.Begin);
@@ -126,7 +126,7 @@ public class FFProbeAppClient
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     /// <exception cref="FileNotFoundException"></exception>
-    /// <exception cref="FFProbeAppClientException"></exception>
+    /// <exception cref="FFProbeClientException"></exception>
     public async IAsyncEnumerable<FFProbePacket> GetProbePackets(
         string mediaFilePath,
         int streamId = 0,
@@ -165,7 +165,7 @@ public class FFProbeAppClient
             var entryType = csvDataReader.GetString(0);
             if (string.Compare(entryType, "packet", true) != 0)
             {
-                throw new FFProbeAppClientException($"Entry Type:{entryType} is not supported");
+                throw new FFProbeClientException($"Entry Type:{entryType} is not supported");
             }
             //Index     Sample(csv)     ffprobe (Frame)
             //0         packet,         
@@ -196,6 +196,6 @@ public class FFProbeAppClient
 
         var exitCode = await commandTask;
         if (exitCode != 0)
-        { throw new FFProbeAppClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
+        { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
     }
 }

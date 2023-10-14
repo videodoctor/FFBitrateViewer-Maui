@@ -64,7 +64,7 @@ public partial class MainViewModel : ViewModelBase
 
     private readonly FileDialogService _fileDialogService = new();
 
-    private readonly FFProbeAppClient _ffprobeAppClient = new();
+    private readonly FFProbeClient _ffprobeAppClient = new();
 
 
     [RelayCommand]

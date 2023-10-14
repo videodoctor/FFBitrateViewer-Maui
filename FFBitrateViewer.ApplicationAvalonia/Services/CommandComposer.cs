@@ -26,9 +26,9 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                yield return new PwshExeCommandComposer();
                 yield return new PowerShellExeCommandComposer();
                 yield return new CmdExeCommandComposer();
+                yield return new PwshExeCommandComposer();
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {

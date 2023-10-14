@@ -6,7 +6,7 @@ var processService = new ProcessService();
 await processService.ExecuteAsync(@"echo ""`env`""", standardOutputWriter: Console.Out);
 processService.Which("pwsh.exe").ToList().ForEach(Console.WriteLine);
 
-var ffprobeAppClient = new FFProbeAppClient();
+var ffprobeAppClient = new FFProbeClient();
 var mediaFilePath = @"D:\documents\video\my-journey\NUCUMA\Nucuma-1.mkv";
 
 var version = await ffprobeAppClient.GetVersionAsync();
