@@ -26,7 +26,7 @@ public class FFProbeAppClient
     // based on benchmark (2020/12) https://www.joelverhagen.com/blog/2020/12/fastest-net-csv-parsers
     // For hierarchical structures with "reasonable" size we use JSON with System.Text.Json parser.
 
-    private readonly OSProcessService _oSProcessService = new();
+    private readonly ProcessService _processService = new();
 
     /// <summary>
     /// Returns the full path of ffprobe executable.
@@ -38,7 +38,7 @@ public class FFProbeAppClient
     private string WhichFFProbeFilePath()
     {
         var ffProbeFileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ffprobe.exe" : "ffprobe";
-        var ffprobeFilePaths = _oSProcessService.Which(ffProbeFileName);
+        var ffprobeFilePaths = _processService.Which(ffProbeFileName);
         if (!ffprobeFilePaths.Any())
         {
             throw new FFProbeAppClientException($"Executable {ffProbeFileName} was not found.");
@@ -59,7 +59,7 @@ public class FFProbeAppClient
         using StringWriter sw = new(sb);
 
         var command = $"{FFProbeFilePath} -version";
-        var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: sw, cancellationToken: cancellationToken).ConfigureAwait(false);
+        var exitCode = await _processService.ExecuteAsync(command, standardOutputWriter: sw, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (exitCode != 0)
         { throw new FFProbeAppClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
 
@@ -94,7 +94,7 @@ public class FFProbeAppClient
 
         using var memoryStream = new MemoryStream();
         using var streamWriter = new StreamWriter(memoryStream);
-        var exitCode = await _oSProcessService.ExecuteAsync(command, standardOutputWriter: streamWriter).ConfigureAwait(false);
+        var exitCode = await _processService.ExecuteAsync(command, standardOutputWriter: streamWriter).ConfigureAwait(false);
         if (exitCode != 0)
         { throw new FFProbeAppClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
 
@@ -144,7 +144,7 @@ public class FFProbeAppClient
 
         var commandStdOuputChannel = Channel.CreateUnbounded<string>();
         var command = $@"{FFProbeFilePath} -hide_banner -threads {threadCount} -print_format csv -loglevel fatal -show_error -select_streams v:{streamId} -show_entries packet=dts_time,duration_time,pts_time,size,flags ""{mediaFilePath}""";
-        var commandTask = _oSProcessService.ExecuteAsync(command, standardOutputChannel: commandStdOuputChannel, cancellationToken: token).ConfigureAwait(false);
+        var commandTask = _processService.ExecuteAsync(command, standardOutputChannel: commandStdOuputChannel, cancellationToken: token).ConfigureAwait(false);
 
         var csvDataReaderOptions = new CsvDataReaderOptions
         { HasHeaders = false, };

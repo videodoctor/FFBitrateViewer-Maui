@@ -2,9 +2,9 @@
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 
-var oSProcessService = new OSProcessService();
-await oSProcessService.ExecuteAsync(@"echo ""`env`""", standardOutputWriter: Console.Out);
-oSProcessService.Which("pwsh.exe").ToList().ForEach(Console.WriteLine);
+var processService = new ProcessService();
+await processService.ExecuteAsync(@"echo ""`env`""", standardOutputWriter: Console.Out);
+processService.Which("pwsh.exe").ToList().ForEach(Console.WriteLine);
 
 var ffprobeAppClient = new FFProbeAppClient();
 var mediaFilePath = @"D:\documents\video\my-journey\NUCUMA\Nucuma-1.mkv";

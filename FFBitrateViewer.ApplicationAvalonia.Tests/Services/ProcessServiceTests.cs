@@ -5,16 +5,16 @@ using System.Threading.Channels;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Tests.Services;
 
-internal class OSProcessServiceTests
+internal class ProcessServiceTests
 {
     private static readonly string TestAppFilePath = typeof(Program).Assembly.Location;
 
-    private OSProcessService _OSProcessService;
+    private ProcessService _processService;
 
     [SetUp]
     public void Setup()
     {
-        _OSProcessService = new OSProcessService();
+        _processService = new ProcessService();
     }
 
     [Test]
@@ -24,7 +24,7 @@ internal class OSProcessServiceTests
         var command = $"dotnet {TestAppFilePath} echo \"Hello World\"";
 
         // act
-        var exitCode = await _OSProcessService.ExecuteAsync(command);
+        var exitCode = await _processService.ExecuteAsync(command);
 
         // assert
         Assert.That(exitCode, Is.EqualTo(0));
@@ -39,7 +39,7 @@ internal class OSProcessServiceTests
 
         // act
         var sb = new StringBuilder();
-        var exitCode = await _OSProcessService.ExecuteAsync(
+        var exitCode = await _processService.ExecuteAsync(
             command,
             standardOutputWriter: new StringWriter(sb),
             standardOutputEncoding: Encoding.UTF8
@@ -59,7 +59,7 @@ internal class OSProcessServiceTests
 
         // act
         var commandStdOuputChannel = Channel.CreateUnbounded<string>();
-        var exitCode = await _OSProcessService.ExecuteAsync(
+        var exitCode = await _processService.ExecuteAsync(
             command,
             standardOutputChannel: commandStdOuputChannel,
             standardOutputEncoding: Encoding.UTF8
@@ -84,7 +84,7 @@ internal class OSProcessServiceTests
         var command = $"dotnet {TestAppFilePath} exit 42";
 
         // act
-        var exitCode = await _OSProcessService.ExecuteAsync(command);
+        var exitCode = await _processService.ExecuteAsync(command);
 
         // assert
         Assert.That(exitCode, Is.EqualTo(42));
@@ -98,7 +98,7 @@ internal class OSProcessServiceTests
         var cancellationTokenSource = new CancellationTokenSource();
 
         // act
-        var task = _OSProcessService.ExecuteAsync(command, cancellationToken: cancellationTokenSource.Token);
+        var task = _processService.ExecuteAsync(command, cancellationToken: cancellationTokenSource.Token);
         cancellationTokenSource.CancelAfter(1000);
         var taskCanceledException = Assert.ThrowsAsync<TaskCanceledException>(async () => await task);
 
@@ -114,7 +114,7 @@ internal class OSProcessServiceTests
         var command = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "dotnet.exe" : "dotnet";
 
         // act
-        var foundFilePaths = _OSProcessService.Which(command);
+        var foundFilePaths = _processService.Which(command);
 
         // assert
         Assert.That(foundFilePaths, Is.Not.Null);
@@ -131,7 +131,7 @@ internal class OSProcessServiceTests
         // act
         var sb = new StringBuilder();
         using var sw = new StringWriter(sb);
-        var exitCode = await _OSProcessService.ExecuteAsync(
+        var exitCode = await _processService.ExecuteAsync(
             command,
             standardOutputWriter: sw,
             surrogateEnvironmentalVariables: new Dictionary<string, string?> {

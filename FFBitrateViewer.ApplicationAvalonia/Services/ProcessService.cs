@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 namespace FFBitrateViewer.ApplicationAvalonia.Services;
 
 /// <summary>
-/// OSProcessService is a wrapper for OS process creation.
+/// ProcessService is a service for executing commands in a new process.
 /// </summary>
-public class OSProcessService
+public class ProcessService
 {
 
     private readonly Dictionary<Process, (TextWriter, TextWriter, Channel<string>?, Channel<string>?, CancellationToken)> _processes = new();
@@ -35,7 +35,7 @@ public class OSProcessService
     /// <param name="surrogateEnvironmentalVariables">When provided specified variables are overridden with new values</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <exception cref="OSProcessServiceException"></exception>
+    /// <exception cref="ProcessServiceException"></exception>
     public async Task<int> ExecuteAsync(
         string command,
         string? workingDirectory = null,
@@ -89,7 +89,7 @@ public class OSProcessService
         var hasProcessStarted = process.Start();
         if (!hasProcessStarted)
         {
-            throw new OSProcessServiceException($"Failed to execute command: {command}");
+            throw new ProcessServiceException($"Failed to execute command: {command}");
         }
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
@@ -109,6 +109,13 @@ public class OSProcessService
         return process.ExitCode;
     }
 
+    /// <summary>
+    /// Looks for a file in the directories specified in the PATH environment variable.
+    /// Additional lookup paths can be specified, if not provided the current directory is used.
+    /// </summary>
+    /// <param name="executableFileName"></param>
+    /// <param name="additionalLookupPaths"></param>
+    /// <returns></returns>
     public IEnumerable<string> Which(
         string executableFileName,
         params string[] additionalLookupPaths)
@@ -189,25 +196,25 @@ public class OSProcessService
         process.StartInfo.StandardInputEncoding = standardInputEncoding;
 
 
-        var commandComposers = OSShellCommandComposer.GetCommandComposers();
+        var commandComposers = CommandComposer.GetCommandComposers();
         foreach (var commandComposer in commandComposers)
         {
-            var (executable, arguments) = commandComposer.GetCommandLine(command);
+            var (osCommand, arguments) = commandComposer.GetCommandLine(command);
 
-            if (!File.Exists(executable))
-            { executable = Which(executable).FirstOrDefault(); }
+            if (!File.Exists(osCommand))
+            { osCommand = Which(osCommand).FirstOrDefault(); }
 
-            if (executable == null)
+            if (osCommand == null)
             { continue; }
 
-            process.StartInfo.FileName = executable;
+            process.StartInfo.FileName = osCommand;
             arguments.ForEach(process.StartInfo.ArgumentList.Add);
             break;
         }
 
         if (string.IsNullOrEmpty(process.StartInfo.FileName))
         {
-            throw new OSProcessServiceException($"Process creation in: {RuntimeInformation.OSDescription} is not supported.");
+            throw new ProcessServiceException($"Process creation in: {RuntimeInformation.OSDescription} is not supported.");
         }
 
         return process;
