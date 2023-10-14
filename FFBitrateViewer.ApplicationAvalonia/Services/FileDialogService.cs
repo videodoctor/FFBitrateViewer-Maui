@@ -16,11 +16,11 @@ public class FileDialogService
         bool IsSingleSelection = true
     )
     {
-        if (AppProcessService.DesktopApplication == null)
+        if (UIApplicationService.DesktopApplication == null)
         { throw new System.Exception("A desktop application is required to open files."); }
 
         // Get top level from the current control. Alternatively, you can use Window reference instead.
-        var topLevel = TopLevel.GetTopLevel(AppProcessService.DesktopApplication.MainWindow);
+        var topLevel = TopLevel.GetTopLevel(UIApplicationService.DesktopApplication.MainWindow);
 
         // Start async operation to open the dialog.
         var files = await topLevel!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions

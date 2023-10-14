@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FFBitrateViewer.ApplicationAvalonia.Services;
 
 
-public class AppProcessService
+public class UIApplicationService
 {
     internal static IClassicDesktopStyleApplicationLifetime? DesktopApplication => _desktopApplication.Value;
 
