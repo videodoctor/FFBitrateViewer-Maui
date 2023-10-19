@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
+using Hmb.ProcessRunner;
 
 var processService = new ProcessService();
 await processService.ExecuteAsync(@"echo ""`env`""", standardOutputWriter: Console.Out);
