@@ -3,199 +3,199 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:FFBitrateViewer.ApplicationAvalonia.ViewModels"
-			 xmlns:m="clr-namespace:FFBitrateViewer.ApplicationAvalonia.Models"
+             xmlns:m="clr-namespace:FFBitrateViewer.ApplicationAvalonia.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FFBitrateViewer.ApplicationAvalonia.Views.MainView"
              x:DataType="vm:MainViewModel"
-			 x:CompileBindings="True"
-			 xmlns:OxyPlot_Avalonia="clr-namespace:OxyPlot.Avalonia;assembly=OxyPlot.Avalonia"
-			 xmlns:pgc="clr-namespace:Avalonia.PropertyGrid.Controls;assembly=Avalonia.PropertyGrid"
-			 xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             x:CompileBindings="True"
+             xmlns:OxyPlot_Avalonia="clr-namespace:OxyPlot.Avalonia;assembly=OxyPlot.Avalonia"
+             xmlns:pgc="clr-namespace:Avalonia.PropertyGrid.Controls;assembly=Avalonia.PropertyGrid"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-			 x:Name="MainViewUserControl"
-			 >
-	<i:Interaction.Behaviors>
-		<ia:EventTriggerBehavior EventName="Loaded" SourceObject="MainViewUserControl">
-			<ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotModelData" Value="{Binding ActualModel, ElementName=PlotControl}" />
-			<ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotControllerData" Value="{Binding ActualController, ElementName=PlotControl}" />
-			<ia:InvokeCommandAction Command="{Binding LoadedCommand,Mode=OneTime}" />
-		</ia:EventTriggerBehavior>
-	</i:Interaction.Behaviors>
-	<Design.DataContext>
-		<!-- This only sets the DataContext for the previewer in an IDE,
+             x:Name="MainViewUserControl"
+             >
+    <i:Interaction.Behaviors>
+        <ia:EventTriggerBehavior EventName="Loaded" SourceObject="MainViewUserControl">
+            <ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotModelData" Value="{Binding ActualModel, ElementName=PlotControl}" />
+            <ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotControllerData" Value="{Binding ActualController, ElementName=PlotControl}" />
+            <ia:InvokeCommandAction Command="{Binding LoadedCommand,Mode=OneTime}" />
+        </ia:EventTriggerBehavior>
+    </i:Interaction.Behaviors>
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-		<vm:MainViewModel />
-	</Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
 
-	<Grid RowDefinitions="Auto,Auto,*,Auto,*,Auto">
-		<!-- Menu -->
-		<Menu Grid.Row="0">
-			<MenuItem Header="_File">
-				<MenuItem Header="E_xit" Command="{Binding ExitCommand,Mode=OneTime}" />
-			</MenuItem>
-			<MenuItem Header="A_ctions">
-				<MenuItem Header="_Add files…" Command="{Binding AddFilesCommand,Mode=OneTime}" />
-				<MenuItem Header="_Remove selected files"/>
-				<MenuItem Header="Remove ALL files"/>
-				<Separator/>
-				<MenuItem Header="Refresh _media info"/>
-				<Separator/>
-				<MenuItem Header="_Start"/>
-				<MenuItem Header="St_op"/>
-				<Separator/>
-				<MenuItem Header="Copy plot to _clipboard"/>
-				<MenuItem Header="Save plot to _file…"/>
-			</MenuItem>
-			<MenuItem Header="_Options">
-				<MenuItem Header="Write _FFProbe commands to log"/>
-			</MenuItem>
-			<MenuItem Header="_Help">
-				<MenuItem Header="_About"/>
-			</MenuItem>
-		</Menu>
-		<!--
+    <Grid RowDefinitions="Auto,Auto,*,Auto,*,Auto">
+        <!-- Menu -->
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand,Mode=OneTime}" />
+            </MenuItem>
+            <MenuItem Header="A_ctions">
+                <MenuItem Header="_Add files…" Command="{Binding AddFilesCommand,Mode=OneTime}" />
+                <MenuItem Header="_Remove selected files"/>
+                <MenuItem Header="Remove ALL files"/>
+                <Separator/>
+                <MenuItem Header="Refresh _media info"/>
+                <Separator/>
+                <MenuItem Header="_Start"/>
+                <MenuItem Header="St_op"/>
+                <Separator/>
+                <MenuItem Header="Copy plot to _clipboard"/>
+                <MenuItem Header="Save plot to _file…"/>
+            </MenuItem>
+            <MenuItem Header="_Options">
+                <MenuItem Header="Write _FFProbe commands to log"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About"/>
+            </MenuItem>
+        </Menu>
+        <!--
 
-		-->
+        -->
 
-		<!--buttons-->
-		<StackPanel Grid.Row="1" Orientation="Horizontal">
-			<Button Content="Add file"/>
-			<Button Content="Remove selected"/>
-		</StackPanel>
+        <!--buttons-->
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Button Content="Add file"/>
+            <Button Content="Remove selected"/>
+        </StackPanel>
 
-		<Grid Grid.Row="2" ColumnDefinitions="0.8*,4,0.2*">
+        <Grid Grid.Row="2" ColumnDefinitions="0.8*,4,0.2*">
 
-			<DataGrid Grid.Column="0" ItemsSource="{Binding Files,Mode=OneTime}"
-				  CanUserReorderColumns="True"
-				  CanUserResizeColumns="True"
-				  CanUserSortColumns="False"
-				  GridLinesVisibility="All"
-				  BorderThickness="1" BorderBrush="Gray"
-				  SelectionMode="Single" SelectedItem="{Binding SelectedFile,Mode=TwoWay}"
-					  >
-				<DataGrid.Columns>
-					<!--<DataGridTextColumn Header="" Binding="{Binding IsSelected}"/>-->
-					<DataGridCheckBoxColumn Header="Is Active" Binding="{Binding IsSelected}" IsReadOnly="False"/>
-					<DataGridTextColumn Header="Path to file"  Binding="{Binding Path,Mode=OneTime}" IsReadOnly="True" />
-					<DataGridTextColumn Header="Media Info" Binding="{Binding FirstVideoShortDesc,Mode=OneTime}" IsReadOnly="True" />
-					<DataGridTextColumn Header="Bit Rate (avg)" Binding="{Binding BitRateAverage,Mode=OneWay,StringFormat=' {0} kb/s'}" IsReadOnly="True" />
-					<DataGridTextColumn Header="Bit Rate (max)" Binding="{Binding BitRateMaximum,Mode=OneWay,StringFormat=' {0} kb/s'}" IsReadOnly="True" />
-				</DataGrid.Columns>
-			</DataGrid>
+            <DataGrid Grid.Column="0" ItemsSource="{Binding Files,Mode=OneTime}"
+                  CanUserReorderColumns="True"
+                  CanUserResizeColumns="True"
+                  CanUserSortColumns="False"
+                  GridLinesVisibility="All"
+                  BorderThickness="1" BorderBrush="Gray"
+                  SelectionMode="Single" SelectedItem="{Binding SelectedFile,Mode=TwoWay}"
+                      >
+                <DataGrid.Columns>
+                    <!--<DataGridTextColumn Header="" Binding="{Binding IsSelected}"/>-->
+                    <DataGridCheckBoxColumn Header="Is Active" Binding="{Binding IsSelected}" IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Path to file"  Binding="{Binding Path,Mode=OneTime}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Media Info" Binding="{Binding FirstVideoShortDesc,Mode=OneTime}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Bit Rate (avg)" Binding="{Binding BitRateAverage,Mode=OneWay,StringFormat=' {0} kb/s'}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Bit Rate (max)" Binding="{Binding BitRateMaximum,Mode=OneWay,StringFormat=' {0} kb/s'}" IsReadOnly="True" />
+                </DataGrid.Columns>
+            </DataGrid>
 
-			<GridSplitter Grid.Column="1" ResizeDirection="Columns"/>
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns"/>
 
 
-			<ScrollViewer Grid.Column="2">
-				<pgc:PropertyGrid SelectedObject="{Binding SelectedFile}" />
-			</ScrollViewer>
+            <ScrollViewer Grid.Column="2">
+                <pgc:PropertyGrid DataContext="{Binding SelectedFile}" />
+            </ScrollViewer>
 
-		</Grid>
+        </Grid>
 
-		<!--<DataGrid Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}"
-				  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-				  AutoGenerateColumns="True"
-				  GridLinesVisibility="All"
-				  BorderThickness="1" BorderBrush="Gray">
-		</DataGrid>-->
+        <!--<DataGrid Grid.Row="2" ItemsSource="{Binding Files,Mode=OneTime}"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                  AutoGenerateColumns="True"
+                  GridLinesVisibility="All"
+                  BorderThickness="1" BorderBrush="Gray">
+        </DataGrid>-->
 
-		<!--Button and check buttons-->
-		<StackPanel Grid.Row="3" Orientation="Horizontal">
-			<Button Content="Start" Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"/>
-			<Button Content="Stop" Command="{Binding ToggleOnOffPlotterPlotterCancelCommand,Mode=OneTime}"/>
-			<!--<ToggleSwitch OnContent="Stop" OffContent="Start" IsChecked="{Binding IsPlotterOn,Mode=TwoWay}" 
-						  Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"
-						  />-->
-			<Label Content="Plot view:" VerticalAlignment="Center" />
-			<RadioButton GroupName="PotViewGroupName" Content="Frame based" IsChecked="True"
-						 Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
-						 CommandParameter="{x:Static m:PlotViewType.FrameBased}"
-						 />
-			<RadioButton GroupName="PotViewGroupName" Content="Second based" IsChecked="False"
-						 Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
-						 CommandParameter="{x:Static m:PlotViewType.SecondBased}"
-						 />
-			<Label Content="Adjust frame start time" VerticalAlignment="Center"/>
-			<CheckBox IsChecked="{Binding HasToAdjustFrameStartTime}"></CheckBox>
-		</StackPanel>
+        <!--Button and check buttons-->
+        <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <Button Content="Start" Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"/>
+            <Button Content="Stop" Command="{Binding ToggleOnOffPlotterPlotterCancelCommand,Mode=OneTime}"/>
+            <!--<ToggleSwitch OnContent="Stop" OffContent="Start" IsChecked="{Binding IsPlotterOn,Mode=TwoWay}" 
+                          Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"
+                          />-->
+            <Label Content="Plot view:" VerticalAlignment="Center" />
+            <RadioButton GroupName="PotViewGroupName" Content="Frame based" IsChecked="True"
+                         Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
+                         CommandParameter="{x:Static m:PlotViewType.FrameBased}"
+                         />
+            <RadioButton GroupName="PotViewGroupName" Content="Second based" IsChecked="False"
+                         Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
+                         CommandParameter="{x:Static m:PlotViewType.SecondBased}"
+                         />
+            <Label Content="Adjust frame start time" VerticalAlignment="Center"/>
+            <CheckBox IsChecked="{Binding HasToAdjustFrameStartTime}"></CheckBox>
+        </StackPanel>
 
-		<!--Plot view-->
-		<Grid Grid.Row="4">
-			<!-- The OxyPlot control is binding to a PlotModel in the MainViewModel -->
-			<OxyPlot_Avalonia:Plot x:Name="PlotControl">
-				<!--
-				ActualModel="{Binding PlotModelData,Mode=OneWayToSource}"
-				ActualController="{Binding PlotControllerData,Mode=OneWayToSource}"
-				-->
-				<OxyPlot_Avalonia:Plot.Legends>
-					<OxyPlot_Avalonia:Legend
-						LegendPosition="BottomRight"
-						LegendPlacement="Outside"
-						LegendOrientation="Horizontal"
-						LegendMargin="0"
-						LegendPadding="0"
-						LegendBorderThickness="0"
-						LegendBorder="Black"
-						LegendBackground="Gray"
-						
-					/>
-					<!--
-					ShowInvisibleSeries="false"
-					LegendFont            = "Arial" // todo@ Chineese characters not rendered correctly
-					LegendBackground      = OxyColor.FromAColor(200, OxyColors.White),
-					-->
-				</OxyPlot_Avalonia:Plot.Legends>
-				<OxyPlot_Avalonia:Plot.Axes>
-					<OxyPlot_Avalonia:TimeSpanAxis
-						AbsoluteMaximum="10"
-						AbsoluteMinimum="0"
-						Maximum="10"
-						Minimum="0"
-						MaximumPadding="0"
-						MinimumPadding="0"
-						MinimumRange="0.5"
-						MajorGridlineStyle="Solid"
-						MinorGridlineStyle="Dot"
-						Position="Bottom"
-						StringFormat="mm:ss"
-						MajorGridlineColor="CornFlowerBlue"
-						MinorGridlineColor="LightBlue"
-					/>
-					<!--
-					MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139),
-					MinorGridlineColor = OxyColor.FromArgb(20, 0, 0, 139),
-					-->
-					<OxyPlot_Avalonia:LinearAxis
-						AbsoluteMaximum="1"
-						AbsoluteMinimum="0"
-						Maximum="1"
-						Minimum="0"
-						MaximumPadding="0"
-						MinimumPadding="0"
-						MaximumDataMargin="5"
-						MinimumRange="1"
-						MajorGridlineStyle="Solid"
-						MinorGridlineStyle="Dot"
-						Position="Left"
-						Angle="270"
-						MajorGridlineColor="CornFlowerBlue"
-						MinorGridlineColor="LightBlue"
-						/>
-					<!--
-					MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139),
-					MinorGridlineColor = OxyColor.FromArgb(20, 0, 0, 139),
-					-->
-				</OxyPlot_Avalonia:Plot.Axes>
-			</OxyPlot_Avalonia:Plot>
-			<!--Controller="{Binding Path=PlotModel.Controller}"-->
-			<!-- The OxyPlot control is binding to a PlotModel in the MainViewModel -->
-			<!--<OxyPlot_Avalonia:PlotView Model="{Binding Path=PlotModel}" Controller="{Binding Path=PlotModel.Controller}" Padding="0,1,0,0" Margin="0" />-->
-		</Grid>
+        <!--Plot view-->
+        <Grid Grid.Row="4">
+            <!-- The OxyPlot control is binding to a PlotModel in the MainViewModel -->
+            <OxyPlot_Avalonia:Plot x:Name="PlotControl">
+                <!--
+                ActualModel="{Binding PlotModelData,Mode=OneWayToSource}"
+                ActualController="{Binding PlotControllerData,Mode=OneWayToSource}"
+                -->
+                <OxyPlot_Avalonia:Plot.Legends>
+                    <OxyPlot_Avalonia:Legend
+                        LegendPosition="BottomRight"
+                        LegendPlacement="Outside"
+                        LegendOrientation="Horizontal"
+                        LegendMargin="0"
+                        LegendPadding="0"
+                        LegendBorderThickness="0"
+                        LegendBorder="Black"
+                        LegendBackground="Gray"
+                        
+                    />
+                    <!--
+                    ShowInvisibleSeries="false"
+                    LegendFont            = "Arial" // todo@ Chineese characters not rendered correctly
+                    LegendBackground      = OxyColor.FromAColor(200, OxyColors.White),
+                    -->
+                </OxyPlot_Avalonia:Plot.Legends>
+                <OxyPlot_Avalonia:Plot.Axes>
+                    <OxyPlot_Avalonia:TimeSpanAxis
+                        AbsoluteMaximum="10"
+                        AbsoluteMinimum="0"
+                        Maximum="10"
+                        Minimum="0"
+                        MaximumPadding="0"
+                        MinimumPadding="0"
+                        MinimumRange="0.5"
+                        MajorGridlineStyle="Solid"
+                        MinorGridlineStyle="Dot"
+                        Position="Bottom"
+                        StringFormat="mm:ss"
+                        MajorGridlineColor="CornFlowerBlue"
+                        MinorGridlineColor="LightBlue"
+                    />
+                    <!--
+                    MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139),
+                    MinorGridlineColor = OxyColor.FromArgb(20, 0, 0, 139),
+                    -->
+                    <OxyPlot_Avalonia:LinearAxis
+                        AbsoluteMaximum="1"
+                        AbsoluteMinimum="0"
+                        Maximum="1"
+                        Minimum="0"
+                        MaximumPadding="0"
+                        MinimumPadding="0"
+                        MaximumDataMargin="5"
+                        MinimumRange="1"
+                        MajorGridlineStyle="Solid"
+                        MinorGridlineStyle="Dot"
+                        Position="Left"
+                        Angle="270"
+                        MajorGridlineColor="CornFlowerBlue"
+                        MinorGridlineColor="LightBlue"
+                        />
+                    <!--
+                    MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139),
+                    MinorGridlineColor = OxyColor.FromArgb(20, 0, 0, 139),
+                    -->
+                </OxyPlot_Avalonia:Plot.Axes>
+            </OxyPlot_Avalonia:Plot>
+            <!--Controller="{Binding Path=PlotModel.Controller}"-->
+            <!-- The OxyPlot control is binding to a PlotModel in the MainViewModel -->
+            <!--<OxyPlot_Avalonia:PlotView Model="{Binding Path=PlotModel}" Controller="{Binding Path=PlotModel.Controller}" Padding="0,1,0,0" Margin="0" />-->
+        </Grid>
 
-		<!--Status bar-->
-		<Grid Grid.Row="5">
-			<TextBlock Text="{Binding Version}" FontSize="18" />
-		</Grid>
-	</Grid>
+        <!--Status bar-->
+        <Grid Grid.Row="5">
+            <TextBlock Text="{Binding Version}" FontSize="18" />
+        </Grid>
+    </Grid>
 
 </UserControl>
