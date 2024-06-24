@@ -98,7 +98,7 @@ public partial class FileItemViewModel : ViewModelBase
         FirstVideoShortDesc = VideoStreams.FirstOrDefault()?.ToString(VideoStreamToStringMode.SHORT) ?? string.Empty;
     }
 
-    public void RefreshBitRateAverage(bool isAdjustmentStartTime = false, double startTime = 0.0)
+    public double GetRefreshedBitRateAverage(bool isAdjustmentStartTime = false, double startTime = 0.0)
     {
         var bitRateAverage = GetAverageBitRate(
             Frames,
@@ -107,9 +107,9 @@ public partial class FileItemViewModel : ViewModelBase
         );
 
         if (double.IsNaN(bitRateAverage))
-        { return; }
+        { return double.NaN; }
 
-        BitRateAverage = double.Round(bitRateAverage / 1000);
+        return double.Round(bitRateAverage / 1000);
     }
 
     public double GetAverageBitRate(
@@ -180,7 +180,7 @@ public partial class FileItemViewModel : ViewModelBase
         return GetDurationFromFrames(Frames) ?? GetDurationFromStream(VideoStreams) ?? GetDurationFromFileInfo(_mediaInfo);
     }
 
-    public void RefreshBitRateMaximum(
+    public double RefreshBitRateMaximum(
         double intervalDuration = 1,
         double intervalStartTime = 0
     )
@@ -188,9 +188,9 @@ public partial class FileItemViewModel : ViewModelBase
         var bitRateMaximum = GetBitRateMaximum(intervalDuration, intervalStartTime);
         
         if (bitRateMaximum == null)
-        { return; }
+        { return double.NaN; }
 
-        BitRateMaximum = bitRateMaximum.Value / 1000;
+        return bitRateMaximum.Value / 1000;
     }
 
     public double? GetBitRateMaximum(

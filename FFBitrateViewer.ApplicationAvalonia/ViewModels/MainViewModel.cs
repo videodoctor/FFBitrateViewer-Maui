@@ -224,10 +224,13 @@ public partial class MainViewModel : ViewModelBase
                 var axisY = GetAxisYForFile(file);
 
                 // Refresh BitRateAverage and BitRateMaximum
+            var bitRateAverage = file.GetRefreshedBitRateAverage();
+            var bitRateMaximum = file.RefreshBitRateMaximum();
+
                 _uiApplicationService.FireAndForget(() =>
                 {
-                    file.RefreshBitRateAverage();
-                    file.RefreshBitRateMaximum();
+                file.BitRateAverage = bitRateAverage;
+                file.BitRateMaximum = bitRateMaximum;
                     PlotModelData!.Series.Add(series);
                 });
 
