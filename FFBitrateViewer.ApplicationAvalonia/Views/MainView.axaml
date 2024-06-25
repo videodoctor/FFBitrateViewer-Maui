@@ -8,16 +8,16 @@
              x:Class="FFBitrateViewer.ApplicationAvalonia.Views.MainView"
              x:DataType="vm:MainViewModel"
              x:CompileBindings="True"
-             xmlns:OxyPlot_Avalonia="clr-namespace:OxyPlot.Avalonia;assembly=OxyPlot.Avalonia"
              xmlns:pgc="clr-namespace:Avalonia.PropertyGrid.Controls;assembly=Avalonia.PropertyGrid"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:ScottPlot_Avalonia="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
              x:Name="MainViewUserControl"
              >
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="Loaded" SourceObject="MainViewUserControl">
-            <ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotModelData" Value="{Binding ActualModel, ElementName=PlotControl}" />
-            <ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotControllerData" Value="{Binding ActualController, ElementName=PlotControl}" />
+            <!--<ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotModelData" Value="{Binding ActualModel, ElementName=PlotControl}" />
+            <ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotControllerData" Value="{Binding ActualController, ElementName=PlotControl}" />-->
             <ia:InvokeCommandAction Command="{Binding LoadedCommand,Mode=OneTime}" />
         </ia:EventTriggerBehavior>
     </i:Interaction.Behaviors>
@@ -121,75 +121,10 @@
 
         <!--Plot view-->
         <Grid Grid.Row="4">
-            <!-- The OxyPlot control is binding to a PlotModel in the MainViewModel -->
-            <OxyPlot_Avalonia:Plot x:Name="PlotControl">
-                <!--
-                ActualModel="{Binding PlotModelData,Mode=OneWayToSource}"
-                ActualController="{Binding PlotControllerData,Mode=OneWayToSource}"
-                -->
-                <OxyPlot_Avalonia:Plot.Legends>
-                    <OxyPlot_Avalonia:Legend
-                        LegendPosition="BottomRight"
-                        LegendPlacement="Outside"
-                        LegendOrientation="Horizontal"
-                        LegendMargin="0"
-                        LegendPadding="0"
-                        LegendBorderThickness="0"
-                        LegendBorder="Black"
-                        LegendBackground="Gray"
-                        
-                    />
-                    <!--
-                    ShowInvisibleSeries="false"
-                    LegendFont            = "Arial" // todo@ Chineese characters not rendered correctly
-                    LegendBackground      = OxyColor.FromAColor(200, OxyColors.White),
-                    -->
-                </OxyPlot_Avalonia:Plot.Legends>
-                <OxyPlot_Avalonia:Plot.Axes>
-                    <OxyPlot_Avalonia:TimeSpanAxis
-                        AbsoluteMaximum="10"
-                        AbsoluteMinimum="0"
-                        Maximum="10"
-                        Minimum="0"
-                        MaximumPadding="0"
-                        MinimumPadding="0"
-                        MinimumRange="0.5"
-                        MajorGridlineStyle="Solid"
-                        MinorGridlineStyle="Dot"
-                        Position="Bottom"
-                        StringFormat="mm:ss"
-                        MajorGridlineColor="CornFlowerBlue"
-                        MinorGridlineColor="LightBlue"
-                    />
-                    <!--
-                    MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139),
-                    MinorGridlineColor = OxyColor.FromArgb(20, 0, 0, 139),
-                    -->
-                    <OxyPlot_Avalonia:LinearAxis
-                        AbsoluteMaximum="1"
-                        AbsoluteMinimum="0"
-                        Maximum="1"
-                        Minimum="0"
-                        MaximumPadding="0"
-                        MinimumPadding="0"
-                        MaximumDataMargin="5"
-                        MinimumRange="1"
-                        MajorGridlineStyle="Solid"
-                        MinorGridlineStyle="Dot"
-                        Position="Left"
-                        Angle="270"
-                        MajorGridlineColor="CornFlowerBlue"
-                        MinorGridlineColor="LightBlue"
-                        />
-                    <!--
-                    MajorGridlineColor = OxyColor.FromArgb(40, 0, 0, 139),
-                    MinorGridlineColor = OxyColor.FromArgb(20, 0, 0, 139),
-                    -->
-                </OxyPlot_Avalonia:Plot.Axes>
-            </OxyPlot_Avalonia:Plot>
-            <!--Controller="{Binding Path=PlotModel.Controller}"-->
-            <!-- The OxyPlot control is binding to a PlotModel in the MainViewModel -->
-            <!--<OxyPlot_Avalonia:PlotView Model="{Binding Path=PlotModel}" Controller="{Binding Path=PlotModel.Controller}" Padding="0,1,0,0" Margin="0" />-->
+			<ScottPlot_Avalonia:AvaPlot>
+				
+			</ScottPlot_Avalonia:AvaPlot>
+			
         </Grid>
 
         <!--Status bar-->

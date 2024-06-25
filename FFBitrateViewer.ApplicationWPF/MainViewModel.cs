@@ -30,7 +30,7 @@ namespace FFBitrateViewer
         public CancellationTokenSource? cancellationTokenSource;
         private readonly Channel<bool> filesMediaInfoNotificationChannel = Channel.CreateUnbounded<bool>();
         private readonly ConcurrentQueue<FilesMediaInfoQueueItem> filesMediaInfoQueue = new();
-        private readonly Task? filesBitRateInfoGetTask;
+        //private readonly Task? filesBitRateInfoGetTask;
 
         public VersionInfo? VersionInfo { get { return Get<VersionInfo>(); } private set { Set(value); } }
         public ObservableCollection<FileItem> Files { get; private set; }
@@ -258,7 +258,7 @@ namespace FFBitrateViewer
 
         public async void FilesProcess()
         {
-            if (filesBitRateInfoGetTask != null && filesBitRateInfoGetTask.Status == TaskStatus.Running) return;
+            //if (filesBitRateInfoGetTask != null && filesBitRateInfoGetTask.Status == TaskStatus.Running) return;
             IsReady = false;
             IsRunning = true;
             OverallProgress?.Show("Processing files");
