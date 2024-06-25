@@ -3,7 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Models;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
+using ScottPlot;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -31,6 +33,8 @@ public partial class MainViewModel : ViewModelBase
 
     //public PlotModel? PlotModelData { get; set; }
     //public PlotController? PlotControllerData { get; set; }
+
+    public IPlotControl? PlotController { get; set; }
 
     private PlotViewType _plotViewType = PlotViewType.FrameBased;
 
@@ -152,46 +156,66 @@ public partial class MainViewModel : ViewModelBase
     private async Task ToggleOnOffPlotterPlotter(CancellationToken token)
     {
 
-        //PlotModelData!.Series.Clear();
+        token.ThrowIfCancellationRequested();
 
-        await Task.Run(async () =>
+        await Parallel.ForEachAsync(Files.Where(file => file.IsSelected), async (file, ct) =>
         {
-
-            token.ThrowIfCancellationRequested();
-
-            var tasks = Files
-                .Where(file => file.IsSelected)
-                .Select(file => PopulateFramesAndSeries(file, token));
-            var fileAxis = await Task.WhenAll(tasks).ConfigureAwait(false);
-
-            (var maxX, var maxY) =
-                fileAxis.Aggregate(
-                    seed: (MaxX: -1.0, MaxY: -1.0),
-                    func: (accumulated, current) => (
-                        Math.Max(accumulated.MaxX, current.AxisX ?? -1.0),
-                        Math.Max(accumulated.MaxY, current.AxisY ?? -1.0)
-                    )
-                );
-
-            // Adjust axis x based on max duration
-            if (maxX > 0)
+            List<double> xs = new List<double>();
+            List<double> ys = new List<double>();
+            await foreach (var probePacket in _ffprobeAppClient.GetProbePackets(file.Path.LocalPath, token: ct))
             {
-                //var axisX = PlotModelData!.Axes[0];
-                //axisX.AbsoluteMaximum = axisX.Maximum = maxX;
-                //axisX.StringFormat = AxisXStringFormatBuild(maxX);
+                file.Frames.Add(probePacket);
+                var (x, y) = GetDataPoint(probePacket, file, _plotViewType);
+                if (!x.HasValue)
+                {
+                    continue;
+                }
+                xs.Add(x.Value);
+                ys.Add(y);
             }
+            PlotController?.Plot.Add.Scatter(xs,ys);
+        });
 
-            // Adjust axis y based on Frames or Time
-            if (maxY > 0)
-            {
-                //var axisY = PlotModelData!.Axes[1];
-                //axisY.AbsoluteMaximum = axisY.Maximum = maxY;
-            }
+        ////PlotModelData!.Series.Clear();
+
+        //await Task.Run(async () =>
+        //{
+
+        //    token.ThrowIfCancellationRequested();
+
+        //    var tasks = Files
+        //        .Where(file => file.IsSelected)
+        //        .Select(file => PopulateFramesAndSeries(file, token));
+        //    var fileAxis = await Task.WhenAll(tasks).ConfigureAwait(false);
+
+        //    (var maxX, var maxY) =
+        //        fileAxis.Aggregate(
+        //            seed: (MaxX: -1.0, MaxY: -1.0),
+        //            func: (accumulated, current) => (
+        //                Math.Max(accumulated.MaxX, current.AxisX ?? -1.0),
+        //                Math.Max(accumulated.MaxY, current.AxisY ?? -1.0)
+        //            )
+        //        );
+
+        //    // Adjust axis x based on max duration
+        //    if (maxX > 0)
+        //    {
+        //        //var axisX = PlotModelData!.Axes[0];
+        //        //axisX.AbsoluteMaximum = axisX.Maximum = maxX;
+        //        //axisX.StringFormat = AxisXStringFormatBuild(maxX);
+        //    }
+
+        //    // Adjust axis y based on Frames or Time
+        //    if (maxY > 0)
+        //    {
+        //        //var axisY = PlotModelData!.Axes[1];
+        //        //axisY.AbsoluteMaximum = axisY.Maximum = maxY;
+        //    }
 
 
-        }, token).ConfigureAwait(false);
+        //}, token).ConfigureAwait(false);
 
-        //PlotModelData!.InvalidatePlot(updateData: true);
+        ////PlotModelData!.InvalidatePlot(updateData: true);
     }
 
     private Task<(double? AxisX, double? AxisY)> PopulateFramesAndSeries(FileItemViewModel file, CancellationToken token)
@@ -222,13 +246,13 @@ public partial class MainViewModel : ViewModelBase
                 var axisY = GetAxisYForFile(file);
 
                 // Refresh BitRateAverage and BitRateMaximum
-            var bitRateAverage = file.GetRefreshedBitRateAverage();
-            var bitRateMaximum = file.RefreshBitRateMaximum();
+                var bitRateAverage = file.GetRefreshedBitRateAverage();
+                var bitRateMaximum = file.RefreshBitRateMaximum();
 
                 _uiApplicationService.FireAndForget(() =>
                 {
-                file.BitRateAverage = bitRateAverage;
-                file.BitRateMaximum = bitRateMaximum;
+                    file.BitRateAverage = bitRateAverage;
+                    file.BitRateMaximum = bitRateMaximum;
                     //PlotModelData!.Series.Add(series);
                 });
 
@@ -253,13 +277,13 @@ public partial class MainViewModel : ViewModelBase
     //        //Color = style.Color; 
     //    };
 
-    //private DataPoint GetDataPoint(FFProbePacket probePacket, FileItemViewModel file, PlotViewType plotViewType)
-    //    => plotViewType switch
-    //    {
-    //        PlotViewType.FrameBased => new DataPoint((probePacket.PTSTime ?? 0) - file.StartTime, Convert.ToDouble(probePacket.Size) / 1000.0),
-    //        //PlotViewType.SecondBased => new DataPoint(),
-    //        _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
-    //    };
+    private (double? X, double Y) GetDataPoint(FFProbePacket probePacket, FileItemViewModel file, PlotViewType plotViewType)
+        => plotViewType switch
+        {
+            PlotViewType.FrameBased => ((probePacket.PTSTime ?? 0) - file.StartTime, Convert.ToDouble(probePacket.Size) / 1000.0),
+            //PlotViewType.SecondBased => new DataPoint(),
+            _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
+        };
 
     private double? GetAxisYForFile(FileItemViewModel file)
         => _plotViewType switch

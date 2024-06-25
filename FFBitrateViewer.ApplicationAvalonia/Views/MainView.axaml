@@ -16,6 +16,7 @@
              >
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="Loaded" SourceObject="MainViewUserControl">
+			<ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotController" Value="{Binding ElementName=PlotControl}" />
             <!--<ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotModelData" Value="{Binding ActualModel, ElementName=PlotControl}" />
             <ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotControllerData" Value="{Binding ActualController, ElementName=PlotControl}" />-->
             <ia:InvokeCommandAction Command="{Binding LoadedCommand,Mode=OneTime}" />
@@ -121,7 +122,7 @@
 
         <!--Plot view-->
         <Grid Grid.Row="4">
-			<ScottPlot_Avalonia:AvaPlot>
+			<ScottPlot_Avalonia:AvaPlot Name="PlotControl">
 				
 			</ScottPlot_Avalonia:AvaPlot>
 			

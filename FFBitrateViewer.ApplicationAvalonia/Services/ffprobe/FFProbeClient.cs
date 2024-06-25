@@ -149,7 +149,7 @@ public class FFProbeClient
 
         var csvDataReaderOptions = new CsvDataReaderOptions
         { HasHeaders = false, };
-
+        
         // NOTE: Because of command output can be quite large.
         //       We use Publisher/Consumer pattern thru System.Threading.Channel
         await foreach (var csvLine in commandStdOutputChannel.Reader.ReadAllAsync(token))
