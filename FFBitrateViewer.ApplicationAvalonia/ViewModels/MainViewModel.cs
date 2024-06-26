@@ -4,11 +4,9 @@ using FFBitrateViewer.ApplicationAvalonia.Models;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 using ScottPlot;
-using Sylvan.Data.Csv;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
@@ -74,12 +72,6 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task OnLoaded(CancellationToken token)
     {
-
-        //if (PlotControllerData == null)
-        //{ throw new ApplicationException($"Application failed connecting to {nameof(PlotControllerData)}"); }
-
-        //if (PlotModelData == null)
-        //{ throw new ApplicationException($"Application failed connecting to {nameof(PlotModelData)}"); }
 
         var version = await _ffprobeAppClient.GetVersionAsync(token).ConfigureAwait(false);
         Version = $"{System.IO.Path.GetFileName(_ffprobeAppClient.FFProbeFilePath)} v{version}";
@@ -168,13 +160,15 @@ public partial class MainViewModel : ViewModelBase
                 List<double> xs = [];
                 List<int> ys = [];
                 var probePacketChannel = Channel.CreateUnbounded<FFProbePacket>();
-            
-                var producer = Task.Run(async () => {
-                    await _ffprobeAppClient.GetProbePacketsAsync(probePacketChannel, file.Path.LocalPath);
+
+                var producer = Task.Run(async () =>
+                {
+                    await _ffprobeAppClient.GetProbePacketsAsync(probePacketChannel, file.Path.LocalPath).ConfigureAwait(false);
                     probePacketChannel.Writer.TryComplete();
                 }, token);
-            
-                var consumer = Task.Run(async () => { 
+
+                var consumer = Task.Run(async () =>
+                {
                     await foreach (var probePacket in probePacketChannel.Reader.ReadAllAsync())
                     {
                         file.Frames.Add(probePacket);
@@ -184,11 +178,15 @@ public partial class MainViewModel : ViewModelBase
                     }
                 }, token);
 
-                await Task.WhenAll(producer, consumer);
+                await Task.WhenAll(producer, consumer).ConfigureAwait(false);
 
-                PlotController?.Plot.Add.Scatter(xs,ys);
+                PlotController?.Plot.Add.Scatter(xs, ys);
             }
         );
+
+
+        PlotController?.Plot.Axes.AutoScale();
+        PlotController?.Refresh();
 
         ////PlotModelData!.Series.Clear();
 
@@ -239,12 +237,12 @@ public partial class MainViewModel : ViewModelBase
     //    var fileName = Path.GetFileName(file.Path.LocalPath);
 
     //    var probePacketChannel = Channel.CreateUnbounded<FFProbePacket>();
-        
+
     //    var producer = Task.Run(async () =>
     //    {
     //        await _ffprobeAppClient.GetProbePackets(probePacketChannel, file.Path.LocalPath);
     //    });
-        
+
     //    var consumer = Task.Run(async () =>
     //    {
     //        await foreach (var probePacket in probePacketChannel.Reader.ReadAllAsync())
