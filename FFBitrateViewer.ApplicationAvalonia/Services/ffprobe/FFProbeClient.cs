@@ -85,7 +85,7 @@ public class FFProbeClient
     {
         ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
 
-        if (threadCount <= 0)
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(threadCount);
         { throw new ArgumentOutOfRangeException(nameof(threadCount)); }
 
         if (!File.Exists(mediaFilePath))
