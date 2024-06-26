@@ -93,26 +93,28 @@ public class FFProbeClient
 
         var command = $@"{FFProbeFilePath} -hide_banner -threads {threadCount} -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration ""{mediaFilePath}""";
 
-        using var memoryStream = new MemoryStream();
-        using var streamWriter = new StreamWriter(memoryStream);
-        var exitCode = await _processService.ExecuteAsync(command, standardOutputWriter: streamWriter).ConfigureAwait(false);
+        using var standardOutputMemoryStream = new MemoryStream();
+        using var standardOutputWriter = new StreamWriter(standardOutputMemoryStream);
+        StringBuilder standardErrorStringBuilder = new StringBuilder();
+        StringWriter standardErrorWriter = new StringWriter(standardErrorStringBuilder);
+        var exitCode = await _processService.ExecuteAsync(command, standardOutputWriter: standardOutputWriter, standardErrorWriter: standardErrorWriter).ConfigureAwait(false);
         if (exitCode != 0)
-        { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
+        { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}.{Environment.NewLine}Standard Error Output: '{standardErrorStringBuilder}'"); }
 
 #if DEBUG
-        memoryStream.Seek(0, SeekOrigin.Begin);
-        var jsonText = Encoding.UTF8.GetString(memoryStream.ToArray());
+        standardOutputMemoryStream.Seek(0, SeekOrigin.Begin);
+        var jsonText = Encoding.UTF8.GetString(standardOutputMemoryStream.ToArray());
         Debug.WriteLine(jsonText);
 #endif
 
-        memoryStream.Seek(0, SeekOrigin.Begin);
+        standardOutputMemoryStream.Seek(0, SeekOrigin.Begin);
 
 
         var jsonSerializerOptions = new JsonSerializerOptions
         {
             NumberHandling = JsonNumberHandling.AllowReadingFromString
         };
-        var mediaInfo = await JsonSerializer.DeserializeAsync<FFProbeJsonOutput>(memoryStream, jsonSerializerOptions).ConfigureAwait(false);
+        var mediaInfo = await JsonSerializer.DeserializeAsync<FFProbeJsonOutput>(standardOutputMemoryStream, jsonSerializerOptions).ConfigureAwait(false);
 
         return mediaInfo!;
     }
@@ -128,75 +130,91 @@ public class FFProbeClient
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     /// <exception cref="FileNotFoundException"></exception>
     /// <exception cref="FFProbeClientException"></exception>
-    public async IAsyncEnumerable<FFProbePacket> GetProbePackets(
+    public async Task GetProbePackets(
+        Channel<FFProbePacket> probePacketChannel,
         string mediaFilePath,
         int streamId = 0,
-        int threadCount = 11,
-        [EnumeratorCancellation] CancellationToken token = default
+        int threadCount = 11
     )
     {
         ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
-
-        if (threadCount <= 0)
-        { throw new ArgumentOutOfRangeException(nameof(threadCount)); }
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(threadCount);
 
         if (!File.Exists(mediaFilePath))
         { throw new FileNotFoundException(mediaFilePath); }
 
         var commandStdOutputChannel = Channel.CreateUnbounded<string>();
-        var command = $@"{FFProbeFilePath} -hide_banner -threads {threadCount} -print_format csv -loglevel fatal -show_error -select_streams v:{streamId} -show_entries packet=dts_time,duration_time,pts_time,size,flags ""{mediaFilePath}""";
-        var commandTask = _processService.ExecuteAsync(command, standardOutputChannel: commandStdOutputChannel, cancellationToken: token).ConfigureAwait(false);
 
-        var csvDataReaderOptions = new CsvDataReaderOptions
-        { HasHeaders = false, };
-        
-        // NOTE: Because of command output can be quite large.
-        //       We use Publisher/Consumer pattern thru System.Threading.Channel
-        await foreach (var csvLine in commandStdOutputChannel.Reader.ReadAllAsync(token))
+        var producer = Task.Run(async () =>
         {
-            // Converts a CSV line to a Packet instance. Following is a sample line:
-            // [CSV format]
-            // packet,0.000000,N/A,0.016000,1186,K__
-            // [indexesfor the reader]
-            // 0      1                 2            3                      4          5
-            using var textReader = new StringReader(csvLine);
-            var csvDataReader = CsvDataReader.Create(textReader, csvDataReaderOptions);
-            await csvDataReader.ReadAsync(token).ConfigureAwait(false);
+            var command = $@"{FFProbeFilePath} -hide_banner -threads {threadCount} -print_format csv -loglevel fatal -show_error -select_streams v:{streamId} -show_entries packet=dts_time,duration_time,pts_time,size,flags ""{mediaFilePath}""";
+            var exitCode = await _processService.ExecuteAsync(command, standardOutputChannel: commandStdOutputChannel).ConfigureAwait(false);
+            commandStdOutputChannel.Writer.TryComplete();
+            if (exitCode != 0)
+            { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
+        });
 
-            var entryType = csvDataReader.GetString(0);
-            if (string.Compare(entryType, "packet", true) != 0)
+        var consumer = Task.Run(async () =>
+        {
+
+            var csvDataReaderOptions = new CsvDataReaderOptions
+            { HasHeaders = false, };
+
+
+            // NOTE: Because of command output can be quite large.
+            //       We use Publisher/Consumer pattern thru System.Threading.Channel
+            await foreach (var csvLine in commandStdOutputChannel.Reader.ReadAllAsync())
             {
-                throw new FFProbeClientException($"Entry Type:{entryType} is not supported");
+                // Converts a CSV line to a Packet instance. Following is a sample line:
+                // [CSV format]
+                // packet,0.000000,N/A,0.016000,1186,K__
+                // [indexesfor the reader]
+                // 0      1                 2            3                      4          5
+                using var textReader = new StringReader(csvLine);
+                var csvDataReader = CsvDataReader.Create(textReader, csvDataReaderOptions);
+                await csvDataReader.ReadAsync().ConfigureAwait(false);
+
+                var entryType = csvDataReader.GetString(0);
+                if (string.Compare(entryType, "packet", true) != 0)
+                {
+                    throw new FFProbeClientException($"Entry Type:{entryType} is not supported");
+                }
+                //Index     Sample(csv)     ffprobe (Frame)
+                //0         packet,         
+                //1         0.000000,       PTSTime (Frame:StartTime)
+                //2         N / A,          
+                //3         0.016000,       DuratonTime (Frame:Duration)
+                //4         1186,           Size (Frame:Size)
+                //5         K__             Flag (Frame:Flags)
+
+                var probePacket = new FFProbePacket
+                (
+                    // from CSV
+                    PTSTime: double.TryParse(csvDataReader.GetString(1), out var pstTime) ? pstTime : default,
+                    // csvDataReader.GetString(2)
+                    DurationTime: double.TryParse(csvDataReader.GetString(3), out var durationTime) ? durationTime : default,
+                    Size: int.TryParse(csvDataReader.GetString(4), out var size) ? size : default,
+                    Flags: csvDataReader.GetString(5),
+
+                    // default
+                    CodecType: default,
+                    DTS: default,
+                    DTSTime: default,
+                    Duration: default,
+                    PTS: default,
+                    StreamIndex: default
+                );
+                
+                await probePacketChannel.Writer.WriteAsync(probePacket).ConfigureAwait(false);
+
             }
-            //Index     Sample(csv)     ffprobe (Frame)
-            //0         packet,         
-            //1         0.000000,       PTSTime (Frame:StartTime)
-            //2         N / A,          
-            //3         0.016000,       DuratonTime (Frame:Duration)
-            //4         1186,           Size (Frame:Size)
-            //5         K__             Flag (Frame:Flags)
 
-            yield return new FFProbePacket
-            (
-                // from CSV
-                PTSTime: double.TryParse(csvDataReader.GetString(1), out var pstTime) ? pstTime : default,
-                // csvDataReader.GetString(2)
-                DurationTime: double.TryParse(csvDataReader.GetString(3), out var durationTime) ? durationTime : default,
-                Size: int.TryParse(csvDataReader.GetString(4), out var size) ? size : default,
-                Flags: csvDataReader.GetString(5),
+            probePacketChannel.Writer.TryComplete();
 
-                // default
-                CodecType: default,
-                DTS: default,
-                DTSTime: default,
-                Duration: default,
-                PTS: default,
-                StreamIndex: default
-            );
-        }
+        });
 
-        var exitCode = await commandTask;
-        if (exitCode != 0)
-        { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
+        await Task.WhenAll(producer, consumer);
+
+
     }
 }
