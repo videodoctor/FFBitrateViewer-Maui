@@ -4,12 +4,14 @@ using FFBitrateViewer.ApplicationAvalonia.Models;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 using ScottPlot;
+using Sylvan.Data.Csv;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
@@ -153,28 +155,40 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
-    private async Task ToggleOnOffPlotterPlotter(CancellationToken token)
+    private async Task ToggleOnOffPlotterPlotter(CancellationToken cancellationToken)
     {
 
-        token.ThrowIfCancellationRequested();
+        cancellationToken.ThrowIfCancellationRequested();
 
-        await Parallel.ForEachAsync(Files.Where(file => file.IsSelected), async (file, ct) =>
-        {
-            List<double> xs = new List<double>();
-            List<double> ys = new List<double>();
-            await foreach (var probePacket in _ffprobeAppClient.GetProbePackets(file.Path.LocalPath, token: ct))
+        await Parallel.ForEachAsync(
+            Files.Where(file => file.IsSelected),
+            cancellationToken,
+            async (file, token) =>
             {
-                file.Frames.Add(probePacket);
-                var (x, y) = GetDataPoint(probePacket, file, _plotViewType);
-                if (!x.HasValue)
-                {
-                    continue;
-                }
-                xs.Add(x.Value);
-                ys.Add(y);
+                List<double> xs = [];
+                List<int> ys = [];
+                var probePacketChannel = Channel.CreateUnbounded<FFProbePacket>();
+            
+                var producer = Task.Run(async () => {
+                    await _ffprobeAppClient.GetProbePackets(probePacketChannel, file.Path.LocalPath);
+                    probePacketChannel.Writer.TryComplete();
+                }, token);
+            
+                var consumer = Task.Run(async () => { 
+                    await foreach (var probePacket in probePacketChannel.Reader.ReadAllAsync())
+                    {
+                        file.Frames.Add(probePacket);
+                        var (x, y) = GetDataPoint(probePacket, file, _plotViewType);
+                        xs.Add(x ?? 0);
+                        ys.Add(Convert.ToInt32(y));
+                    }
+                }, token);
+
+                await Task.WhenAll(producer, consumer);
+
+                PlotController?.Plot.Add.Scatter(xs,ys);
             }
-            PlotController?.Plot.Add.Scatter(xs,ys);
-        });
+        );
 
         ////PlotModelData!.Series.Clear();
 
@@ -218,48 +232,50 @@ public partial class MainViewModel : ViewModelBase
         ////PlotModelData!.InvalidatePlot(updateData: true);
     }
 
-    private Task<(double? AxisX, double? AxisY)> PopulateFramesAndSeries(FileItemViewModel file, CancellationToken token)
-    {
-        token.ThrowIfCancellationRequested();
+    //private async Task PopulateFramesAndSeries(FileItemViewModel file, CancellationToken token)
+    //{
+    //    token.ThrowIfCancellationRequested();
 
-        var fileName = Path.GetFileName(file.Path.LocalPath);
-        //var series = GetNewSerie(fileName);
+    //    var fileName = Path.GetFileName(file.Path.LocalPath);
 
-        // Request ffprobe information to create data points for serie
-        return _ffprobeAppClient
-            .GetProbePackets(file.Path.LocalPath, token: token)
-            .ForEachAsync(probePacket =>
-            {
-                token.ThrowIfCancellationRequested();
+    //    var probePacketChannel = Channel.CreateUnbounded<FFProbePacket>();
+        
+    //    var producer = Task.Run(async () =>
+    //    {
+    //        await _ffprobeAppClient.GetProbePackets(probePacketChannel, file.Path.LocalPath);
+    //    });
+        
+    //    var consumer = Task.Run(async () =>
+    //    {
+    //        await foreach (var probePacket in probePacketChannel.Reader.ReadAllAsync())
+    //        {
 
-                file.Frames.Add(probePacket);
-                //series.Points.Add(GetDataPoint(probePacket, file, _plotViewType));
+    //            file.Frames.Add(probePacket);
+    //            //series.Points.Add(GetDataPoint(probePacket, file, _plotViewType));
 
-            }, token)
-            .ContinueWith(_ =>
-            {
-                token.ThrowIfCancellationRequested();
-                // Computes axis x based on max duration
-                var axisX = GetAxisXForFile(file);
+    //            // Computes axis x based on max duration
+    //            var axisX = GetAxisXForFile(file);
 
-                // Computes axis y based on Frames or Time
-                var axisY = GetAxisYForFile(file);
+    //            // Computes axis y based on Frames or Time
+    //            var axisY = GetAxisYForFile(file);
 
-                // Refresh BitRateAverage and BitRateMaximum
-                var bitRateAverage = file.GetRefreshedBitRateAverage();
-                var bitRateMaximum = file.RefreshBitRateMaximum();
+    //            // Refresh BitRateAverage and BitRateMaximum
+    //            var bitRateAverage = file.GetRefreshedBitRateAverage();
+    //            var bitRateMaximum = file.RefreshBitRateMaximum();
 
-                _uiApplicationService.FireAndForget(() =>
-                {
-                    file.BitRateAverage = bitRateAverage;
-                    file.BitRateMaximum = bitRateMaximum;
-                    //PlotModelData!.Series.Add(series);
-                });
+    //            _uiApplicationService.FireAndForget(() =>
+    //            {
+    //                file.BitRateAverage = bitRateAverage;
+    //                file.BitRateMaximum = bitRateMaximum;
+    //                //PlotModelData!.Series.Add(series);
+    //            });
 
-                return (axisX, axisY);
+    //            //return (axisX, axisY);
+    //        }
+    //    });
 
-            }, token);
-    }
+    //    await Task.WhenAll(producer, consumer);
+    //}
 
     //private StairStepSeries GetNewSerie(string fileName)
     //    => new()
