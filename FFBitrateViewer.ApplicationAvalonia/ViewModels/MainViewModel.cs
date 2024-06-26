@@ -298,7 +298,7 @@ public partial class MainViewModel : ViewModelBase
         {
             PlotViewType.FrameBased => ((probePacket.PTSTime ?? 0) - file.StartTime, Convert.ToDouble(probePacket.Size) / 1000.0),
             //PlotViewType.SecondBased => new DataPoint(),
-            _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
+            _ => throw new NotImplementedException($"{nameof(GetDataPoint)} for Plot Type {_plotViewType} is not implemented.")
         };
 
     private double? GetAxisYForFile(FileItemViewModel file)
@@ -306,7 +306,7 @@ public partial class MainViewModel : ViewModelBase
         {
             PlotViewType.FrameBased => file.Frames.Max(f => f.Size),
             PlotViewType.SecondBased => file.GetBitRateMaximum(),
-            _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
+            _ => throw new NotImplementedException($"{nameof(GetAxisYForFile)} for Plot Type {_plotViewType} is not implemented.")
         } / 1000;
 
     private static double? GetAxisXForFile(FileItemViewModel file)
