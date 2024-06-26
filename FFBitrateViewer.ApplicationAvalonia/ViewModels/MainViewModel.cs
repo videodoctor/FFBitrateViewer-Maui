@@ -241,7 +241,14 @@ public partial class MainViewModel : ViewModelBase
 
                 await Task.WhenAll(producer, consumer).ConfigureAwait(false);
 
-                  
+                // Once all probe packets are received, we compute max and average
+                var bitRateAverage = file.GetRefreshedBitRateAverage();
+                var bitRateMaximum = file.RefreshBitRateMaximum();
+                _uiApplicationService.FireAndForget(() =>
+                {
+                    file.BitRateAverage = bitRateAverage;
+                    file.BitRateMaximum = bitRateMaximum;
+                });
 
                 //    (var maxX, var maxY) =
                 //        fileAxis.Aggregate(
