@@ -86,7 +86,6 @@ public class FFProbeClient
         ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
 
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(threadCount);
-        { throw new ArgumentOutOfRangeException(nameof(threadCount)); }
 
         if (!File.Exists(mediaFilePath))
         { throw new FileNotFoundException(mediaFilePath); }
@@ -120,24 +119,28 @@ public class FFProbeClient
     }
 
     /// <summary>
-    /// Returns a list of packets for the given media file.
+    /// Retrieves packets information from the specified media file and streams them through a provided channel.
     /// </summary>
-    /// <param name="mediaFilePath"></param>
-    /// <param name="streamId"></param>
-    /// <param name="threadCount"></param>
-    /// <param name="token"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    /// <exception cref="FileNotFoundException"></exception>
-    /// <exception cref="FFProbeClientException"></exception>
-    public async Task GetProbePackets(
+    /// <param name="probePacketChannel">The channel to stream the packets information.</param>
+    /// <param name="mediaFilePath">The path to the media file.</param>
+    /// <param name="streamId">The ID of the stream to retrieve packets from. Default is 0.</param>
+    /// <param name="threadCount">The number of threads to use for processing. Default is 11.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="mediaFilePath"/> is null or empty.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="threadCount"/> is less than or equal to zero.</exception>
+    /// <exception cref="FileNotFoundException">Thrown when the specified <paramref name="mediaFilePath"/> does not exist.</exception>
+    /// <exception cref="FFProbeClientException">Thrown when an error occurs during the ffprobe command execution.</exception>
+    public async Task GetProbePacketsAsync(
         Channel<FFProbePacket> probePacketChannel,
         string mediaFilePath,
         int streamId = 0,
-        int threadCount = 11
+        int threadCount = 11,
+        CancellationToken cancellationToken = default
     )
     {
         ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
+
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(threadCount);
 
         if (!File.Exists(mediaFilePath))
@@ -148,11 +151,11 @@ public class FFProbeClient
         var producer = Task.Run(async () =>
         {
             var command = $@"{FFProbeFilePath} -hide_banner -threads {threadCount} -print_format csv -loglevel fatal -show_error -select_streams v:{streamId} -show_entries packet=dts_time,duration_time,pts_time,size,flags ""{mediaFilePath}""";
-            var exitCode = await _processService.ExecuteAsync(command, standardOutputChannel: commandStdOutputChannel).ConfigureAwait(false);
+            var exitCode = await _processService.ExecuteAsync(command, standardOutputChannel: commandStdOutputChannel, cancellationToken: cancellationToken).ConfigureAwait(false);
             commandStdOutputChannel.Writer.TryComplete();
             if (exitCode != 0)
             { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
-        });
+        }, cancellationToken);
 
         var consumer = Task.Run(async () =>
         {
@@ -163,7 +166,7 @@ public class FFProbeClient
 
             // NOTE: Because of command output can be quite large.
             //       We use Publisher/Consumer pattern thru System.Threading.Channel
-            await foreach (var csvLine in commandStdOutputChannel.Reader.ReadAllAsync())
+            await foreach (var csvLine in commandStdOutputChannel.Reader.ReadAllAsync(cancellationToken))
             {
                 // Converts a CSV line to a Packet instance. Following is a sample line:
                 // [CSV format]
@@ -205,13 +208,13 @@ public class FFProbeClient
                     StreamIndex: default
                 );
                 
-                await probePacketChannel.Writer.WriteAsync(probePacket).ConfigureAwait(false);
+                await probePacketChannel.Writer.WriteAsync(probePacket, cancellationToken).ConfigureAwait(false);
 
             }
 
             probePacketChannel.Writer.TryComplete();
 
-        });
+        }, cancellationToken);
 
         await Task.WhenAll(producer, consumer);
 

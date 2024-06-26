@@ -170,7 +170,7 @@ public partial class MainViewModel : ViewModelBase
                 var probePacketChannel = Channel.CreateUnbounded<FFProbePacket>();
             
                 var producer = Task.Run(async () => {
-                    await _ffprobeAppClient.GetProbePackets(probePacketChannel, file.Path.LocalPath);
+                    await _ffprobeAppClient.GetProbePacketsAsync(probePacketChannel, file.Path.LocalPath);
                     probePacketChannel.Writer.TryComplete();
                 }, token);
             
