@@ -39,43 +39,91 @@ public partial class MainViewModel : ViewModelBase
 
     private PlotViewType _plotViewType = PlotViewType.FrameBased;
 
-    private string AxisYUnitBuild => _plotViewType switch
+    private string AxisYTickLabelSuffix => _plotViewType switch
     {
         PlotViewType.FrameBased => "kb",
         PlotViewType.SecondBased => "kb/s",
         PlotViewType.GOPBased => "kb/GOP",
-        _ => throw new NotImplementedException($"Text for {nameof(AxisYUnitBuild)} equals to {_plotViewType} is not implemented.")
+        _ => throw new NotImplementedException($"Text for {nameof(AxisYTickLabelSuffix)} equals to {_plotViewType} is not implemented.")
     };
 
-    private string AxisYTitleBuild => _plotViewType switch
+    private string AxisYTitleLabel => _plotViewType switch
     {
         PlotViewType.FrameBased => "Frame size",
         PlotViewType.SecondBased => "Bit rate",
         PlotViewType.GOPBased => "Bit rate",
-        _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleBuild)} equals to {_plotViewType} is not implemented.")
+        _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleLabel)} equals to {_plotViewType} is not implemented.")
     };
 
-    private string TrackerFormatStringBuild => $@"{{0}}{Environment.NewLine}Time={{2:hh\:mm\:ss\.fff}}{Environment.NewLine}{{3}}={{4:0}} {AxisYUnitBuild}";
+    private string TrackerFormatStringBuild => $@"{{0}}{Environment.NewLine}Time={{2:hh\:mm\:ss\.fff}}{Environment.NewLine}{{3}}={{4:0}} {AxisYTickLabelSuffix}";
 
-    private string AxisXStringFormatBuild(double? duration) =>
-          (duration == null || duration.Value < 60) ? "m:ss"
-        : (duration.Value < 60 * 60) ? "mm:ss"
-        : "h:mm:ss"
+    private string AxisXTickLabel(double duration) =>
+          (duration < 60) ? @"m\:ss"
+        : (duration < 60 * 60) ? @"mm\:ss"
+        : (duration < 60 * 60 * 24) ?  @"h\:mm\:ss"
+        : @"d\.hh\:mm\:ss"
         ;
 
     private readonly UIApplicationService _uiApplicationService = new();
 
     private readonly FileDialogService _fileDialogService = new();
 
-    private readonly FFProbeClient _ffprobeAppClient = new();
+    private readonly FFProbeClient _probeAppClient = new();
 
 
     [RelayCommand]
     private async Task OnLoaded(CancellationToken token)
     {
 
-        var version = await _ffprobeAppClient.GetVersionAsync(token).ConfigureAwait(false);
-        Version = $"{System.IO.Path.GetFileName(_ffprobeAppClient.FFProbeFilePath)} v{version}";
+        var version = await _probeAppClient.GetVersionAsync(token).ConfigureAwait(false);
+        Version = $"{System.IO.Path.GetFileName(_probeAppClient.FFProbeFilePath)} v{version}";
+        
+        SetPlotLabels();
+
+        if (PlotController is not null)
+        {
+            //PlotController.Plot.RenderManager.RenderStarting += (s, e) =>
+            //{
+            //    Tick[] ticks = PlotController.Plot.Axes.Bottom.TickGenerator.Ticks;
+            //    for (int i = 0; i < ticks.Length; i++)
+            //    {
+            //        string tickLabel =  TimeSpan.FromSeconds(ticks[i].Position).ToString(AxisXTickLabel(ticks[i].Position));
+            //        ticks[i] = new Tick(ticks[i].Position, tickLabel);
+            //    }
+            //};
+
+            try
+            {
+                var platformClient = OSPlatformClient.GetOSPlatformClient();
+                if (platformClient.IsDark())
+                {
+                    PlotController.Plot.Add.Palette = new ScottPlot.Palettes.Penumbra();
+                    // change figure colors
+                    PlotController.Plot.FigureBackground.Color = Color.FromHex("#181818");
+                    PlotController.Plot.DataBackground.Color = Color.FromHex("#1f1f1f");
+
+                    // change axis and grid colors
+                    PlotController.Plot.Axes.Color(Color.FromHex("#d7d7d7"));
+                    PlotController.Plot.Grid.MajorLineColor = Color.FromHex("#404040");
+
+                    // change legend colors
+                    PlotController.Plot.Legend.BackgroundColor = Color.FromHex("#404040");
+                    PlotController.Plot.Legend.FontColor = Color.FromHex("#d7d7d7");
+                    PlotController.Plot.Legend.OutlineColor = Color.FromHex("#d7d7d7");
+
+                    PlotController.Refresh();
+                }
+            }
+            catch { 
+                // NOTE: Ignoring error when trying to set dark theme
+            }
+
+            // Change style for the tick labels
+            PlotController.Plot.Axes.Bottom.TickLabelStyle.Rotation = 45;
+            PlotController.Plot.Axes.Bottom.TickLabelStyle.Alignment = Alignment.MiddleLeft;
+
+        }
+
 
         // setting up Plot View
         //PlotControllerData.UnbindMouseDown(OxyMouseButton.Left);
@@ -103,8 +151,8 @@ public partial class MainViewModel : ViewModelBase
         //    }
         //    if (axisIndex == 1)
         //    {
-        //        axis.Title = AxisYTitleBuild;
-        //        axis.Unit = AxisYUnitBuild;
+        //        axis.Title = AxisYTitleLabel;
+        //        axis.Unit = AxisYTickLabelSuffix;
         //    }
 
         //}
@@ -121,6 +169,16 @@ public partial class MainViewModel : ViewModelBase
     private void SetPlotViewType(PlotViewType plotViewType)
     {
         _plotViewType = plotViewType;
+        SetPlotLabels();
+    }
+
+    private void SetPlotLabels()
+    {
+        if (PlotController is null)
+        { return; }
+
+        PlotController.Plot.Axes.Left.Label.Text = this.AxisYTitleLabel;
+        PlotController.Refresh();
     }
 
     [RelayCommand]
@@ -133,7 +191,7 @@ public partial class MainViewModel : ViewModelBase
             for (int fileInfoIndex = 0; fileInfoIndex < fileInfoEntries.Count; fileInfoIndex++)
             {
                 var fileInfo = fileInfoEntries[fileInfoIndex];
-                var mediaInfo = await _ffprobeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath).ConfigureAwait(false);
+                var mediaInfo = await _probeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath).ConfigureAwait(false);
                 var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = true };
 
                 // Add file to Data Grid
@@ -153,18 +211,20 @@ public partial class MainViewModel : ViewModelBase
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        // for each selected file
         await Parallel.ForEachAsync(
             Files.Where(file => file.IsSelected),
             cancellationToken,
             async (file, token) =>
             {
+                // gets frames
                 List<double> xs = [];
                 List<int> ys = [];
                 var probePacketChannel = Channel.CreateUnbounded<FFProbePacket>();
 
                 var producer = Task.Run(async () =>
                 {
-                    await _ffprobeAppClient.GetProbePacketsAsync(probePacketChannel, file.Path.LocalPath).ConfigureAwait(false);
+                    await _probeAppClient.GetProbePacketsAsync(probePacketChannel, file.Path.LocalPath).ConfigureAwait(false);
                     probePacketChannel.Writer.TryComplete();
                 }, token);
 
@@ -181,11 +241,40 @@ public partial class MainViewModel : ViewModelBase
 
                 await Task.WhenAll(producer, consumer).ConfigureAwait(false);
 
+                  
+
+                //    (var maxX, var maxY) =
+                //        fileAxis.Aggregate(
+                //            seed: (MaxX: -1.0, MaxY: -1.0),
+                //            func: (accumulated, current) => (
+                //                Math.Max(accumulated.MaxX, current.AxisX ?? -1.0),
+                //                Math.Max(accumulated.MaxY, current.AxisY ?? -1.0)
+                //            )
+                //        );
+
+                //    // Adjust axis x based on max duration
+                //    if (maxX > 0)
+                //    {
+                //        //var axisX = PlotModelData!.Axes[0];
+                //        //axisX.AbsoluteMaximum = axisX.Maximum = maxX;
+                //        //axisX.StringFormat = AxisXStringFormatBuild(maxX);
+                //    }
+
+                //    // Adjust axis y based on Frames or Time
+                //    if (maxY > 0)
+                //    {
+                //        //var axisY = PlotModelData!.Axes[1];
+                //        //axisY.AbsoluteMaximum = axisY.Maximum = maxY;
+                //    }
+
                 var scatter = PlotController?.Plot.Add.Scatter(xs, ys)!;
                 scatter.LegendText = Path.GetFileName(file.Path.LocalPath);
+                scatter.ConnectStyle = ConnectStyle.StepHorizontal;
+                //scatter.Smooth = true;
             }
         );
 
+      
         PlotController?.Plot.ShowLegend(Alignment.LowerRight, Orientation.Horizontal);
         PlotController?.Plot.Axes.AutoScale();
         PlotController?.Refresh();
@@ -242,7 +331,7 @@ public partial class MainViewModel : ViewModelBase
 
     //    var producer = Task.Run(async () =>
     //    {
-    //        await _ffprobeAppClient.GetProbePackets(probePacketChannel, file.Path.LocalPath);
+    //        await _probeAppClient.GetProbePackets(probePacketChannel, file.Path.LocalPath);
     //    });
 
     //    var consumer = Task.Run(async () =>
