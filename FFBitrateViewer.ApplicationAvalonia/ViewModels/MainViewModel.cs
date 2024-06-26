@@ -7,6 +7,7 @@ using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
@@ -180,11 +181,12 @@ public partial class MainViewModel : ViewModelBase
 
                 await Task.WhenAll(producer, consumer).ConfigureAwait(false);
 
-                PlotController?.Plot.Add.Scatter(xs, ys);
+                var scatter = PlotController?.Plot.Add.Scatter(xs, ys)!;
+                scatter.LegendText = Path.GetFileName(file.Path.LocalPath);
             }
         );
 
-
+        PlotController?.Plot.ShowLegend(Alignment.LowerRight, Orientation.Horizontal);
         PlotController?.Plot.Axes.AutoScale();
         PlotController?.Refresh();
 
