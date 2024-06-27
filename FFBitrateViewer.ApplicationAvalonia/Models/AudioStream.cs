@@ -32,5 +32,14 @@ public record AudioStream : BaseStream
         return audioStream;
     }
 
+    public override string ToString()
+    {
+        var result = new List<string>();
+        if (Encoder is not null) result.Add(Encoder);
+        if (Channels is not null) result.Add(Channels);
+        if (BitRate is not null) result.Add(BitRate.ToString());
+        if (Frequency is not null) result.Add(Frequency.ToString());
+        return string.Join(", ", result);
+    }
 
 }
