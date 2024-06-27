@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace FFBitrateViewer.ApplicationAvalonia.Models;
+namespace FFBitrateViewer.ApplicationAvalonia.Models.Media;
 
 [Flags]
 public enum Unit

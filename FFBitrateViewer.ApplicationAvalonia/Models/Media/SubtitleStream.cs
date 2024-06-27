@@ -1,7 +1,7 @@
 ﻿using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 
 
-namespace FFBitrateViewer.ApplicationAvalonia.Models;
+namespace FFBitrateViewer.ApplicationAvalonia.Models.Media;
 
 public record SubtitleStream : BaseStream
 {
@@ -9,7 +9,7 @@ public record SubtitleStream : BaseStream
     public static new SubtitleStream Build(FFProbeStream info)
     {
         var subtitleStream = new SubtitleStream();
-        BaseStream.PopulateBaseStream(ref info, ref subtitleStream);
+        PopulateBaseStream(ref info, ref subtitleStream);
         return subtitleStream;
     }
 }

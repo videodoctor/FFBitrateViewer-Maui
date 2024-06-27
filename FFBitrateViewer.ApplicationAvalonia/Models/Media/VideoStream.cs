@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 
-namespace FFBitrateViewer.ApplicationAvalonia.Models;
+namespace FFBitrateViewer.ApplicationAvalonia.Models.Media;
 
 public record VideoStream : BaseStream
 {
@@ -22,7 +22,7 @@ public record VideoStream : BaseStream
         ArgumentNullException.ThrowIfNull(info);
 
         var videoStream = new VideoStream();
-        BaseStream.PopulateBaseStream(ref info, ref videoStream);
+        PopulateBaseStream(ref info, ref videoStream);
 
         videoStream.Format = VideoStreamFormat.Build(info);
         videoStream.Profile = info.Profile; //TODO: Check if this refernce is released

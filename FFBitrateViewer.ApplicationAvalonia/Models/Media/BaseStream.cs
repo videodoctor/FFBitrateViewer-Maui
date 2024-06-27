@@ -2,7 +2,7 @@
 using System;
 
 
-namespace FFBitrateViewer.ApplicationAvalonia.Models;
+namespace FFBitrateViewer.ApplicationAvalonia.Models.Media;
 
 public record BaseStream
 {

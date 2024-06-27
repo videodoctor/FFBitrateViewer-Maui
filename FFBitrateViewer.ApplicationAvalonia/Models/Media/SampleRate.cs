@@ -1,3 +1,3 @@
-﻿namespace FFBitrateViewer.ApplicationAvalonia.Models;
+﻿namespace FFBitrateViewer.ApplicationAvalonia.Models.Media;
 
 public record SampleRate(int Value) : UInt(Value, Unit.Hertz);

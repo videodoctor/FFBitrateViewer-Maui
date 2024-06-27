@@ -1,4 +1,4 @@
-﻿namespace FFBitrateViewer.ApplicationAvalonia.Models;
+﻿namespace FFBitrateViewer.ApplicationAvalonia.Models.Media;
 
 public record PInt(int X, int Y)
 {

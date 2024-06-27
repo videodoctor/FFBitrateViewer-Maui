@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 
-namespace FFBitrateViewer.ApplicationAvalonia.Models;
+namespace FFBitrateViewer.ApplicationAvalonia.Models.Media;
 
 public record NDPair(string Value, int? Numerator, int? Denominator)
 {

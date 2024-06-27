@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 
-namespace FFBitrateViewer.ApplicationAvalonia.Models;
+namespace FFBitrateViewer.ApplicationAvalonia.Models.Media;
 
 public record AudioStream : BaseStream
 {
@@ -18,7 +18,7 @@ public record AudioStream : BaseStream
 
         var audioStream = new AudioStream();
 
-        BaseStream.PopulateBaseStream(ref info, ref audioStream);
+        PopulateBaseStream(ref info, ref audioStream);
 
         if (info.BitRate is not null)
         { audioStream.BitRate = new BitRate((int)info.BitRate); }
