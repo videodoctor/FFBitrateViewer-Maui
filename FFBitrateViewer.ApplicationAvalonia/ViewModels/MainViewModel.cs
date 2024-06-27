@@ -78,20 +78,9 @@ public partial class MainViewModel : ViewModelBase
 
         var version = await _probeAppClient.GetVersionAsync(token).ConfigureAwait(false);
         Version = $"{System.IO.Path.GetFileName(_probeAppClient.FFProbeFilePath)} v{version}";
-        
-        SetPlotLabels();
 
         if (PlotController is not null)
         {
-            //PlotController.Plot.RenderManager.RenderStarting += (s, e) =>
-            //{
-            //    Tick[] ticks = PlotController.Plot.Axes.Bottom.TickGenerator.Ticks;
-            //    for (int i = 0; i < ticks.Length; i++)
-            //    {
-            //        string tickLabel =  TimeSpan.FromSeconds(ticks[i].Position).ToString(AxisXTickLabel(ticks[i].Position));
-            //        ticks[i] = new Tick(ticks[i].Position, tickLabel);
-            //    }
-            //};
 
             try
             {
@@ -113,9 +102,13 @@ public partial class MainViewModel : ViewModelBase
                     PlotController.Plot.Legend.OutlineColor = Color.FromHex("#d7d7d7");
                 }
             }
-            catch { 
+            catch
+            {
                 // NOTE: Ignoring error when trying to set dark theme
             }
+
+            // Showing the left title
+            PlotController.Plot.Axes.Left.Label.Text = this.AxisYTitleLabel;
 
             // Change style for the tick labels
             PlotController.Plot.Axes.Bottom.TickLabelStyle.Rotation = 45;
@@ -128,13 +121,11 @@ public partial class MainViewModel : ViewModelBase
             };
             PlotController.Plot.Axes.Bottom.TickGenerator = myTickGenerator;
 
-
             // Shows title label in the left side
-            PlotController?.Plot.ShowLegend(Alignment.LowerRight, Orientation.Horizontal);
+            PlotController.Plot.ShowLegend(Alignment.LowerRight, Orientation.Horizontal);
 
             // refresh the plot
-            PlotController?.Refresh();
-
+            PlotController.Refresh();
         }
     }
 
@@ -142,11 +133,7 @@ public partial class MainViewModel : ViewModelBase
     private void SetPlotViewType(PlotViewType plotViewType)
     {
         _plotViewType = plotViewType;
-        SetPlotLabels();
-    }
 
-    private void SetPlotLabels()
-    {
         if (PlotController is null)
         { return; }
 
@@ -183,7 +170,7 @@ public partial class MainViewModel : ViewModelBase
         // process files in parallel
         await Parallel.ForEachAsync(Files.Where(file => file.IsSelected), cancellationToken, async (file, token) =>
         {
-            
+
             List<double> xs = [];
             List<int> ys = [];
             var probePacketChannel = Channel.CreateUnbounded<FFProbePacket>();
@@ -241,7 +228,7 @@ public partial class MainViewModel : ViewModelBase
         => _plotViewType switch
         {
             PlotViewType.FrameBased => file.Frames.Max(f => f.Size),
-            PlotViewType.SecondBased => file.GetBitRateMaximum( magnitudeOrder: 1000),
+            PlotViewType.SecondBased => file.GetBitRateMaximum(magnitudeOrder: 1000),
             _ => throw new NotImplementedException($"{nameof(GetAxisYForFile)} for Plot Type {_plotViewType} is not implemented.")
         } / 1000;
 
