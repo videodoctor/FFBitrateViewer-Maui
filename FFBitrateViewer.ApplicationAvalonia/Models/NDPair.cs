@@ -29,7 +29,7 @@ public record NDPair(string Value, int? Numerator, int? Denominator)
 
     public double? ToDouble()
     {
-        if (Numerator == null || Denominator == null)
+        if (Numerator is null || Denominator is null)
         { return null; }
         return (double)Numerator / (double)Denominator;
     }

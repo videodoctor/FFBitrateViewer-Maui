@@ -6,7 +6,7 @@ using System.Text;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Models;
 
-public class VideoStream : BaseStream
+public record VideoStream : BaseStream
 {
     public BitRate? BitRate { get; set; }
     public bool IsBitrateCalculated { get; set; }
@@ -27,10 +27,10 @@ public class VideoStream : BaseStream
         videoStream.Format = VideoStreamFormat.Build(info);
         videoStream.Profile = info.Profile; //TODO: Check if this refernce is released
 
-        if (info.BitRate != null)
+        if (info.BitRate is not null)
         { videoStream.BitRate = new BitRate(info.BitRate.Value); }
 
-        if (info.Width != null && info.Height != null)
+        if (info.Width is not null && info.Height is not null)
         { videoStream.Resolution = new PInt(info.Width.Value, info.Height.Value); }
 
         return videoStream;
@@ -44,10 +44,10 @@ public class VideoStream : BaseStream
         {
             case null: // FULL
 
-                if (Resolution != null)
+                if (Resolution is not null)
                 { sb.Append(Resolution.ToString('x')); }
 
-                if (FrameRateAvg?.Value != null)
+                if (FrameRateAvg?.Value is not null)
                 { sb.Append("-" + FrameRateAvg.ToString(isNumberOnly: true)); }
 
                 sb.Append(Format?.ToString(VideoStreamFormatToStringMode.FIELD_TYPE));
@@ -57,17 +57,17 @@ public class VideoStream : BaseStream
                 if (!string.IsNullOrEmpty(format))
                 { result.Add(format); }
 
-                if (BitRate != null)
+                if (BitRate is not null)
                 { result.Add(BitRate.ToString()); }
 
                 break;
 
             case VideoStreamToStringMode.SHORT:
 
-                if (Resolution != null)
+                if (Resolution is not null)
                 { sb.Append(Resolution.Y); }
 
-                if (FrameRateAvg?.Value != null)
+                if (FrameRateAvg?.Value is not null)
                 { sb.Append("-" + FrameRateAvg.ToString(isNumberOnly: true)); }
 
                 sb.Append(Format?.ToString(VideoStreamFormatToStringMode.FIELD_TYPE));

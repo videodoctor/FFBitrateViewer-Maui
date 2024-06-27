@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Models;
 
-public class AudioStream : BaseStream
+public record AudioStream : BaseStream
 {
     public BitRate? BitRate { get; set; }
     public string? Channels { get; set; }
@@ -20,25 +20,25 @@ public class AudioStream : BaseStream
 
         BaseStream.PopulateBaseStream(ref info, ref audioStream);
 
-        if (info.BitRate != null)
+        if (info.BitRate is not null)
         { audioStream.BitRate = new BitRate((int)info.BitRate); }
 
-        if (info.ChannelLayout != null)
+        if (info.ChannelLayout is not null)
         { audioStream.Channels = info.ChannelLayout; }
 
-        if (info.SampleRate != null)
+        if (info.SampleRate is not null)
         { audioStream.Frequency = new SampleRate((int)info.SampleRate); }
 
         return audioStream;
     }
 
-    public override string? ToString()
+    public override string ToString()
     {
         var result = new List<string>();
-        if (Encoder != null) result.Add(Encoder);
-        if (Channels != null) result.Add(Channels);
-        if (BitRate != null) result.Add(BitRate.ToString());
-        if (Frequency != null) result.Add(Frequency.ToString());
+        if (Encoder is not null) result.Add(Encoder);
+        if (Channels is not null) result.Add(Channels);
+        if (BitRate is not null) result.Add(BitRate.ToString());
+        if (Frequency is not null) result.Add(Frequency.ToString());
         return string.Join(", ", result);
     }
 

@@ -1,9 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,7 +14,7 @@ public class FileDialogService
         bool IsSingleSelection = true
     )
     {
-        if (UIApplicationService.DesktopApplication == null)
+        if (UIApplicationService.DesktopApplication is null)
         { throw new System.Exception("A desktop application is required to open files."); }
 
         // Get top level from the current control. Alternatively, you can use Window reference instead.

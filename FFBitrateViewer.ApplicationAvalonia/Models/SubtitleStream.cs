@@ -3,7 +3,7 @@
 
 namespace FFBitrateViewer.ApplicationAvalonia.Models;
 
-public class SubtitleStream : BaseStream
+public record SubtitleStream : BaseStream
 {
     // todo@ override ToString
     public static new SubtitleStream Build(FFProbeStream info)

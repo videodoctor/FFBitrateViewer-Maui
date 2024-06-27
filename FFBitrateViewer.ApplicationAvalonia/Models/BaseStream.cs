@@ -4,7 +4,7 @@ using System;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Models;
 
-public class BaseStream
+public record BaseStream
 {
     public string? CodecName { get; set; }
     public string? CodecTag { get; set; }
