@@ -98,120 +98,53 @@ public partial class FileItemViewModel : ViewModelBase
         FirstVideoShortDesc = VideoStreams.FirstOrDefault()?.ToString(VideoStreamToStringMode.SHORT) ?? string.Empty;
     }
 
-    public double GetRefreshedBitRateAverage(bool isAdjustmentStartTime = false, double startTime = 0.0)
-    {
-        var bitRateAverage = GetAverageBitRate(
-            Frames,
-            isAdjustmentStartTime,
-            startTime
-        );
-
-        if (double.IsNaN(bitRateAverage))
-        { return double.NaN; }
-
-        return double.Round(bitRateAverage / 1000);
-    }
 
     public double GetAverageBitRate(
+        IList<FFProbePacket>? frames = null,
+        double? adjustmentStartTime = null,
+        int? magnitudeOrder = null
+    )
+    {
+        frames ??= Frames;
+
+        if (frames.Count == 0)
+        { return double.NaN; }
+
+        double adjustment = adjustmentStartTime ?? 0.0;
+        double duration = frames[^1].PTSTime ?? 0 + frames[^1].DurationTime ?? 0 - adjustment;
+        double bitrateAverage = frames.Sum(f => f.Size ?? 0) / duration * 8.0;
+
+
+        bitrateAverage = double.Round(bitrateAverage / (magnitudeOrder ?? 1));
+        
+        return bitrateAverage;
+    }
+
+    public double GetBitRateMaximum(
+        IList<FFProbePacket>? frames = null,
+        double intervalDuration = 1,
+        double intervalStartTime = 0,
+        int? magnitudeOrder = null
+    )
+    {
+        frames ??= Frames;
+        var bitrates = GetBitRates(frames, intervalDuration, intervalStartTime);
+        
+        if (bitrates is null || bitrates.Count == 0)
+        { return double.NaN; }
+
+        double bitRateMaximum = bitrates.Max() / (magnitudeOrder ?? 1);
+
+        return bitRateMaximum;
+    }
+
+    public static ICollection<int> GetBitRates(
         IList<FFProbePacket> frames,
-        bool isAdjustmentStartTime = false,
-        double startTime = 0.0)
-    {
-        if (frames.Count == 0)
-        { return double.NaN; }
-
-        double adjustment = isAdjustmentStartTime ? startTime : 0;
-        var duration = GetDurationFromFrames(frames, adjustment);
-
-        var bitrateAverage = frames.Sum(f => f.Size) / duration * 8;
-        return bitrateAverage ?? double.NaN;
-    }
-
-    private double? GetDurationFromFrames(IList<FFProbePacket> frames, double adjustment = 0)
-    {
-        if (frames.Count == 0)
-        { return null; }
-        return frames[^1].PTSTime ?? 0 + frames[^1].DurationTime ?? 0 - adjustment;
-    }
-
-    public double? GetDurationFromStream(IList<VideoStream> videoStreams)
-    {
-        if (videoStreams.Count == 0 || videoStreams[0] == null)
-        { return null; }
-        var video0 = videoStreams[0];
-        return (video0.Duration > 0) ? (video0.Duration - (video0.StartTime ?? 0)) : null;
-    }
-
-    public double? GetDurationFromFileInfo(FFProbeJsonOutput mediaInfo)
-    {
-        if (mediaInfo == null)
-        { return null; }
-
-        var mediaInfoDuration = GetDurationFromStreams(mediaInfo);
-        var startTime = mediaInfo.Format?.StartTime ?? 0;
-
-        return (mediaInfoDuration > 0) ? (mediaInfoDuration - startTime) : null;
-    }
-
-    public double? GetDurationFromStreams(FFProbeJsonOutput ffProbeOutput)
-    {
-        if (ffProbeOutput == null)
-        { return null; }
-
-        if (ffProbeOutput.Format?.Duration != null)
-        { return ffProbeOutput.Format.Duration.Value; }
-
-        if (ffProbeOutput.Streams != null)
-        {
-            // todo@ should start is taken into consideration?
-            var durationQuery = from stream in ffProbeOutput.Streams
-                                where stream.StartTime != null && stream.Duration != null
-                                let endTime = stream.StartTime + stream.Duration
-                                select endTime;
-
-            return durationQuery.FirstOrDefault();
-        }
-
-        return null;
-    }
-
-    public double? GetDuration()
-    {
-        return GetDurationFromFrames(Frames) ?? GetDurationFromStream(VideoStreams) ?? GetDurationFromFileInfo(_mediaInfo);
-    }
-
-    public double RefreshBitRateMaximum(
         double intervalDuration = 1,
         double intervalStartTime = 0
     )
     {
-        var bitRateMaximum = GetBitRateMaximum(intervalDuration, intervalStartTime);
-        
-        if (bitRateMaximum == null)
-        { return double.NaN; }
-
-        return bitRateMaximum.Value / 1000;
-    }
-
-    public double? GetBitRateMaximum(
-        double intervalDuration = 1,
-        double intervalStartTime = 0
-    )
-    {
-        var bitrates = GetBitRates(intervalDuration, intervalStartTime);
-        
-        if (bitrates == null || bitrates.Count == 0)
-        { return null; }
-
-        return bitrates.Max();
-    }
-
-    public ICollection<int> GetBitRates(
-        double intervalDuration = 1,
-        double intervalStartTime = 0
-    )
-    {
-        if (Frames.Count == 0 || intervalDuration == 0)
+        if (frames.Count == 0 || intervalDuration == 0)
         { return Array.Empty<int>(); }
 
         int bitrate;
@@ -221,10 +154,10 @@ public partial class FileItemViewModel : ViewModelBase
         var indexes = new List<int>();
         var bitrates = new List<int>();
 
-        for (int frameNumber = 0; frameNumber < Frames.Count; ++frameNumber)
+        for (int frameNumber = 0; frameNumber < frames.Count; ++frameNumber)
         {
             bitrates.Add(0);
-            var frame = Frames[frameNumber];
+            var frame = frames[frameNumber];
             double duration = frame.DurationTime ?? 0;
             double size = frame.Size ?? 0;
             double startTime = frame.PTSTime ?? 0;
