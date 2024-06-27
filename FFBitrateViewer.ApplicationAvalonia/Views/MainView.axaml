@@ -29,7 +29,7 @@
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto,*,Auto">
+    <Grid RowDefinitions="Auto,Auto,*,4,*,Auto">
         <!-- Menu -->
         <Menu Grid.Row="0" Padding="5 2">
             <MenuItem Header="_File">
@@ -67,7 +67,7 @@
             </StackPanel>
         </Border>
 
-
+        <!-- data grid-->
         <Border Grid.Row="2" Padding="10 4" >
             <Grid ColumnDefinitions="0.8*,4,0.2*">
 
@@ -105,32 +105,34 @@
                   BorderThickness="1" BorderBrush="Gray">
         </DataGrid>-->
 
-        <!--Button and check buttons-->
-        <Border Grid.Row="3" Padding="10 4">
-            <StackPanel  Orientation="Horizontal">
-                <Button Content="Start" Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"/>
-                <Button Content="Stop" Command="{Binding ToggleOnOffPlotterPlotterCancelCommand,Mode=OneTime}"/>
-                <!--<ToggleSwitch OnContent="Stop" OffContent="Start" IsChecked="{Binding IsPlotterOn,Mode=TwoWay}" 
+        <GridSplitter Grid.Row="3"  ResizeDirection="Rows"/>
+
+        <!-- buttons and plot -->
+        <Border Grid.Row="4" Padding="10 4">
+
+            <Grid RowDefinitions="Auto,*">
+                <!--Button and check buttons-->
+                <StackPanel Grid.Row="0"  Orientation="Horizontal">
+                    <Button Content="Start" Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"/>
+                    <Button Content="Stop" Command="{Binding ToggleOnOffPlotterPlotterCancelCommand,Mode=OneTime}"/>
+                    <!--<ToggleSwitch OnContent="Stop" OffContent="Start" IsChecked="{Binding IsPlotterOn,Mode=TwoWay}" 
                           Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"
                           />-->
-                <Label Content="Plot view:" VerticalAlignment="Center" />
-                <RadioButton GroupName="PotViewGroupName" Content="Frame based" IsChecked="True"
-                             Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
-                             CommandParameter="{x:Static m:PlotViewType.FrameBased}"
+                    <Label Content="Plot view:" VerticalAlignment="Center" />
+                    <RadioButton GroupName="PotViewGroupName" Content="Frame based" IsChecked="True"
+                                 Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
+                                 CommandParameter="{x:Static m:PlotViewType.FrameBased}"
                          />
-                <RadioButton GroupName="PotViewGroupName" Content="Second based" IsChecked="False"
-                             Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
-                             CommandParameter="{x:Static m:PlotViewType.SecondBased}"
+                    <RadioButton GroupName="PotViewGroupName" Content="Second based" IsChecked="False"
+                                 Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
+                                 CommandParameter="{x:Static m:PlotViewType.SecondBased}"
                          />
-                <Label Content="Adjust frame start time" VerticalAlignment="Center"/>
-                <CheckBox IsChecked="{Binding HasToAdjustFrameStartTime}"></CheckBox>
-            </StackPanel>
-        </Border>
+                    <Label Content="Adjust frame start time" VerticalAlignment="Center"/>
+                    <CheckBox IsChecked="{Binding HasToAdjustFrameStartTime}"></CheckBox>
+                </StackPanel>
 
-        <!--Plot view-->
-        <Border Grid.Row="4" Padding="10 4">
-            <Grid >
-                <ScottPlot_Avalonia:AvaPlot Name="PlotControl">
+                <!--Plot view-->
+                <ScottPlot_Avalonia:AvaPlot Name="PlotControl" Grid.Row="1" >
 
                 </ScottPlot_Avalonia:AvaPlot>
 
