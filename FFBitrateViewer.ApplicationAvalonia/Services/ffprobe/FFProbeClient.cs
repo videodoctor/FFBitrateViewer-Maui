@@ -1,11 +1,9 @@
 ﻿using Hmb.ProcessRunner;
 using Sylvan.Data.Csv;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
@@ -35,6 +33,10 @@ public class FFProbeClient
     public string FFProbeFilePath { get => _fFProbeFilePath ??= WhichFFProbe(); }
 
     private string? _fFProbeFilePath;
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+    {
+        NumberHandling = JsonNumberHandling.AllowReadingFromString
+    };
 
     private string WhichFFProbe()
     {
@@ -81,7 +83,10 @@ public class FFProbeClient
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     /// <exception cref="FileNotFoundException"></exception>
     /// <exception cref="FFProbeClientException"></exception>
-    public async Task<FFProbeJsonOutput> GetMediaInfoAsync(string mediaFilePath, int threadCount = 11)
+    public async Task<FFProbeJsonOutput> GetMediaInfoAsync(
+        string mediaFilePath, 
+        int threadCount = 11,
+        CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrEmpty(mediaFilePath);
 
@@ -96,9 +101,11 @@ public class FFProbeClient
         using var standardOutputWriter = new StreamWriter(standardOutputMemoryStream);
         StringBuilder standardErrorStringBuilder = new StringBuilder();
         StringWriter standardErrorWriter = new StringWriter(standardErrorStringBuilder);
-        var exitCode = await _processService.ExecuteAsync(command, standardOutputWriter: standardOutputWriter, standardErrorWriter: standardErrorWriter).ConfigureAwait(false);
+        var exitCode = await _processService.ExecuteAsync(command, standardOutputWriter: standardOutputWriter, standardErrorWriter: standardErrorWriter, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (exitCode != 0)
         { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}.{Environment.NewLine}Standard Error Output: '{standardErrorStringBuilder}'"); }
+
+        cancellationToken.ThrowIfCancellationRequested();
 
 #if DEBUG
         standardOutputMemoryStream.Seek(0, SeekOrigin.Begin);
@@ -108,12 +115,7 @@ public class FFProbeClient
 
         standardOutputMemoryStream.Seek(0, SeekOrigin.Begin);
 
-
-        var jsonSerializerOptions = new JsonSerializerOptions
-        {
-            NumberHandling = JsonNumberHandling.AllowReadingFromString
-        };
-        var mediaInfo = await JsonSerializer.DeserializeAsync<FFProbeJsonOutput>(standardOutputMemoryStream, jsonSerializerOptions).ConfigureAwait(false);
+        var mediaInfo = await JsonSerializer.DeserializeAsync<FFProbeJsonOutput>(standardOutputMemoryStream, _jsonSerializerOptions, cancellationToken).ConfigureAwait(false);
 
         return mediaInfo!;
     }
