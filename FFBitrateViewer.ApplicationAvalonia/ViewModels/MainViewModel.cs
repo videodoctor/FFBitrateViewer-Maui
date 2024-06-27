@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -148,25 +149,21 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task AddFiles(CancellationToken token)
     {
-        // TODO: Check if we really need to use Task.Run
-        await Task.Run(async () =>
+
+        var fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false).ConfigureAwait(false);
+        await Parallel.ForEachAsync(fileInfoEntries, token, async (fileInfo, token) =>
         {
-            var fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false).ConfigureAwait(false);
-            for (int fileInfoIndex = 0; fileInfoIndex < fileInfoEntries.Count; fileInfoIndex++)
+            var mediaInfo = await _probeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath, cancellationToken: token).ConfigureAwait(false);
+            var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = true };
+
+            // Add file to Data Grid
+            _uiApplicationService.FireAndForget(() =>
             {
-                var fileInfo = fileInfoEntries[fileInfoIndex];
-                var mediaInfo = await _probeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath, cancellationToken: token).ConfigureAwait(false);
-                var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = true };
+                Files.Add(fileItemViewModel);
+            });
+        }).ConfigureAwait(false);
 
-                // Add file to Data Grid
-                _uiApplicationService.FireAndForget(() =>
-                {
-                    Files.Add(fileItemViewModel);
-                });
-            }
-            SelectedFile = Files.LastOrDefault();
-
-        }, token).ConfigureAwait(false);
+        SelectedFile = Files.LastOrDefault();
     }
 
     [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
