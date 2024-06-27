@@ -16,12 +16,13 @@
              >
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="Loaded" SourceObject="MainViewUserControl">
-			<ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotController" Value="{Binding ElementName=PlotControl}" />
+            <ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotController" Value="{Binding ElementName=PlotControl}" />
             <!--<ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotModelData" Value="{Binding ActualModel, ElementName=PlotControl}" />
             <ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotControllerData" Value="{Binding ActualController, ElementName=PlotControl}" />-->
             <ia:InvokeCommandAction Command="{Binding LoadedCommand,Mode=OneTime}" />
         </ia:EventTriggerBehavior>
     </i:Interaction.Behaviors>
+
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
@@ -122,10 +123,10 @@
 
         <!--Plot view-->
         <Grid Grid.Row="4">
-			<ScottPlot_Avalonia:AvaPlot Name="PlotControl">
-				
-			</ScottPlot_Avalonia:AvaPlot>
-			
+            <ScottPlot_Avalonia:AvaPlot Name="PlotControl">
+
+            </ScottPlot_Avalonia:AvaPlot>
+
         </Grid>
 
         <!--Status bar-->
