@@ -58,11 +58,11 @@ public partial class MainViewModel : ViewModelBase
 
     private string TrackerFormatStringBuild => $@"{{0}}{Environment.NewLine}Time={{2:hh\:mm\:ss\.fff}}{Environment.NewLine}{{3}}={{4:0}} {AxisYTickLabelSuffix}";
 
-    private string AxisXTickLabel(double duration) =>
-          (duration < 60) ? @"m\:ss"
-        : (duration < 60 * 60) ? @"mm\:ss"
-        : (duration < 60 * 60 * 24) ?  @"h\:mm\:ss"
-        : @"d\.hh\:mm\:ss"
+    private string AxisXTickLabelFormatter(double duration) =>
+          (duration < 60) ? TimeSpan.FromSeconds(duration).ToString(@"m\:ss")
+        : (duration < 60 * 60) ? TimeSpan.FromSeconds(duration).ToString(@"mm\:ss")
+        : (duration < 60 * 60 * 24) ? TimeSpan.FromSeconds(duration).ToString(@"h\:mm\:ss")
+        : TimeSpan.FromSeconds(duration).ToString(@"d\.hh\:mm\:ss")
         ;
 
     private readonly UIApplicationService _uiApplicationService = new();
@@ -120,6 +120,14 @@ public partial class MainViewModel : ViewModelBase
             // Change style for the tick labels
             PlotController.Plot.Axes.Bottom.TickLabelStyle.Rotation = 45;
             PlotController.Plot.Axes.Bottom.TickLabelStyle.Alignment = Alignment.MiddleLeft;
+
+            // create a custom tick generator using your custom label formatter
+            ScottPlot.TickGenerators.NumericAutomatic myTickGenerator = new()
+            {
+                LabelFormatter = AxisXTickLabelFormatter
+            };
+            PlotController.Plot.Axes.Bottom.TickGenerator = myTickGenerator;
+
 
             // Shows title label in the left side
             PlotController?.Plot.ShowLegend(Alignment.LowerRight, Orientation.Horizontal);
