@@ -77,7 +77,7 @@
                 <DataGrid.Columns>
                     <!--<DataGridTextColumn Header="" Binding="{Binding IsSelected}"/>-->
                     <DataGridCheckBoxColumn Header="Is Active" Binding="{Binding IsSelected}" IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Path to file"  Binding="{Binding Path,Mode=OneTime}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Path to file"  Binding="{Binding Path.LocalPath,Mode=OneTime}" IsReadOnly="True" />
                     <DataGridTextColumn Header="Media Info" Binding="{Binding FirstVideoShortDesc,Mode=OneTime}" IsReadOnly="True" />
                     <DataGridTextColumn Header="Bit Rate (avg)" Binding="{Binding BitRateAverage,Mode=OneWay,StringFormat=' {0} kb/s'}" IsReadOnly="True" />
                     <DataGridTextColumn Header="Bit Rate (max)" Binding="{Binding BitRateMaximum,Mode=OneWay,StringFormat=' {0} kb/s'}" IsReadOnly="True" />
