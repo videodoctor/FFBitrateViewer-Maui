@@ -65,7 +65,7 @@ public partial class MainViewModel : ViewModelBase
         : TimeSpan.FromSeconds(duration).ToString(@"d\.hh\:mm\:ss")
         ;
 
-    private readonly UIApplicationService _uiApplicationService = new();
+    private readonly GuiService _guiService = new();
 
     private readonly FileDialogService _fileDialogService = new();
 
@@ -158,7 +158,7 @@ public partial class MainViewModel : ViewModelBase
             var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = true };
 
             // Add file to Data Grid
-            _uiApplicationService.FireAndForget(() =>
+            _guiService.RunLater(() =>
             {
                 Files.Add(fileItemViewModel);
             });
@@ -204,7 +204,7 @@ public partial class MainViewModel : ViewModelBase
             var bitRateAverage = file.GetAverageBitRate(magnitudeOrder: 1000);
             var bitRateMaximum = file.GetBitRateMaximum(magnitudeOrder: 1000);
 
-            _uiApplicationService.FireAndForget(() =>
+            _guiService.RunLater(() =>
             {
                 file.BitRateAverage = bitRateAverage;
                 file.BitRateMaximum = bitRateMaximum;
@@ -242,7 +242,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void Exit()
     {
-        _uiApplicationService.Exit();
+        _guiService.Exit();
     }
 
 }
