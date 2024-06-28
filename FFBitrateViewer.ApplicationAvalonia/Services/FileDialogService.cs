@@ -47,6 +47,7 @@ public class FileEntry
 }
 
 
+[Serializable]
 public class FileDialogException : System.Exception
 {
     public FileDialogException() { }
