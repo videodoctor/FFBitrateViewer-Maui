@@ -9,13 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.Application
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationAvalonia.Browser", "FFBitrateViewer.ApplicationAvalonia.Browser\FFBitrateViewer.ApplicationAvalonia.Browser.csproj", "{68D38951-4F97-4BA8-957A-F47D52918971}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationConsole", "FFBitrateViewer.ApplicationConsole\FFBitrateViewer.ApplicationConsole.csproj", "{5FBD5BFE-FB16-42C7-A63C-F79BB23F7135}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationWPF", "FFBitrateViewer.ApplicationWPF\FFBitrateViewer.ApplicationWPF.csproj", "{ADB8C070-D1AA-44E4-B99F-A9A258A8EE52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFBitrateViewer.ApplicationAvalonia.Tests", "FFBitrateViewer.ApplicationAvalonia.Tests\FFBitrateViewer.ApplicationAvalonia.Tests.csproj", "{52268157-AD3B-4A04-A608-10F74B1B9B3B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFBitrateViewer.ApplicationAvalonia.TestApp", "FFBitrateViewer.ApplicationAvalonia.TestApp\FFBitrateViewer.ApplicationAvalonia.TestApp.csproj", "{E68A2B41-E3D0-4F1F-A8D5-A437280C6006}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationAvalonia.Tests", "FFBitrateViewer.ApplicationAvalonia.Tests\FFBitrateViewer.ApplicationAvalonia.Tests.csproj", "{52268157-AD3B-4A04-A608-10F74B1B9B3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +31,6 @@ Global
 		{68D38951-4F97-4BA8-957A-F47D52918971}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68D38951-4F97-4BA8-957A-F47D52918971}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68D38951-4F97-4BA8-957A-F47D52918971}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5FBD5BFE-FB16-42C7-A63C-F79BB23F7135}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5FBD5BFE-FB16-42C7-A63C-F79BB23F7135}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5FBD5BFE-FB16-42C7-A63C-F79BB23F7135}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5FBD5BFE-FB16-42C7-A63C-F79BB23F7135}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ADB8C070-D1AA-44E4-B99F-A9A258A8EE52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ADB8C070-D1AA-44E4-B99F-A9A258A8EE52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADB8C070-D1AA-44E4-B99F-A9A258A8EE52}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -47,10 +39,6 @@ Global
 		{52268157-AD3B-4A04-A608-10F74B1B9B3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52268157-AD3B-4A04-A608-10F74B1B9B3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52268157-AD3B-4A04-A608-10F74B1B9B3B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E68A2B41-E3D0-4F1F-A8D5-A437280C6006}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E68A2B41-E3D0-4F1F-A8D5-A437280C6006}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E68A2B41-E3D0-4F1F-A8D5-A437280C6006}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E68A2B41-E3D0-4F1F-A8D5-A437280C6006}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

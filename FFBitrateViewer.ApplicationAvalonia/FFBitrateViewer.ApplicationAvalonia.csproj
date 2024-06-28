@@ -10,6 +10,11 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
+  
+  <ItemGroup>
+    <Content Remove="C:\Users\hfmad\.nuget\packages\hmb.processrunner\1.0.4\contentFiles\any\net8.0\README.md" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.0.11" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.11" />

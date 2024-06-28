@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FFBitrateViewer.ApplicationAvalonia.TestApp\FFBitrateViewer.ApplicationAvalonia.TestApp.csproj" />
     <ProjectReference Include="..\FFBitrateViewer.ApplicationAvalonia\FFBitrateViewer.ApplicationAvalonia.csproj" />
   </ItemGroup>
 
