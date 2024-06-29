@@ -44,7 +44,6 @@ public partial class MainViewModel(
 
     public ObservableCollection<FileItemViewModel> Files { get; } = [];
 
-
     private PlotViewType _plotViewType = PlotViewType.FrameBased;
 
     private string AxisYTickLabelSuffix => _plotViewType switch
@@ -119,23 +118,6 @@ public partial class MainViewModel(
         await AddFilesAsync(fileInfoEntries, token).ConfigureAwait(false);
     }
 
-    private async Task AddFilesAsync(IEnumerable<IFileEntry> fileInfoEntries, CancellationToken token = default)
-    {
-        await Parallel.ForEachAsync(fileInfoEntries, token, async (fileInfo, token) =>
-        {
-            var mediaInfo = await _probeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath, cancellationToken: token).ConfigureAwait(false);
-            var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = true };
-
-            // Add file to Data Grid
-            await _guiService.RunNowAsync(() =>
-            {
-                Files.Add(fileItemViewModel);
-            }).ConfigureAwait(false);
-        }).ConfigureAwait(false);
-
-        SelectedFile = Files.LastOrDefault();
-    }
-
     [RelayCommand]
     private void Exit()
     {
@@ -195,6 +177,23 @@ public partial class MainViewModel(
         // Request Plot to adjust viewport and redraw
         PlotController?.Plot.Axes.AutoScale();
         PlotController?.Refresh();
+    }
+
+    private async Task AddFilesAsync(IEnumerable<IFileEntry> fileInfoEntries, CancellationToken token = default)
+    {
+        await Parallel.ForEachAsync(fileInfoEntries, token, async (fileInfo, token) =>
+        {
+            var mediaInfo = await _probeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath, cancellationToken: token).ConfigureAwait(false);
+            var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = true };
+
+            // Add file to Data Grid
+            await _guiService.RunNowAsync(() =>
+            {
+                Files.Add(fileItemViewModel);
+            }).ConfigureAwait(false);
+        }).ConfigureAwait(false);
+
+        SelectedFile = Files.LastOrDefault();
     }
 
     private (double? X, double Y) GetDataPoint(FFProbePacket probePacket, FileItemViewModel file, PlotViewType plotViewType)
