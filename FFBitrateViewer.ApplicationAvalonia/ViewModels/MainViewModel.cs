@@ -43,21 +43,20 @@ public partial class MainViewModel(
 
     public IPlotControl? _plotController;
 
+    private PlotControllerFacade _plotControllerFacade = PlotControllerFacade.None;
+
+    partial void OnPlotControllerChanging(global::ScottPlot.IPlotControl? value)
+        => _plotControllerFacade = new PlotControllerFacade(value);
+
     public ObservableCollection<FileItemViewModel> Files { get; } = [];
 
     private PlotViewType _plotViewType = PlotViewType.FrameBased;
+
     public IPlotStrategy PlotStrategy => _plotStrategies[_plotViewType];
 
     private readonly IDictionary<PlotViewType, IPlotStrategy> _plotStrategies = plotStrategies.ToDictionary(p => p.PlotViewType);
 
     private string TrackerFormatStringBuild => $@"{{0}}{Environment.NewLine}Time={{2:hh\:mm\:ss\.fff}}{Environment.NewLine}{{3}}={{4:0}} {PlotStrategy.AxisYTickLabelSuffix}";
-
-    private string AxisXTickLabelFormatter(double duration) =>
-          (duration < 60) ? TimeSpan.FromSeconds(duration).ToString(@"m\:ss")
-        : (duration < 60 * 60) ? TimeSpan.FromSeconds(duration).ToString(@"mm\:ss")
-        : (duration < 60 * 60 * 24) ? TimeSpan.FromSeconds(duration).ToString(@"h\:mm\:ss")
-        : TimeSpan.FromSeconds(duration).ToString(@"d\.hh\:mm\:ss")
-        ;
 
     private readonly GuiService _guiService = guiService;
 
@@ -91,11 +90,8 @@ public partial class MainViewModel(
     {
         _plotViewType = plotViewType;
 
-        if (PlotController is null)
-        { return; }
-
-        PlotController.Plot.Axes.Left.Label.Text = PlotStrategy.AxisYTitleLabel;
-        PlotController.Refresh();
+        _plotControllerFacade.AxisYTitleLabel = PlotStrategy.AxisYTitleLabel;
+        _plotControllerFacade.Refresh();
     }
 
     [RelayCommand]
@@ -156,15 +152,13 @@ public partial class MainViewModel(
             });
 
             // Add scatter to plot view
-            var scatter = PlotController?.Plot.Add.Scatter(xs, ys)!;
-            scatter.LegendText = Path.GetFileName(file.Path.LocalPath);
-            scatter.ConnectStyle = ConnectStyle.StepHorizontal;
-            //scatter.Smooth = true;
+            _plotControllerFacade.AddScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
+            
         });
 
         // Request Plot to adjust viewport and redraw
-        PlotController?.Plot.Axes.AutoScale();
-        PlotController?.Refresh();
+        _plotControllerFacade.AutoScaleViewport();
+        _plotControllerFacade.Refresh();
     }
 
     private async Task AddFilesAsync(IEnumerable<IFileEntry> fileInfoEntries, CancellationToken token = default)
@@ -186,29 +180,13 @@ public partial class MainViewModel(
 
     private void InitializePlotController()
     {
-        if (PlotController is null)
-        {
-            return;
-        }
 
         try
         {
             var platformClient = OSPlatformClient.GetOSPlatformClient();
             if (platformClient.IsDark())
             {
-                PlotController.Plot.Add.Palette = new ScottPlot.Palettes.Penumbra();
-                // change figure colors
-                PlotController.Plot.FigureBackground.Color = Color.FromHex("#181818");
-                PlotController.Plot.DataBackground.Color = Color.FromHex("#1f1f1f");
-
-                // change axis and grid colors
-                PlotController.Plot.Axes.Color(Color.FromHex("#d7d7d7"));
-                PlotController.Plot.Grid.MajorLineColor = Color.FromHex("#404040");
-
-                // change legend colors
-                PlotController.Plot.Legend.BackgroundColor = Color.FromHex("#404040");
-                PlotController.Plot.Legend.FontColor = Color.FromHex("#d7d7d7");
-                PlotController.Plot.Legend.OutlineColor = Color.FromHex("#d7d7d7");
+                _plotControllerFacade.SetDarkTheme();
             }
         }
         catch
@@ -216,25 +194,8 @@ public partial class MainViewModel(
             // NOTE: Ignoring error when trying to set dark theme
         }
 
-        // Showing the left title
-        PlotController.Plot.Axes.Left.Label.Text = PlotStrategy.AxisYTitleLabel;
-
-        // Change style for the tick labels
-        PlotController.Plot.Axes.Bottom.TickLabelStyle.Rotation = 45;
-        PlotController.Plot.Axes.Bottom.TickLabelStyle.Alignment = Alignment.MiddleLeft;
-
-        // create a custom tick generator using your custom label formatter
-        ScottPlot.TickGenerators.NumericAutomatic myTickGenerator = new()
-        {
-            LabelFormatter = AxisXTickLabelFormatter
-        };
-        PlotController.Plot.Axes.Bottom.TickGenerator = myTickGenerator;
-
-        // Shows title label in the left side
-        PlotController.Plot.ShowLegend(Alignment.LowerRight, Orientation.Horizontal);
-
-        // refresh the plot
-        PlotController.Refresh();
+        _plotControllerFacade.Initialize(PlotStrategy.AxisYTitleLabel);
+        _plotControllerFacade.Refresh();
     }
 
 }
