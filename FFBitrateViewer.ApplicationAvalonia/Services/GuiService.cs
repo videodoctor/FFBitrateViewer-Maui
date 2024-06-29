@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls.ApplicationLifetimes;
+﻿using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using System;
 using System.Threading.Tasks;
@@ -74,5 +75,9 @@ public class GuiService
         _desktopApplication.Value?.Shutdown(exitCode);
     }
 
-    public bool IsDarkTheme => string.Equals("Dark",Avalonia.Application.Current?.ActualThemeVariant.Key.ToString(), StringComparison.OrdinalIgnoreCase);
+    /// <summary>
+    /// Whether or not the GUI is using Dark theme.
+    /// </summary>
+    public bool IsDarkTheme => string.Equals("Dark", TopLevel.GetTopLevel(_desktopApplication.Value!.MainWindow)!.ActualThemeVariant.Key.ToString(), StringComparison.OrdinalIgnoreCase);
+
 }

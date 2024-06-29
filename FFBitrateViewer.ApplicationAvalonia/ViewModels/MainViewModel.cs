@@ -70,11 +70,8 @@ public partial class MainViewModel(
     private async Task OnLoaded(CancellationToken token)
     {
         // initialize the plot view
-        await _guiService.RunNowAsync(() =>
-        {
-            _plotControllerFacade.Initialize(PlotStrategy.AxisYTitleLabel, _guiService.IsDarkTheme);
-            _plotControllerFacade.Refresh();
-        });
+        _plotControllerFacade.Initialize(PlotStrategy.AxisYTitleLabel, _guiService.IsDarkTheme);
+        _plotControllerFacade.Refresh();
 
         // gets version of the ffprobe
         var version = await _probeAppClient.GetVersionAsync(token).ConfigureAwait(false);
