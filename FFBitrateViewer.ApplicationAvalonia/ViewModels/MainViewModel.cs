@@ -15,8 +15,13 @@ using System.Threading.Tasks;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
-public partial class MainViewModel : ViewModelBase
+public partial class MainViewModel(
+    GuiService guiService,
+    FileDialogService fileDialogService,
+    FFProbeClient probeAppClient
+    ) : ViewModelBase
 {
+
     [ObservableProperty]
     private string _version = string.Empty;
 
@@ -30,11 +35,11 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private FileItemViewModel? _selectedFile;
 
-    public ObservableCollection<FileItemViewModel> Files { get; } = new();
-
     [ObservableProperty]
 
     public IPlotControl? _plotController;
+
+    public ObservableCollection<FileItemViewModel> Files { get; } = new();
 
 
     private PlotViewType _plotViewType = PlotViewType.FrameBased;
@@ -64,12 +69,11 @@ public partial class MainViewModel : ViewModelBase
         : TimeSpan.FromSeconds(duration).ToString(@"d\.hh\:mm\:ss")
         ;
 
-    private readonly GuiService _guiService = new();
+    private readonly GuiService _guiService = guiService;
 
-    private readonly FileDialogService _fileDialogService = new();
+    private readonly FileDialogService _fileDialogService = fileDialogService;
 
-    private readonly FFProbeClient _probeAppClient = new();
-
+    private readonly FFProbeClient _probeAppClient = probeAppClient;
 
     [RelayCommand]
     private async Task OnLoaded(CancellationToken token)
@@ -79,59 +83,6 @@ public partial class MainViewModel : ViewModelBase
         Version = $"{Path.GetFileName(_probeAppClient.FFProbeFilePath)} v{version}";
 
         InitializePlotController();
-    }
-
-    private void InitializePlotController()
-    {
-        if (PlotController is null)
-        {
-            return;
-        }
-
-        try
-        {
-            var platformClient = OSPlatformClient.GetOSPlatformClient();
-            if (platformClient.IsDark())
-            {
-                PlotController.Plot.Add.Palette = new ScottPlot.Palettes.Penumbra();
-                // change figure colors
-                PlotController.Plot.FigureBackground.Color = Color.FromHex("#181818");
-                PlotController.Plot.DataBackground.Color = Color.FromHex("#1f1f1f");
-
-                // change axis and grid colors
-                PlotController.Plot.Axes.Color(Color.FromHex("#d7d7d7"));
-                PlotController.Plot.Grid.MajorLineColor = Color.FromHex("#404040");
-
-                // change legend colors
-                PlotController.Plot.Legend.BackgroundColor = Color.FromHex("#404040");
-                PlotController.Plot.Legend.FontColor = Color.FromHex("#d7d7d7");
-                PlotController.Plot.Legend.OutlineColor = Color.FromHex("#d7d7d7");
-            }
-        }
-        catch
-        {
-            // NOTE: Ignoring error when trying to set dark theme
-        }
-
-        // Showing the left title
-        PlotController.Plot.Axes.Left.Label.Text = this.AxisYTitleLabel;
-
-        // Change style for the tick labels
-        PlotController.Plot.Axes.Bottom.TickLabelStyle.Rotation = 45;
-        PlotController.Plot.Axes.Bottom.TickLabelStyle.Alignment = Alignment.MiddleLeft;
-
-        // create a custom tick generator using your custom label formatter
-        ScottPlot.TickGenerators.NumericAutomatic myTickGenerator = new()
-        {
-            LabelFormatter = AxisXTickLabelFormatter
-        };
-        PlotController.Plot.Axes.Bottom.TickGenerator = myTickGenerator;
-
-        // Shows title label in the left side
-        PlotController.Plot.ShowLegend(Alignment.LowerRight, Orientation.Horizontal);
-
-        // refresh the plot
-        PlotController.Refresh();
     }
 
     [RelayCommand]
@@ -164,6 +115,12 @@ public partial class MainViewModel : ViewModelBase
         }).ConfigureAwait(false);
 
         SelectedFile = Files.LastOrDefault();
+    }
+
+    [RelayCommand]
+    private void Exit()
+    {
+        _guiService.Exit();
     }
 
     [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
@@ -237,11 +194,57 @@ public partial class MainViewModel : ViewModelBase
             _ => throw new NotImplementedException($"{nameof(GetAxisYForFile)} for Plot Type {_plotViewType} is not implemented.")
         } / 1000;
 
-
-    [RelayCommand]
-    private void Exit()
+    private void InitializePlotController()
     {
-        _guiService.Exit();
+        if (PlotController is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var platformClient = OSPlatformClient.GetOSPlatformClient();
+            if (platformClient.IsDark())
+            {
+                PlotController.Plot.Add.Palette = new ScottPlot.Palettes.Penumbra();
+                // change figure colors
+                PlotController.Plot.FigureBackground.Color = Color.FromHex("#181818");
+                PlotController.Plot.DataBackground.Color = Color.FromHex("#1f1f1f");
+
+                // change axis and grid colors
+                PlotController.Plot.Axes.Color(Color.FromHex("#d7d7d7"));
+                PlotController.Plot.Grid.MajorLineColor = Color.FromHex("#404040");
+
+                // change legend colors
+                PlotController.Plot.Legend.BackgroundColor = Color.FromHex("#404040");
+                PlotController.Plot.Legend.FontColor = Color.FromHex("#d7d7d7");
+                PlotController.Plot.Legend.OutlineColor = Color.FromHex("#d7d7d7");
+            }
+        }
+        catch
+        {
+            // NOTE: Ignoring error when trying to set dark theme
+        }
+
+        // Showing the left title
+        PlotController.Plot.Axes.Left.Label.Text = this.AxisYTitleLabel;
+
+        // Change style for the tick labels
+        PlotController.Plot.Axes.Bottom.TickLabelStyle.Rotation = 45;
+        PlotController.Plot.Axes.Bottom.TickLabelStyle.Alignment = Alignment.MiddleLeft;
+
+        // create a custom tick generator using your custom label formatter
+        ScottPlot.TickGenerators.NumericAutomatic myTickGenerator = new()
+        {
+            LabelFormatter = AxisXTickLabelFormatter
+        };
+        PlotController.Plot.Axes.Bottom.TickGenerator = myTickGenerator;
+
+        // Shows title label in the left side
+        PlotController.Plot.ShowLegend(Alignment.LowerRight, Orientation.Horizontal);
+
+        // refresh the plot
+        PlotController.Refresh();
     }
 
 }

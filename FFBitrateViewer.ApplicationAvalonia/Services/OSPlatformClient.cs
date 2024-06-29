@@ -31,7 +31,6 @@ public abstract class OSPlatformClient
     public abstract bool IsLight();
 }
 
-
 public class OSPlatformClientException : FFBitrateViewerException
 {
     public OSPlatformClientException() { }

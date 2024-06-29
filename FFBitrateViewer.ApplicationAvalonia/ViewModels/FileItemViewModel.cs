@@ -98,7 +98,6 @@ public partial class FileItemViewModel : ViewModelBase
         FirstVideoShortDesc = VideoStreams.FirstOrDefault()?.ToString(VideoStreamToStringMode.SHORT) ?? string.Empty;
     }
 
-
     public double GetAverageBitRate(
         IList<FFProbePacket>? frames = null,
         double? adjustmentStartTime = null,

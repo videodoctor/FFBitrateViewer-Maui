@@ -46,7 +46,6 @@ public class FileEntry
     public FileEntry(IStorageFile storageFile) => _storageFile = storageFile;
 }
 
-
 [Serializable]
 public class FileDialogException : FFBitrateViewerException
 {

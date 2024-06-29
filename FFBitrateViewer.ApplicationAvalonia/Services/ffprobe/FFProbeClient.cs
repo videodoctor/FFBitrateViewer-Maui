@@ -31,8 +31,8 @@ public class FFProbeClient
     /// Returns the full path of ffprobe executable.
     /// </summary>
     public string FFProbeFilePath { get => _fFProbeFilePath ??= WhichFFProbe(); }
-
     private string? _fFProbeFilePath;
+    
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
     {
         NumberHandling = JsonNumberHandling.AllowReadingFromString
