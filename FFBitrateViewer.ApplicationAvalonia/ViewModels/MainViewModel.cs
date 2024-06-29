@@ -69,15 +69,22 @@ public partial class MainViewModel(
     [RelayCommand]
     private async Task OnLoaded(CancellationToken token)
     {
+        // initialize the plot view
+        await _guiService.RunNowAsync(() =>
+        {
+            _plotControllerFacade.Initialize(PlotStrategy.AxisYTitleLabel, _guiService.IsDarkTheme);
+            _plotControllerFacade.Refresh();
+        });
 
+        // gets version of the ffprobe
         var version = await _probeAppClient.GetVersionAsync(token).ConfigureAwait(false);
         Version = $"{Path.GetFileName(_probeAppClient.FFProbeFilePath)} v{version}";
 
-        InitializePlotController();
-
+        // load files from CLI
         var localFiles = _applicationOptions.Files.Select(f => new LocalFileEntry(f));
         await AddFilesAsync(localFiles, token).ConfigureAwait(false);
 
+        // renders plot on autorun
         if (_applicationOptions.AutoRun)
         {
             await ToggleOnOffPlotterPlotter(token).ConfigureAwait(false);
@@ -176,26 +183,6 @@ public partial class MainViewModel(
         }).ConfigureAwait(false);
 
         SelectedFile = Files.LastOrDefault();
-    }
-
-    private void InitializePlotController()
-    {
-
-        try
-        {
-            var platformClient = OSPlatformClient.GetOSPlatformClient();
-            if (platformClient.IsDark())
-            {
-                _plotControllerFacade.SetDarkTheme();
-            }
-        }
-        catch
-        {
-            // NOTE: Ignoring error when trying to set dark theme
-        }
-
-        _plotControllerFacade.Initialize(PlotStrategy.AxisYTitleLabel);
-        _plotControllerFacade.Refresh();
     }
 
 }

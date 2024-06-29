@@ -58,11 +58,15 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
         PlotController.Plot.Legend.OutlineColor = Color.FromHex("#d7d7d7");
     }
 
-    public void Initialize(string axisYTitleLabel)
+    public void Initialize(string axisYTitleLabel, bool IsDarkThemeEnable)
     {
         if (PlotController is null)
         { return; }
 
+        if(IsDarkThemeEnable)
+        {
+            SetDarkTheme();
+        }
 
         // Showing the left title
         PlotController.Plot.Axes.Left.Label.Text = axisYTitleLabel;
