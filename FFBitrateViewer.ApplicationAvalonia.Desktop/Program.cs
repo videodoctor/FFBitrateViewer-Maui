@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
+using FFBitrateViewer.ApplicationAvalonia.Models.Config;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Desktop;
 
@@ -28,7 +30,7 @@ class Program
         var autoRunOption = new Option<bool>("--AutoRun", getDefaultValue: () => false, "Whether or not start automatically the file processing.");
         autoRunOption.AddAlias("-a");
 
-        var tempDirOption = new Option<DirectoryInfo?>("--TempDir", getDefaultValue: () => new DirectoryInfo(Path.GetTempPath()), "Temporary directory");
+        var tempDirOption = new Option<DirectoryInfo>("--TempDir", getDefaultValue: () => new DirectoryInfo(Path.GetTempPath()), "Temporary directory");
         tempDirOption.AddAlias("-t");
 
         var filesOption = new Option<List<FileInfo>>("--Files", getDefaultValue: () => [], "Input files");
@@ -44,27 +46,19 @@ class Program
             filesOption,
         };
 
-        rootCommand.Handler = CommandHandler.Create<double?, bool, bool, bool, string?, string>(
-            (
-                startTimeAdjustmentOptionValue,
-                exitOptionValue,
-                logCommandsOptionValue,
-                autoRunOptionValue,
-                tempDirOptionValue,
-                filesOptionValue
-            ) => StartAvalonia()
-        );
-
+        ApplicationOptionsBinderBase applicationOptionsBinderBase =  new (startTimeAdjustmentOption, exitOption, logCommandsOption, autoRunOption, tempDirOption, filesOption);
+        rootCommand.SetHandler((applicationOptions) =>
+        {
+            BuildAvaloniaApp(applicationOptions)
+            .StartWithClassicDesktopLifetime(Environment.GetCommandLineArgs());
+        }, applicationOptionsBinderBase);
 
         return await rootCommand.InvokeAsync(args);
     }
 
-    private static int StartAvalonia()
-        => BuildAvaloniaApp().StartWithClassicDesktopLifetime(Environment.GetCommandLineArgs());
-
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+    public static AppBuilder BuildAvaloniaApp(ApplicationOptions? applicationOptions = null)
+        => AppBuilder.Configure(() => new App() { ApplicationOptions = applicationOptions })
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();

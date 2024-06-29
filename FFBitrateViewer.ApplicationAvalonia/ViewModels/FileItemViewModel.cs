@@ -50,11 +50,11 @@ public partial class FileItemViewModel : ViewModelBase
 
     #endregion
 
-    private readonly FileEntry _fileEntry;
+    private readonly IFileEntry _fileEntry;
     
     private readonly FFProbeJsonOutput _mediaInfo;
 
-    public FileItemViewModel(FileEntry fileEntry, FFProbeJsonOutput mediaInfo)
+    public FileItemViewModel(IFileEntry fileEntry, FFProbeJsonOutput mediaInfo)
     {
         ArgumentException.ThrowIfNullOrEmpty(nameof(fileEntry));
         ArgumentException.ThrowIfNullOrEmpty(nameof(mediaInfo));
@@ -65,7 +65,7 @@ public partial class FileItemViewModel : ViewModelBase
         InitializeViewModel(ref _fileEntry, ref _mediaInfo);
     }
 
-    private void InitializeViewModel(ref FileEntry fileEntry, ref FFProbeJsonOutput mediaInfo)
+    private void InitializeViewModel(ref IFileEntry fileEntry, ref FFProbeJsonOutput mediaInfo)
     {
         Path = fileEntry.Path;
 

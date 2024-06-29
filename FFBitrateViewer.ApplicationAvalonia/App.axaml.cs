@@ -5,12 +5,16 @@ using Avalonia.Markup.Xaml;
 
 using FFBitrateViewer.ApplicationAvalonia.ViewModels;
 using FFBitrateViewer.ApplicationAvalonia.Views;
+using Microsoft.CodeAnalysis.Emit;
 using Microsoft.Extensions.DependencyInjection;
+using System.IO;
 
 namespace FFBitrateViewer.ApplicationAvalonia;
 
 public partial class App : Application
 {
+    public Models.Config.ApplicationOptions? ApplicationOptions { get; set; }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -26,6 +30,19 @@ public partial class App : Application
         var collection = new ServiceCollection();
         collection.AddFFBitrateViewerServices();
         collection.AddFFBitrateViewerViewModels();
+        collection.AddOptions<Models.Config.ApplicationOptions>()
+            .Configure((options =>
+            {
+                if (ApplicationOptions is null)
+                { return; }
+
+                options.StartTimeAdjustment = ApplicationOptions.StartTimeAdjustment;
+                options.Exit = ApplicationOptions.Exit;
+                options.LogCommands = ApplicationOptions.LogCommands;
+                options.AutoRun = ApplicationOptions.AutoRun;
+                options.TempDir = ApplicationOptions.TempDir;
+                options.Files = ApplicationOptions.Files;
+            }));
 
         // Creates a ServiceProvider containing services from the provided IServiceCollection
         var services = collection.BuildServiceProvider();

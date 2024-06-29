@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FFBitrateViewer.ApplicationAvalonia.Models.Config;
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
+using Microsoft.Extensions.Options;
 using ScottPlot;
 using System;
 using System.Collections.Generic;
@@ -18,7 +20,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 public partial class MainViewModel(
     GuiService guiService,
     FileDialogService fileDialogService,
-    FFProbeClient probeAppClient
+    FFProbeClient probeAppClient,
+    IOptions<Models.Config.ApplicationOptions> applicationOptions
     ) : ViewModelBase
 {
 
@@ -39,7 +42,7 @@ public partial class MainViewModel(
 
     public IPlotControl? _plotController;
 
-    public ObservableCollection<FileItemViewModel> Files { get; } = new();
+    public ObservableCollection<FileItemViewModel> Files { get; } = [];
 
 
     private PlotViewType _plotViewType = PlotViewType.FrameBased;
@@ -75,6 +78,8 @@ public partial class MainViewModel(
 
     private readonly FFProbeClient _probeAppClient = probeAppClient;
 
+    private readonly ApplicationOptions _applicationOptions = applicationOptions.Value;
+
     [RelayCommand]
     private async Task OnLoaded(CancellationToken token)
     {
@@ -83,6 +88,10 @@ public partial class MainViewModel(
         Version = $"{Path.GetFileName(_probeAppClient.FFProbeFilePath)} v{version}";
 
         InitializePlotController();
+
+        var localFiles = _applicationOptions.Files.Select(f => new LocalFileEntry(f));
+        await AddFiles(localFiles, token).ConfigureAwait(false);
+
     }
 
     [RelayCommand]
@@ -102,6 +111,11 @@ public partial class MainViewModel(
     {
 
         var fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false).ConfigureAwait(false);
+        await AddFiles(fileInfoEntries, token).ConfigureAwait(false);
+    }
+
+    private async Task AddFiles(IEnumerable<IFileEntry> fileInfoEntries, CancellationToken token = default)
+    {
         await Parallel.ForEachAsync(fileInfoEntries, token, async (fileInfo, token) =>
         {
             var mediaInfo = await _probeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath, cancellationToken: token).ConfigureAwait(false);

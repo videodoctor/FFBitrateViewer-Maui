@@ -11,7 +11,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services;
 
 public class FileDialogService
 {
-    public async Task<IList<FileEntry>> OpenAsync(
+    public async Task<IList<IFileEntry>> OpenAsync(
         string filePickerTitle = "Open Text File",
         bool IsSingleSelection = true
     )
@@ -30,20 +30,25 @@ public class FileDialogService
         });
 
 
-        return files.Select(f => new FileEntry(f)).ToImmutableList();
+        return files.Select(f => new StorageFileEntry(f)).OfType<IFileEntry>().ToImmutableList();
     }
 
 }
 
-public class FileEntry
+public class StorageFileEntry(IStorageFile storageFile) : IFileEntry
 {
-    private readonly IStorageFile _storageFile;
+    private readonly IStorageFile _storageFile = storageFile;
 
     public Uri Path { get => _storageFile.Path; }
 
     public Task<Stream> OpenReadAsync() => _storageFile.OpenReadAsync();
+}
 
-    public FileEntry(IStorageFile storageFile) => _storageFile = storageFile;
+public class LocalFileEntry(string filePath) : IFileEntry
+{
+    public Uri Path { get; } = new Uri(filePath, UriKind.RelativeOrAbsolute);
+
+    public Task<Stream> OpenReadAsync() => Task.FromResult((Stream)File.OpenRead(Path.LocalPath));
 }
 
 [Serializable]
