@@ -57,7 +57,10 @@ class Program
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp(ApplicationOptions? applicationOptions = null)
+    public static AppBuilder BuildAvaloniaApp()
+        => BuildAvaloniaApp(default);
+
+    public static AppBuilder BuildAvaloniaApp(ApplicationOptions? applicationOptions)
         => AppBuilder.Configure(() => new App() { ApplicationOptions = applicationOptions })
             .UsePlatformDetect()
             .WithInterFont()
