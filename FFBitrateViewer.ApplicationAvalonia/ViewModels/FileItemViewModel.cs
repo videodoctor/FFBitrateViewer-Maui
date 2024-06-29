@@ -40,13 +40,13 @@ public partial class FileItemViewModel : ViewModelBase
     [ObservableProperty]
     private double _bitRateMaximum = double.NaN;
 
-    public List<FFProbePacket> Frames { get; } = new();
+    public List<FFProbePacket> Frames { get; } = [];
 
-    public List<VideoStream> VideoStreams { get; } = new();
+    public List<VideoStream> VideoStreams { get; } = [];
     
-    public List<AudioStream> AudioStreams { get; } = new();
+    public List<AudioStream> AudioStreams { get; } = [];
     
-    public List<SubtitleStream> SubtitleStreams { get; } = new();
+    public List<SubtitleStream> SubtitleStreams { get; } = [];
 
     #endregion
 
