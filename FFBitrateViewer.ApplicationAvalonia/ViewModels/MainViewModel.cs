@@ -92,6 +92,12 @@ public partial class MainViewModel(
         var localFiles = _applicationOptions.Files.Select(f => new LocalFileEntry(f));
         await AddFiles(localFiles, token).ConfigureAwait(false);
 
+        if (_applicationOptions.AutoRun)
+        {
+            CancellationTokenSource cts = new CancellationTokenSource();
+            await ToggleOnOffPlotterPlotter(cts.Token);
+        }
+
     }
 
     [RelayCommand]

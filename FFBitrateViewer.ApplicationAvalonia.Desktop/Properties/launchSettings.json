@@ -2,7 +2,7 @@
   "profiles": {
     "FFBitrateViewer.ApplicationAvalonia.Desktop": {
       "commandName": "Project",
-      "commandLineArgs": "-f C:\\Users\\hfmad\\Downloads\\sample-file-sd.mp4\r\n-f C:\\Users\\hfmad\\Downloads\\sample-file-hd.mp4"
+      "commandLineArgs": "--AutoRun\r\n-f C:\\Users\\hfmad\\Downloads\\sample-file-sd.mp4\r\n-f C:\\Users\\hfmad\\Downloads\\sample-file-hd.mp4"
     }
   }
 }
