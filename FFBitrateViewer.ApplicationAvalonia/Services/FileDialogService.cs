@@ -48,7 +48,7 @@ public class FileEntry
 
 
 [Serializable]
-public class FileDialogException : System.Exception
+public class FileDialogException : FFBitrateViewerException
 {
     public FileDialogException() { }
     public FileDialogException(string message) : base(message) { }

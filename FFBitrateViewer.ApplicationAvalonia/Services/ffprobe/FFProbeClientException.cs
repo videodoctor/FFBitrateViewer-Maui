@@ -3,7 +3,7 @@
 namespace FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 
 [Serializable]
-public class FFProbeClientException : ApplicationException
+public class FFProbeClientException : FFBitrateViewerException
 {
     public FFProbeClientException() { }
     public FFProbeClientException(string message) : base(message) { }

@@ -32,7 +32,7 @@ public abstract class OSPlatformClient
 }
 
 
-public class OSPlatformClientException : Exception
+public class OSPlatformClientException : FFBitrateViewerException
 {
     public OSPlatformClientException() { }
 
