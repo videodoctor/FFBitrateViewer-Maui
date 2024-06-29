@@ -90,12 +90,11 @@ public partial class MainViewModel(
         InitializePlotController();
 
         var localFiles = _applicationOptions.Files.Select(f => new LocalFileEntry(f));
-        await AddFiles(localFiles, token).ConfigureAwait(false);
+        await AddFilesAsync(localFiles, token).ConfigureAwait(false);
 
         if (_applicationOptions.AutoRun)
         {
-            CancellationTokenSource cts = new CancellationTokenSource();
-            await ToggleOnOffPlotterPlotter(cts.Token);
+            await ToggleOnOffPlotterPlotter(token).ConfigureAwait(false);
         }
 
     }
@@ -117,10 +116,10 @@ public partial class MainViewModel(
     {
 
         var fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false).ConfigureAwait(false);
-        await AddFiles(fileInfoEntries, token).ConfigureAwait(false);
+        await AddFilesAsync(fileInfoEntries, token).ConfigureAwait(false);
     }
 
-    private async Task AddFiles(IEnumerable<IFileEntry> fileInfoEntries, CancellationToken token = default)
+    private async Task AddFilesAsync(IEnumerable<IFileEntry> fileInfoEntries, CancellationToken token = default)
     {
         await Parallel.ForEachAsync(fileInfoEntries, token, async (fileInfo, token) =>
         {
@@ -128,10 +127,10 @@ public partial class MainViewModel(
             var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = true };
 
             // Add file to Data Grid
-            _guiService.RunLater(() =>
+            await _guiService.RunNowAsync(() =>
             {
                 Files.Add(fileItemViewModel);
-            });
+            }).ConfigureAwait(false);
         }).ConfigureAwait(false);
 
         SelectedFile = Files.LastOrDefault();
