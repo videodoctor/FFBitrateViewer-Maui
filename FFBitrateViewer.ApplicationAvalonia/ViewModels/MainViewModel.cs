@@ -21,6 +21,7 @@ public partial class MainViewModel(
     GuiService guiService,
     FileDialogService fileDialogService,
     FFProbeClient probeAppClient,
+    IEnumerable<IPlotStrategy> plotStrategies,
     IOptions<Models.Config.ApplicationOptions> applicationOptions
     ) : ViewModelBase
 {
@@ -45,24 +46,11 @@ public partial class MainViewModel(
     public ObservableCollection<FileItemViewModel> Files { get; } = [];
 
     private PlotViewType _plotViewType = PlotViewType.FrameBased;
+    public IPlotStrategy PlotStrategy => _plotStrategies[_plotViewType];
 
-    private string AxisYTickLabelSuffix => _plotViewType switch
-    {
-        PlotViewType.FrameBased => "kb",
-        PlotViewType.SecondBased => "kb/s",
-        PlotViewType.GOPBased => "kb/GOP",
-        _ => throw new NotImplementedException($"Text for {nameof(AxisYTickLabelSuffix)} equals to {_plotViewType} is not implemented.")
-    };
+    private readonly IDictionary<PlotViewType, IPlotStrategy> _plotStrategies = plotStrategies.ToDictionary(p => p.PlotViewType);
 
-    private string AxisYTitleLabel => _plotViewType switch
-    {
-        PlotViewType.FrameBased => "Frame size",
-        PlotViewType.SecondBased => "Bit rate",
-        PlotViewType.GOPBased => "Bit rate",
-        _ => throw new NotImplementedException($"Text for {nameof(AxisYTitleLabel)} equals to {_plotViewType} is not implemented.")
-    };
-
-    private string TrackerFormatStringBuild => $@"{{0}}{Environment.NewLine}Time={{2:hh\:mm\:ss\.fff}}{Environment.NewLine}{{3}}={{4:0}} {AxisYTickLabelSuffix}";
+    private string TrackerFormatStringBuild => $@"{{0}}{Environment.NewLine}Time={{2:hh\:mm\:ss\.fff}}{Environment.NewLine}{{3}}={{4:0}} {PlotStrategy.AxisYTickLabelSuffix}";
 
     private string AxisXTickLabelFormatter(double duration) =>
           (duration < 60) ? TimeSpan.FromSeconds(duration).ToString(@"m\:ss")
@@ -106,7 +94,7 @@ public partial class MainViewModel(
         if (PlotController is null)
         { return; }
 
-        PlotController.Plot.Axes.Left.Label.Text = this.AxisYTitleLabel;
+        PlotController.Plot.Axes.Left.Label.Text = PlotStrategy.AxisYTitleLabel;
         PlotController.Refresh();
     }
 
@@ -149,7 +137,7 @@ public partial class MainViewModel(
                 await foreach (var probePacket in probePacketChannel.Reader.ReadAllAsync())
                 {
                     file.Frames.Add(probePacket);
-                    var (x, y) = GetDataPoint(probePacket, file, _plotViewType);
+                    var (x, y) = PlotStrategy.GetDataPoint(file.StartTime, probePacket);
                     xs.Add(x ?? 0);
                     ys.Add(Convert.ToInt32(y));
                 }
@@ -196,22 +184,6 @@ public partial class MainViewModel(
         SelectedFile = Files.LastOrDefault();
     }
 
-    private (double? X, double Y) GetDataPoint(FFProbePacket probePacket, FileItemViewModel file, PlotViewType plotViewType)
-        => plotViewType switch
-        {
-            PlotViewType.FrameBased => ((probePacket.PTSTime ?? 0) - file.StartTime, Convert.ToDouble(probePacket.Size) / 1000.0),
-            //PlotViewType.SecondBased => new DataPoint(),
-            _ => throw new NotImplementedException($"{nameof(GetDataPoint)} for Plot Type {_plotViewType} is not implemented.")
-        };
-
-    private double? GetAxisYForFile(FileItemViewModel file)
-        => _plotViewType switch
-        {
-            PlotViewType.FrameBased => file.Frames.Max(f => f.Size),
-            PlotViewType.SecondBased => file.GetBitRateMaximum(magnitudeOrder: 1000),
-            _ => throw new NotImplementedException($"{nameof(GetAxisYForFile)} for Plot Type {_plotViewType} is not implemented.")
-        } / 1000;
-
     private void InitializePlotController()
     {
         if (PlotController is null)
@@ -245,7 +217,7 @@ public partial class MainViewModel(
         }
 
         // Showing the left title
-        PlotController.Plot.Axes.Left.Label.Text = this.AxisYTitleLabel;
+        PlotController.Plot.Axes.Left.Label.Text = PlotStrategy.AxisYTitleLabel;
 
         // Change style for the tick labels
         PlotController.Plot.Axes.Bottom.TickLabelStyle.Rotation = 45;

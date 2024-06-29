@@ -5,9 +5,7 @@ using Avalonia.Markup.Xaml;
 
 using FFBitrateViewer.ApplicationAvalonia.ViewModels;
 using FFBitrateViewer.ApplicationAvalonia.Views;
-using Microsoft.CodeAnalysis.Emit;
 using Microsoft.Extensions.DependencyInjection;
-using System.IO;
 
 namespace FFBitrateViewer.ApplicationAvalonia;
 

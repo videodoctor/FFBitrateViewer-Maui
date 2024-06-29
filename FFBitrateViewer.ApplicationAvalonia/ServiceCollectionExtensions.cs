@@ -13,6 +13,9 @@ public static class ServiceCollectionExtensions
         collection.AddSingleton<GuiService>();
         //collection.AddSingleton<OSPlatformClient>();
         collection.AddSingleton<FFProbeClient>();
+        collection.AddSingleton<IPlotStrategy, FrameBasedPlotStrategy>();
+        collection.AddSingleton<IPlotStrategy, SecondBasedPlotStrategy>();
+        collection.AddSingleton<IPlotStrategy, GOPBasedPlotStrategy>();
     }
 
     public static void AddFFBitrateViewerViewModels(this IServiceCollection collection)
