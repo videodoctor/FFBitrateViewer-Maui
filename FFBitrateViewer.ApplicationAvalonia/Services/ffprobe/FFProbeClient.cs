@@ -19,7 +19,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 /// </summary>
 public class FFProbeClient
 {
-    // ffprobe can produce different output as exlpained in
+    // ffprobe can produce different output as explained in
     // https://ffmpeg.org/ffprobe.html . Thus we use CSV for
     // large lists. The CSV parser is Sylvan.Data.Csv which has the best performance
     // based on benchmark (2020/12) https://www.joelverhagen.com/blog/2020/12/fastest-net-csv-parsers
