@@ -104,13 +104,25 @@ public partial class MainViewModel(
         await AddFilesAsync(fileInfoEntries, token).ConfigureAwait(false);
     }
 
-
     public System.Collections.IList? SelectedFiles { get; set; }
 
     [RelayCommand]
     private void RemoveSelectedFiles()
     {
+        if (SelectedFiles is null )
+        { return; }
 
+        var files = SelectedFiles.OfType<FileItemViewModel>().ToList();
+        foreach ( var file in files ) 
+        {
+            Files.Remove(file);
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveAllFiles()
+    {
+        Files.Clear();
     }
 
     [RelayCommand]
