@@ -59,7 +59,7 @@
         <!--buttons-->
         <Border Grid.Row="1" Padding="10 4 " >
             <StackPanel Orientation="Horizontal" >
-                <Button Content="Add file"/>
+                <Button Content="Add file" Command="{Binding AddFilesCommand,Mode=OneTime}"/>
                 <Button Content="Remove selected" Command="{Binding RemoveSelectedFilesCommand,Mode=OneTime}" />
             </StackPanel>
         </Border>

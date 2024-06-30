@@ -31,18 +31,16 @@ public partial class MainViewModel(
     private string _version = string.Empty;
 
     [ObservableProperty]
-
     private bool _isPlotterOn = false;
 
     [ObservableProperty]
     private bool _hasToAdjustFrameStartTime = false;
 
     [ObservableProperty]
-
     private IPlotControl? _plotController;
 
     [ObservableProperty]
-    private FileItemViewModel _selectedFile;
+    private FileItemViewModel? _selectedFile;
     
     public System.Collections.IList? SelectedFiles { get; set; }
 
