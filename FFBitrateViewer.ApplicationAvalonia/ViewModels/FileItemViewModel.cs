@@ -53,30 +53,19 @@ public partial class FileItemViewModel : ViewModelBase
 
     public IPlottable? Scatter { get; set; }
 
-    private readonly IFileEntry _fileEntry;
+    public IFileEntry? FileEntry { get; init; }
     
-    private readonly FFProbeJsonOutput _mediaInfo;
+    public FFProbeJsonOutput? MediaInfo { get; init; }
 
-    public FileItemViewModel(IFileEntry fileEntry, FFProbeJsonOutput mediaInfo)
+    public void Initialize()
     {
-        ArgumentException.ThrowIfNullOrEmpty(nameof(fileEntry));
-        ArgumentException.ThrowIfNullOrEmpty(nameof(mediaInfo));
+        Path = FileEntry?.Path ?? AboutBlankUri;
 
-        _fileEntry = fileEntry;
-        _mediaInfo = mediaInfo;
+        StartTime = MediaInfo?.Format?.StartTime ?? 0;
+        Duration = MediaInfo?.GetDuration() ?? 0;
+        Bitrate = MediaInfo?.Format?.BitRate == null ? Bitrate : new BitRate(MediaInfo.Format.BitRate.Value);
 
-        InitializeViewModel(ref _fileEntry, ref _mediaInfo);
-    }
-
-    private void InitializeViewModel(ref IFileEntry fileEntry, ref FFProbeJsonOutput mediaInfo)
-    {
-        Path = fileEntry.Path;
-
-        StartTime = mediaInfo.Format?.StartTime ?? 0;
-        Duration = mediaInfo.GetDuration();
-        Bitrate = mediaInfo.Format?.BitRate == null ? Bitrate : new BitRate(mediaInfo.Format.BitRate.Value);
-
-        var streams = (mediaInfo.Streams ?? Enumerable.Empty<FFProbeStream>()).ToArray();
+        var streams = (MediaInfo?.Streams ?? Enumerable.Empty<FFProbeStream>()).ToArray();
 
         for (int streamIndex = 0; streamIndex < streams.Length; streamIndex++)
         {

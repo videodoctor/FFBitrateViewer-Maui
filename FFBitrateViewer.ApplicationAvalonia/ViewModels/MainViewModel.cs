@@ -203,7 +203,12 @@ public partial class MainViewModel(
         await Parallel.ForEachAsync(fileInfoEntries, token, async (fileInfo, token) =>
         {
             var mediaInfo = await _probeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath, cancellationToken: token).ConfigureAwait(false);
-            var fileItemViewModel = new FileItemViewModel(fileInfo, mediaInfo) { IsSelected = true };
+            FileItemViewModel fileItemViewModel = new () {
+                FileEntry = fileInfo, 
+                MediaInfo = mediaInfo,
+                IsSelected = true
+            };
+            fileItemViewModel.Initialize();
 
             // Add file to Data Grid
             await _guiService.RunNowAsync(() =>
