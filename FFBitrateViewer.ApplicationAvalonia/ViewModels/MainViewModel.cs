@@ -54,7 +54,7 @@ public partial class MainViewModel(
 
     public ObservableCollection<FileItemViewModel> Files { get; } = [];
 
-    private IPlotStrategy PlotStrategy => _plotStrategies[_plotView];
+    private IPlotStrategy PlotStrategy => _plotStrategies[PlotView];
 
     private readonly IDictionary<PlotViewType, IPlotStrategy> _plotStrategies = plotStrategies.ToDictionary(p => p.PlotViewType);
 
