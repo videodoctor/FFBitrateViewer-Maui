@@ -57,6 +57,8 @@ public partial class FileItemViewModel : ViewModelBase
     
     private readonly FFProbeJsonOutput _mediaInfo;
 
+    private IReadOnlyCollection<int>? _cacheBitRates;
+
     public FileItemViewModel(IFileEntry fileEntry, FFProbeJsonOutput mediaInfo)
     {
         ArgumentException.ThrowIfNullOrEmpty(nameof(fileEntry));
@@ -130,7 +132,7 @@ public partial class FileItemViewModel : ViewModelBase
     )
     {
         frames ??= Frames;
-        var bitrates = GetBitRates(frames, intervalDuration, intervalStartTime);
+        var bitrates = GetBitRates(frames, intervalDuration, intervalStartTime, isCachedEnabled: true);
         
         if (bitrates is null || bitrates.Count == 0)
         { return double.NaN; }
@@ -140,14 +142,18 @@ public partial class FileItemViewModel : ViewModelBase
         return bitRateMaximum;
     }
 
-    public static ICollection<int> GetBitRates(
+    public IReadOnlyCollection<int> GetBitRates(
         IList<FFProbePacket> frames,
         double intervalDuration = 1,
-        double intervalStartTime = 0
+        double intervalStartTime = 0,
+        bool isCachedEnabled = false
     )
     {
+        if (isCachedEnabled && _cacheBitRates is not null)
+        {  return _cacheBitRates; }
+
         if (frames.Count == 0 || intervalDuration == 0)
-        { return Array.Empty<int>(); }
+        { return (_cacheBitRates = []); }
 
         int bitrate;
         double intervalSize = 0;
@@ -218,7 +224,7 @@ public partial class FileItemViewModel : ViewModelBase
         //{ frames[index].BitRate = bitrate; }
         indexes.Clear();
 
-        return bitrates;
+        return (_cacheBitRates = bitrates);
     }
 
 }
