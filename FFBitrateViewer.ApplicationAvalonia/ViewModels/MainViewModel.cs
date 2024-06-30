@@ -41,7 +41,10 @@ public partial class MainViewModel(
 
     [ObservableProperty]
     private FileItemViewModel? _selectedFile;
-    
+
+    [ObservableProperty]
+    private PlotViewType _plotView = PlotViewType.FrameBased;
+
     public System.Collections.IList? SelectedFiles { get; set; }
 
     private PlotControllerFacade _plotControllerFacade = PlotControllerFacade.None;
@@ -51,9 +54,7 @@ public partial class MainViewModel(
 
     public ObservableCollection<FileItemViewModel> Files { get; } = [];
 
-    private PlotViewType _plotViewType = PlotViewType.FrameBased;
-
-    private IPlotStrategy PlotStrategy => _plotStrategies[_plotViewType];
+    private IPlotStrategy PlotStrategy => _plotStrategies[_plotView];
 
     private readonly IDictionary<PlotViewType, IPlotStrategy> _plotStrategies = plotStrategies.ToDictionary(p => p.PlotViewType);
 
@@ -70,6 +71,9 @@ public partial class MainViewModel(
     [RelayCommand]
     private async Task OnLoaded(CancellationToken token)
     {
+        // Sets the plot view based on the CLI input
+        SetPlotViewType(_applicationOptions.PlotView);
+
         // initialize the plot view
         _plotControllerFacade.Initialize(PlotStrategy.AxisYTitleLabel, _guiService.IsDarkTheme);
         _plotControllerFacade.Refresh();
@@ -93,7 +97,7 @@ public partial class MainViewModel(
     [RelayCommand]
     private void SetPlotViewType(PlotViewType plotViewType)
     {
-        _plotViewType = plotViewType;
+        PlotView = plotViewType;
 
         _plotControllerFacade.AxisYTitleLabel = PlotStrategy.AxisYTitleLabel;
         _plotControllerFacade.Refresh();

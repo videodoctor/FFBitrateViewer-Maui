@@ -40,6 +40,7 @@ public partial class App : Application
                 options.AutoRun = ApplicationOptions.AutoRun;
                 options.TempDir = ApplicationOptions.TempDir;
                 options.Files = ApplicationOptions.Files;
+                options.PlotView = ApplicationOptions.PlotView;
             }));
 
         // Creates a ServiceProvider containing services from the provided IServiceCollection

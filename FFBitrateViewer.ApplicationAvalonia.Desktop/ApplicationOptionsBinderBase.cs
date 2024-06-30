@@ -1,4 +1,5 @@
 ﻿using FFBitrateViewer.ApplicationAvalonia.Models.Config;
+using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Binding;
@@ -14,7 +15,8 @@ public class ApplicationOptionsBinderBase
     Option<bool> logCommandsOption,
     Option<bool> autoRunOption,
     Option<DirectoryInfo> tempDirOption,
-    Option<List<FileInfo>> filesOption
+    Option<List<FileInfo>> filesOption,
+    Option<PlotViewType> plotViewTypeOption
 )
     : BinderBase<Models.Config.ApplicationOptions>
 {
@@ -31,6 +33,8 @@ public class ApplicationOptionsBinderBase
 
     private readonly Option<List<FileInfo>> _filesOption = filesOption;
 
+    private readonly Option<PlotViewType> _plotViewTypeOption = plotViewTypeOption;
+
     protected override ApplicationOptions GetBoundValue(BindingContext bindingContext)
         => new ApplicationOptions
         {
@@ -40,5 +44,6 @@ public class ApplicationOptionsBinderBase
             AutoRun = bindingContext.ParseResult.GetValueForOption(_autoRunOption),
             TempDir = bindingContext.ParseResult.GetValueForOption(_tempDirOption)!.FullName,
             Files = bindingContext.ParseResult.GetValueForOption(_filesOption)!.Select(fi => fi.FullName).ToList(),
+            PlotView = bindingContext.ParseResult.GetValueForOption(_plotViewTypeOption)!,
         };
 }

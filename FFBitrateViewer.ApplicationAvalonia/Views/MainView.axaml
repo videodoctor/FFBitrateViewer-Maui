@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:FFBitrateViewer.ApplicationAvalonia.ViewModels"
              xmlns:m="clr-namespace:FFBitrateViewer.ApplicationAvalonia.Models.Media"
+             xmlns:Avalonia_Controls_Converters="using:Avalonia.Controls.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FFBitrateViewer.ApplicationAvalonia.Views.MainView"
              x:DataType="vm:MainViewModel"
@@ -14,6 +15,9 @@
              xmlns:ScottPlot_Avalonia="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
              x:Name="MainViewUserControl"
              >
+	<UserControl.Resources>
+		<Avalonia_Controls_Converters:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
+	</UserControl.Resources>
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="Loaded" SourceObject="MainViewUserControl">
             <ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotController" Value="{Binding ElementName=PlotControl,Mode=OneTime}" />
@@ -123,11 +127,13 @@
                           Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"
                           />-->
                         <Label Content="Plot view:" VerticalAlignment="Center" />
-                        <RadioButton GroupName="PotViewGroupName" Content="Frame based" IsChecked="True"
+                        <RadioButton GroupName="PotViewGroupName" Content="Frame based"
+									 IsChecked="{Binding PlotView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static m:PlotViewType.FrameBased}}"
                                      Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
                                      CommandParameter="{x:Static m:PlotViewType.FrameBased}"
                          />
-                        <RadioButton GroupName="PotViewGroupName" Content="Second based" IsChecked="False"
+                        <RadioButton GroupName="PotViewGroupName" Content="Second based"
+									 IsChecked="{Binding PlotView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static m:PlotViewType.SecondBased}}"
                                      Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
                                      CommandParameter="{x:Static m:PlotViewType.SecondBased}"
                          />

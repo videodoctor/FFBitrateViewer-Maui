@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using FFBitrateViewer.ApplicationAvalonia.Models.Config;
+using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Desktop;
 
@@ -36,6 +37,9 @@ class Program
         var filesOption = new Option<List<FileInfo>>("--Files", getDefaultValue: () => [], "Input files");
         filesOption.AddAlias("-f");
 
+        var plotViewTypeOption = new Option<PlotViewType>("--PlotViewType", getDefaultValue: () => PlotViewType.FrameBased, "The kind of plot view selected by default");
+        plotViewTypeOption.AddAlias("-p");
+
         var rootCommand = new RootCommand("Visualizes video bitrate received by ffprobe.exe")
         {
             startTimeAdjustmentOption,
@@ -44,9 +48,10 @@ class Program
             autoRunOption,
             tempDirOption,
             filesOption,
+            plotViewTypeOption,
         };
 
-        ApplicationOptionsBinderBase applicationOptionsBinderBase =  new (startTimeAdjustmentOption, exitOption, logCommandsOption, autoRunOption, tempDirOption, filesOption);
+        ApplicationOptionsBinderBase applicationOptionsBinderBase =  new (startTimeAdjustmentOption, exitOption, logCommandsOption, autoRunOption, tempDirOption, filesOption, plotViewTypeOption);
         rootCommand.SetHandler((applicationOptions) =>
         {
             BuildAvaloniaApp(applicationOptions)
