@@ -57,8 +57,6 @@ public partial class FileItemViewModel : ViewModelBase
     
     private readonly FFProbeJsonOutput _mediaInfo;
 
-    private IReadOnlyCollection<int>? _cacheBitRates;
-
     public FileItemViewModel(IFileEntry fileEntry, FFProbeJsonOutput mediaInfo)
     {
         ArgumentException.ThrowIfNullOrEmpty(nameof(fileEntry));
@@ -128,13 +126,20 @@ public partial class FileItemViewModel : ViewModelBase
         IList<FFProbePacket>? frames = null,
         double intervalDuration = 1,
         double intervalStartTime = 0,
-        int? magnitudeOrder = null
+        int? magnitudeOrder = null,
+        bool hasToUpdateBitratesInAllFrames = false
     )
     {
         frames ??= Frames;
-        var bitrates = GetBitRates(frames, intervalDuration, intervalStartTime, isCachedEnabled: true);
+
+        // forcing the update of all bit rates by setting 1st to double.NaN
+        if (hasToUpdateBitratesInAllFrames is true && frames.Count > 0)
+        { frames[0].BitRate = double.NaN; }
+        TryUpdateBitratesInAllFrames(frames, intervalDuration, intervalStartTime);
         
-        if (bitrates is null || bitrates.Count == 0)
+
+        var bitrates = frames.Select(f => f.BitRate);
+        if (bitrates is null || !bitrates.Any())
         { return double.NaN; }
 
         double bitRateMaximum = bitrates.Max() / (magnitudeOrder ?? 1);
@@ -142,29 +147,25 @@ public partial class FileItemViewModel : ViewModelBase
         return bitRateMaximum;
     }
 
-    public IReadOnlyCollection<int> GetBitRates(
+    private void TryUpdateBitratesInAllFrames(
         IList<FFProbePacket> frames,
         double intervalDuration = 1,
-        double intervalStartTime = 0,
-        bool isCachedEnabled = false
+        double intervalStartTime = 0
     )
     {
-        if (isCachedEnabled && _cacheBitRates is not null)
-        {  return _cacheBitRates; }
-
-        if (frames.Count == 0 || intervalDuration == 0)
-        { return (_cacheBitRates = []); }
+        var isAnyBitrateNotANumber = frames.Any(f => double.IsNaN(f.BitRate));
+        if ( isAnyBitrateNotANumber is false)
+        { return; }
 
         int bitrate;
         double intervalSize = 0;
         double nextIntervalSize = 0;
 
         var indexes = new List<int>();
-        var bitrates = new List<int>();
 
         for (int frameNumber = 0; frameNumber < frames.Count; ++frameNumber)
         {
-            bitrates.Add(0);
+            frames[frameNumber].BitRate= 0;
             var frame = frames[frameNumber];
             double duration = frame.DurationTime ?? 0;
             double size = frame.Size ?? 0;
@@ -192,7 +193,7 @@ public partial class FileItemViewModel : ViewModelBase
                 // Updating BitRate for frames in prev. interval
                 bitrate = (int)double.Round(intervalSize / intervalDuration * 8);
                 foreach (var index in indexes)
-                { bitrates[index] = bitrate; }
+                { frames[index].BitRate = bitrate; }
                 //{ frames[index].BitRate = bitrate; }
                 indexes.Clear();
 
@@ -220,11 +221,10 @@ public partial class FileItemViewModel : ViewModelBase
         //if (intervalSize > max) max = intervalSize; // last part
         bitrate = (int)double.Round(intervalSize / intervalDuration * 8);
         foreach (var index in indexes)
-        { bitrates[index] = bitrate; }
+        { frames[index].BitRate = bitrate; }
         //{ frames[index].BitRate = bitrate; }
         indexes.Clear();
 
-        return (_cacheBitRates = bitrates);
     }
 
 }

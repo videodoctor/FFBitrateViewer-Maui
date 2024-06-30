@@ -138,8 +138,6 @@ public partial class MainViewModel(
         await Parallel.ForEachAsync(Files.Where(file => file.IsSelected), cancellationToken, async (file, token) =>
         {
 
-            List<double> xs = [];
-            List<int> ys = [];
             var probePacketChannel = Channel.CreateUnbounded<FFProbePacket>();
 
             var probePacketProducerTask = Task.Run(async () =>
@@ -150,16 +148,18 @@ public partial class MainViewModel(
 
             var probePacketConsumerTask = Task.Run(async () =>
             {
-                await foreach (var probePacket in probePacketChannel.Reader.ReadAllAsync())
-                {
-                    file.Frames.Add(probePacket);
-                    var (x, y) = PlotStrategy.GetDataPoint(file.StartTime, probePacket);
-                    xs.Add(x ?? 0);
-                    ys.Add(Convert.ToInt32(y));
-                }
+                file.Frames.AddRange(await probePacketChannel.Reader.ReadAllAsync().ToListAsync());
+                //await foreach (var probePacket in probePacketChannel.Reader.ReadAllAsync())
+                //{
+                //    file.Frames.Add(probePacket);
+                //    var (x, y) = PlotStrategy.GetDataPoint(file.StartTime, probePacket);
+                //    xs.Add(x ?? 0);
+                //    ys.Add(Convert.ToInt32(y));
+                //}
             }, token);
 
             await Task.WhenAll(probePacketProducerTask, probePacketConsumerTask).ConfigureAwait(false);
+
 
             // Once all probe packets are received, we compute max and average
             var bitRateAverage = file.GetAverageBitRate(magnitudeOrder: 1000);
@@ -170,6 +170,19 @@ public partial class MainViewModel(
                 file.BitRateAverage = bitRateAverage;
                 file.BitRateMaximum = bitRateMaximum;
             });
+
+            // Gather data points for plotting
+            // NOTE: This could be done in `probePacketConsumerTask` but 
+            //       some plot strategies use BitRates which depends having all frames
+            List<double> xs = [];
+            List<int> ys = [];
+            for (int frameIndex = 0; frameIndex < file.Frames.Count; frameIndex++)
+            {
+                FFProbePacket? frame = file.Frames[frameIndex];
+                var (x, y) = PlotStrategy.GetDataPoint(file.StartTime, frame);
+                xs.Add(x ?? 0);
+                ys.Add(Convert.ToInt32(y));
+            }
 
             // Add scatter to plot view
             file.Scatter = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));

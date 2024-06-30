@@ -44,12 +44,10 @@ public class SecondBasedPlotStrategy : IPlotStrategy
     public string AxisYTitleLabel => "Bit rate [kb/s]";
 
     public double? GetAxisYForFile(FileItemViewModel file)
-    => file.GetBitRateMaximum(magnitudeOrder: 1000);
+        => file.GetBitRateMaximum(magnitudeOrder: 1000);
 
     public (double? X, double Y) GetDataPoint(double startTime, FFProbePacket probePacket)
-    {
-        throw new NotImplementedException();
-    }
+        => ((probePacket.PTSTime ?? 0) - startTime, Convert.ToDouble(probePacket.BitRate) / 1000.0);
 }
 
 public class GOPBasedPlotStrategy : IPlotStrategy

@@ -123,7 +123,13 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.FFProbe
 
     // [property: JsonExtensionData]
     // Dictionary<string, JsonElement> ExtensionData
-    );
+    )
+    {
+
+        [JsonIgnore]
+        public double BitRate { get; set; } = Double.NaN;
+
+    }
 
     public record FFProbeStream
     (
