@@ -53,7 +53,7 @@ public partial class MainViewModel(
 
     private PlotViewType _plotViewType = PlotViewType.FrameBased;
 
-    public IPlotStrategy PlotStrategy => _plotStrategies[_plotViewType];
+    private IPlotStrategy PlotStrategy => _plotStrategies[_plotViewType];
 
     private readonly IDictionary<PlotViewType, IPlotStrategy> _plotStrategies = plotStrategies.ToDictionary(p => p.PlotViewType);
 
