@@ -26,7 +26,7 @@ public class FrameBasedPlotStrategy : IPlotStrategy
 
     public string AxisYTickLabelSuffix => "kb";
 
-    public string AxisYTitleLabel => "Frame size";
+    public string AxisYTitleLabel => "Frame size [kb]";
 
     public double? GetAxisYForFile(FileItemViewModel file)
         => file.Frames.Max(f => f.Size);
@@ -41,7 +41,7 @@ public class SecondBasedPlotStrategy : IPlotStrategy
 
     public string AxisYTickLabelSuffix => "kb/s";
 
-    public string AxisYTitleLabel => "Bit rate";
+    public string AxisYTitleLabel => "Bit rate [kb/s]";
 
     public double? GetAxisYForFile(FileItemViewModel file)
     => file.GetBitRateMaximum(magnitudeOrder: 1000);
