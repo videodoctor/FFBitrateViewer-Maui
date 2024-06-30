@@ -39,7 +39,12 @@ public partial class MainViewModel(
 
     [ObservableProperty]
 
-    public IPlotControl? _plotController;
+    private IPlotControl? _plotController;
+
+    [ObservableProperty]
+    private FileItemViewModel _selectedFile;
+    
+    public System.Collections.IList? SelectedFiles { get; set; }
 
     private PlotControllerFacade _plotControllerFacade = PlotControllerFacade.None;
 
@@ -103,8 +108,6 @@ public partial class MainViewModel(
         var fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false).ConfigureAwait(false);
         await AddFilesAsync(fileInfoEntries, token).ConfigureAwait(false);
     }
-
-    public System.Collections.IList? SelectedFiles { get; set; }
 
     [RelayCommand]
     private void RemoveSelectedFiles()

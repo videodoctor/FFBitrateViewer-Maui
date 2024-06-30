@@ -74,7 +74,7 @@
                       CanUserSortColumns="False"
                       GridLinesVisibility="All"
                       BorderThickness="1" BorderBrush="Gray"
-                      SelectionMode="Extended"
+                      SelectionMode="Extended" SelectedItem="{Binding SelectedFile}"
                       >
 					<i:Interaction.Behaviors>
 						<ia:EventTriggerBehavior EventName="SelectionChanged" SourceObject="FileDataGrid">
@@ -92,11 +92,11 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <!--<GridSplitter Grid.Column="1" ResizeDirection="Columns"/>
+                <GridSplitter Grid.Column="1" ResizeDirection="Columns"/>
 
                 <ScrollViewer Grid.Column="2">
                     <pgc:PropertyGrid DataContext="{Binding SelectedFile}" />
-                </ScrollViewer>-->
+                </ScrollViewer>
 
             </Grid>
         </Border>
