@@ -38,9 +38,6 @@ public partial class MainViewModel(
     private bool _hasToAdjustFrameStartTime = false;
 
     [ObservableProperty]
-    private FileItemViewModel? _selectedFile;
-
-    [ObservableProperty]
 
     public IPlotControl? _plotController;
 
@@ -105,6 +102,15 @@ public partial class MainViewModel(
 
         var fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false).ConfigureAwait(false);
         await AddFilesAsync(fileInfoEntries, token).ConfigureAwait(false);
+    }
+
+
+    public System.Collections.IList? SelectedFiles { get; set; }
+
+    [RelayCommand]
+    private void RemoveSelectedFiles()
+    {
+
     }
 
     [RelayCommand]
@@ -180,7 +186,7 @@ public partial class MainViewModel(
             }).ConfigureAwait(false);
         }).ConfigureAwait(false);
 
-        SelectedFile = Files.LastOrDefault();
+        //SelectedFile = Files.LastOrDefault();
     }
 
 }

@@ -37,7 +37,7 @@
             </MenuItem>
             <MenuItem Header="A_ctions">
                 <MenuItem Header="_Add files…" Command="{Binding AddFilesCommand,Mode=OneTime}" />
-                <MenuItem Header="_Remove selected files"/>
+                <MenuItem Header="_Remove selected files" Command="{Binding RemoveSelectedFilesCommand,Mode=OneTime}"/>
                 <MenuItem Header="Remove ALL files"/>
                 <Separator/>
                 <MenuItem Header="Refresh _media info"/>
@@ -60,7 +60,7 @@
         <Border Grid.Row="1" Padding="10 4 " >
             <StackPanel Orientation="Horizontal" >
                 <Button Content="Add file"/>
-                <Button Content="Remove selected"/>
+                <Button Content="Remove selected" Command="{Binding RemoveSelectedFilesCommand,Mode=OneTime}" />
             </StackPanel>
         </Border>
 
@@ -68,14 +68,20 @@
         <Border Grid.Row="2" Padding="10 4" >
             <Grid ColumnDefinitions="0.8*,4,0.2*">
 
-                <DataGrid Grid.Column="0" ItemsSource="{Binding Files,Mode=OneTime}"
+                <DataGrid Grid.Column="0" Name="FileDataGrid" ItemsSource="{Binding Files,Mode=OneTime}"
                       CanUserReorderColumns="True"
                       CanUserResizeColumns="True"
                       CanUserSortColumns="False"
                       GridLinesVisibility="All"
                       BorderThickness="1" BorderBrush="Gray"
-                      SelectionMode="Single" SelectedItem="{Binding SelectedFile,Mode=TwoWay}"
+                      SelectionMode="Extended"
                       >
+					<i:Interaction.Behaviors>
+						<ia:EventTriggerBehavior EventName="SelectionChanged" SourceObject="FileDataGrid">
+							<ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="SelectedFiles" Value="{Binding Path=SelectedItems,ElementName=FileDataGrid,Mode=OneTime}" />
+							<!--<ia:InvokeCommandAction Command="{Binding RemoveSelectedFilesCommand,Mode=OneTime}"  />-->
+						</ia:EventTriggerBehavior>
+					</i:Interaction.Behaviors>
                     <DataGrid.Columns>
                         <!--<DataGridTextColumn Header="" Binding="{Binding IsSelected}"/>-->
                         <DataGridCheckBoxColumn Header="Is Active" Binding="{Binding IsSelected}" IsReadOnly="False"/>
@@ -86,11 +92,11 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <GridSplitter Grid.Column="1" ResizeDirection="Columns"/>
+                <!--<GridSplitter Grid.Column="1" ResizeDirection="Columns"/>
 
                 <ScrollViewer Grid.Column="2">
                     <pgc:PropertyGrid DataContext="{Binding SelectedFile}" />
-                </ScrollViewer>
+                </ScrollViewer>-->
 
             </Grid>
         </Border>
