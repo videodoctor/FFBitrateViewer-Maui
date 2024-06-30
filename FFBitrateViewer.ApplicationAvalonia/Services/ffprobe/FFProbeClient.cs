@@ -17,7 +17,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 /// <summary>
 /// FFProbeAppClient is a wrapper for ffprobe command line tool.
 /// </summary>
-public class FFProbeClient
+public class FFProbeClient(ProcessService processService)
 {
     // ffprobe can produce different output as explained in
     // https://ffmpeg.org/ffprobe.html . Thus we use CSV for
@@ -25,7 +25,7 @@ public class FFProbeClient
     // based on benchmark (2020/12) https://www.joelverhagen.com/blog/2020/12/fastest-net-csv-parsers
     // For hierarchical structures with "reasonable" size we use JSON with System.Text.Json parser.
 
-    private readonly ProcessService _processService = new();
+    private readonly ProcessService _processService = processService;
 
     /// <summary>
     /// Returns the full path of ffprobe executable.
@@ -192,7 +192,7 @@ public class FFProbeClient
                 //4         1186,           Size (Frame:Size)
                 //5         K__             Flag (Frame:Flags)
 
-                var probePacket = new FFProbePacket
+                FFProbePacket probePacket = new
                 (
                     // from CSV
                     PTSTime: double.TryParse(csvDataReader.GetString(1), out var pstTime) ? pstTime : default,
@@ -218,7 +218,7 @@ public class FFProbeClient
 
         }, cancellationToken);
 
-        await Task.WhenAll(producer, consumer);
+        await Task.WhenAll(producer, consumer).ConfigureAwait(false);
 
 
     }
