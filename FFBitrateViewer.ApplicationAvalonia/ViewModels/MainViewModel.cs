@@ -110,20 +110,16 @@ public partial class MainViewModel(
     [RelayCommand]
     private void RemoveSelectedFiles()
     {
-        if (SelectedFiles is null )
+        if (SelectedFiles is null || SelectedFiles.Count == 0)
         { return; }
 
-        var files = SelectedFiles.OfType<FileItemViewModel>().ToList();
-        foreach ( var file in files ) 
-        {
-            Files.Remove(file);
-        }
+        RemoveFiles(SelectedFiles.OfType<FileItemViewModel>());
     }
 
     [RelayCommand]
     private void RemoveAllFiles()
     {
-        Files.Clear();
+        RemoveFiles(Files);
     }
 
     [RelayCommand]
@@ -176,8 +172,8 @@ public partial class MainViewModel(
             });
 
             // Add scatter to plot view
-            _plotControllerFacade.AddScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
-            
+            file.Scatter = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
+
         });
 
         // Request Plot to adjust viewport and redraw
@@ -202,4 +198,20 @@ public partial class MainViewModel(
         //SelectedFile = Files.LastOrDefault();
     }
 
+    private void RemoveFiles(IEnumerable<FileItemViewModel> files)
+    {
+        var filesToRemove = files.ToArray();
+
+        if (filesToRemove.Length == 0)
+        { return; }
+
+        foreach (var file in filesToRemove)
+        {
+            _plotControllerFacade.RemoveScatter(file.Scatter);
+            Files.Remove(file);
+        }
+
+        _plotControllerFacade.Refresh();
+
+    }
 }

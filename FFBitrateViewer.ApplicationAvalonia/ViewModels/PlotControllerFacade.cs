@@ -1,4 +1,5 @@
 ﻿using ScottPlot;
+using ScottPlot.Plottables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
         set { if (PlotController is not null) { PlotController.Plot.Axes.Left.Label.Text = value; } }
     }
 
-    public void AddScatter(
+    public IPlottable? InsertScatter(
         List<double> xs,
         List<int> ys,
         string legendText,
@@ -27,12 +28,21 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
     )
     {
         if (PlotController is null)
-        { return; }
+        { return null; }
 
         var scatter = PlotController.Plot.Add.Scatter(xs, ys);
         scatter.ConnectStyle = connectStyle;
         scatter.LegendText = legendText;
 
+        return scatter;
+    }
+
+    public void RemoveScatter(IPlottable? plottable)
+    {
+        if (plottable is null)
+        { return; }
+
+        PlotController?.Plot.Remove(plottable);
     }
 
     public void AutoScaleViewport()

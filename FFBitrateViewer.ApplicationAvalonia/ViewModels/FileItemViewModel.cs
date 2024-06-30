@@ -2,6 +2,7 @@
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
+using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,6 +50,8 @@ public partial class FileItemViewModel : ViewModelBase
     public List<SubtitleStream> SubtitleStreams { get; } = [];
 
     #endregion
+
+    public IPlottable? Scatter { get; set; }
 
     private readonly IFileEntry _fileEntry;
     
