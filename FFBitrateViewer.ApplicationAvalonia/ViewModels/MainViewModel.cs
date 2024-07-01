@@ -190,6 +190,13 @@ public partial class MainViewModel(
         _plotControllerFacade.Refresh();
     }
 
+    [RelayCommand]
+    private void AutoScale()
+    {
+        _plotControllerFacade.AutoScaleViewport();
+        _plotControllerFacade.Refresh();
+    }
+
     private async Task AddFilesAsync(IEnumerable<IFileEntry> fileInfoEntries, CancellationToken token = default)
     {
         await Parallel.ForEachAsync(fileInfoEntries, token, async (fileInfo, token) =>

@@ -35,7 +35,6 @@ public partial class DesignMainViewModel : ViewModelBase
 
     public ObservableCollection<FileItemViewModel> Files { get; } = [];
 
-
     [RelayCommand]
     private async Task OnLoaded(CancellationToken token) { await Task.Yield(); }
 
@@ -57,4 +56,6 @@ public partial class DesignMainViewModel : ViewModelBase
     [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
     private async Task ToggleOnOffPlotterPlotter(CancellationToken cancellationToken) { await Task.Yield(); }
 
+    [RelayCommand]
+    private void AutoScale() { }
 }
