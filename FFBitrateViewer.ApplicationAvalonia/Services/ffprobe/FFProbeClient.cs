@@ -99,11 +99,33 @@ public class FFProbeClient(ProcessService processService)
 
         using var standardOutputMemoryStream = new MemoryStream();
         using var standardOutputWriter = new StreamWriter(standardOutputMemoryStream);
-        StringBuilder standardErrorStringBuilder = new StringBuilder();
-        StringWriter standardErrorWriter = new StringWriter(standardErrorStringBuilder);
-        var exitCode = await _processService.ExecuteAsync(command, standardOutputWriter: standardOutputWriter, standardErrorWriter: standardErrorWriter, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (exitCode != 0)
-        { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}.{Environment.NewLine}Standard Error Output: '{standardErrorStringBuilder}'"); }
+        //StringBuilder standardErrorStringBuilder = new StringBuilder();
+        //StringWriter standardErrorWriter = new StringWriter(standardErrorStringBuilder);
+
+        var commandStdOutputChannel = Channel.CreateUnbounded<string>();
+
+        var producer = Task.Run(async () => {
+
+            var exitCode = await _processService.ExecuteAsync(command, standardOutputChannel: commandStdOutputChannel, cancellationToken: cancellationToken).ConfigureAwait(false);
+            commandStdOutputChannel.Writer.TryComplete();
+            if (exitCode != 0)
+            { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}.{Environment.NewLine}"); }
+
+        }, cancellationToken);
+        
+        var consumer = Task.Run(async () => {
+
+            await foreach (var jsonSegment in commandStdOutputChannel.Reader.ReadAllAsync(cancellationToken))
+            {
+                await standardOutputWriter.WriteAsync(jsonSegment).ConfigureAwait(false);
+            }
+
+            await standardOutputWriter.FlushAsync().ConfigureAwait(false);
+
+        }, cancellationToken);
+
+        await Task.WhenAll(producer, consumer).ConfigureAwait(false);
+
 
         cancellationToken.ThrowIfCancellationRequested();
 
