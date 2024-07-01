@@ -32,7 +32,8 @@ public class GuiService
     /// to schedule the action to be executed on the UI thread.
     /// </remarks>
     public void RunLater<T>(Action<T> action, T? state)
-        => Dispatcher.UIThread.Post(state => {
+        => Dispatcher.UIThread.Post(state =>
+        {
             if (state is not T typedState)
             {
                 throw new InvalidOperationException($"Expect {nameof(state)} argument to be of type {typeof(T).FullName}");

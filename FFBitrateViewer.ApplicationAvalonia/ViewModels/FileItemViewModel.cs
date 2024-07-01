@@ -44,9 +44,9 @@ public partial class FileItemViewModel : ViewModelBase
     public List<FFProbePacket> Frames { get; } = [];
 
     public List<VideoStream> VideoStreams { get; } = [];
-    
+
     public List<AudioStream> AudioStreams { get; } = [];
-    
+
     public List<SubtitleStream> SubtitleStreams { get; } = [];
 
     #endregion
@@ -54,7 +54,7 @@ public partial class FileItemViewModel : ViewModelBase
     public IPlottable? Scatter { get; set; }
 
     public IFileEntry? FileEntry { get; init; }
-    
+
     public FFProbeJsonOutput? MediaInfo { get; init; }
 
     public void Initialize()
@@ -107,7 +107,7 @@ public partial class FileItemViewModel : ViewModelBase
 
 
         bitrateAverage = double.Round(bitrateAverage / (magnitudeOrder ?? 1));
-        
+
         return bitrateAverage;
     }
 
@@ -125,7 +125,7 @@ public partial class FileItemViewModel : ViewModelBase
         if (hasToUpdateBitratesInAllFrames is true && frames.Count > 0)
         { frames[0].BitRate = double.NaN; }
         TryUpdateBitratesInAllFrames(frames, intervalDuration, intervalStartTime);
-        
+
 
         var bitrates = frames.Select(f => f.BitRate);
         if (bitrates is null || !bitrates.Any())
@@ -143,7 +143,7 @@ public partial class FileItemViewModel : ViewModelBase
     )
     {
         var isAnyBitrateNotANumber = frames.Any(f => double.IsNaN(f.BitRate));
-        if ( isAnyBitrateNotANumber is false)
+        if (isAnyBitrateNotANumber is false)
         { return; }
 
         int bitrate;
@@ -154,7 +154,7 @@ public partial class FileItemViewModel : ViewModelBase
 
         for (int frameNumber = 0; frameNumber < frames.Count; ++frameNumber)
         {
-            frames[frameNumber].BitRate= 0;
+            frames[frameNumber].BitRate = 0;
             var frame = frames[frameNumber];
             double duration = frame.DurationTime ?? 0;
             double size = frame.Size ?? 0;

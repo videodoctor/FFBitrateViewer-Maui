@@ -9,7 +9,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 public class PlotControllerFacade(
     IPlotControl? plotControl = null,
     IPlotStrategy? plotStrategy = null
-) {
+)
+{
     internal static readonly PlotControllerFacade None = new();
 
     public IPlotControl? PlotController { get; private set; } = plotControl;
@@ -21,8 +22,8 @@ public class PlotControllerFacade(
         get => PlotController?.Plot.Axes.Left.Label.Text ?? string.Empty;
         set { if (PlotController is not null) { PlotController.Plot.Axes.Left.Label.Text = value; } }
     }
-    private static readonly object _newScatterLock = new ();
-    
+    private static readonly object _newScatterLock = new();
+
     private Crosshair? MyCrosshair;
     private Marker? MyHighlightMarker;
     private Text? MyHighlightText;
@@ -89,7 +90,7 @@ public class PlotControllerFacade(
         if (PlotController is null)
         { return; }
 
-        if(IsDarkThemeEnable)
+        if (IsDarkThemeEnable)
         {
             SetDarkTheme();
         }
@@ -147,7 +148,7 @@ public class PlotControllerFacade(
     {
         // Prevents handling if it cannot draw the mark
         if (pointerEventArgs.Handled || MyCrosshair is null || MyHighlightText is null || MyHighlightMarker is null)
-        {  return; }
+        { return; }
 
         // Get the control that raised the event
         var avaPlot = (ScottPlot.Avalonia.AvaPlot)pointerEventArgs.Source!;
@@ -205,7 +206,7 @@ public class PlotControllerFacade(
 
             MyHighlightText.IsVisible = true;
             MyHighlightText.Location = dataPoint.Coordinates;
-            MyHighlightText.LabelText =$"{PlotStrategy.AxisXTickLabelPrefix}={PlotStrategy.AxisXValueToString(dataPoint.X)}{PlotStrategy.AxisXTickLabelSuffix}{Environment.NewLine}{PlotStrategy.AxisYTickLabelPrefix}={PlotStrategy.AxisYValueToString(dataPoint.Y)}{PlotStrategy.AxisYTickLabelSuffix}";
+            MyHighlightText.LabelText = $"{PlotStrategy.AxisXTickLabelPrefix}={PlotStrategy.AxisXValueToString(dataPoint.X)}{PlotStrategy.AxisXTickLabelSuffix}{Environment.NewLine}{PlotStrategy.AxisYTickLabelPrefix}={PlotStrategy.AxisYValueToString(dataPoint.Y)}{PlotStrategy.AxisYTickLabelSuffix}";
             MyHighlightText.LabelFontColor = scatter.MarkerStyle.FillColor;
 
             avaPlot.Refresh();

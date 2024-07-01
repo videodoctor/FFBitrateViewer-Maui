@@ -32,7 +32,7 @@ public class FFProbeClient(ProcessService processService)
     /// </summary>
     public string FFProbeFilePath { get => _fFProbeFilePath ??= WhichFFProbe(); }
     private string? _fFProbeFilePath;
-    
+
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
     {
         NumberHandling = JsonNumberHandling.AllowReadingFromString
@@ -84,7 +84,7 @@ public class FFProbeClient(ProcessService processService)
     /// <exception cref="FileNotFoundException"></exception>
     /// <exception cref="FFProbeClientException"></exception>
     public async Task<FFProbeJsonOutput> GetMediaInfoAsync(
-        string mediaFilePath, 
+        string mediaFilePath,
         int threadCount = 11,
         CancellationToken cancellationToken = default)
     {
@@ -104,7 +104,8 @@ public class FFProbeClient(ProcessService processService)
 
         var commandStdOutputChannel = Channel.CreateUnbounded<string>();
 
-        var producer = Task.Run(async () => {
+        var producer = Task.Run(async () =>
+        {
 
             var exitCode = await _processService.ExecuteAsync(command, standardOutputChannel: commandStdOutputChannel, cancellationToken: cancellationToken).ConfigureAwait(false);
             commandStdOutputChannel.Writer.TryComplete();
@@ -112,8 +113,9 @@ public class FFProbeClient(ProcessService processService)
             { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}.{Environment.NewLine}"); }
 
         }, cancellationToken);
-        
-        var consumer = Task.Run(async () => {
+
+        var consumer = Task.Run(async () =>
+        {
 
             await foreach (var jsonSegment in commandStdOutputChannel.Reader.ReadAllAsync(cancellationToken))
             {
@@ -233,7 +235,7 @@ public class FFProbeClient(ProcessService processService)
                     PTS: default,
                     StreamIndex: default
                 );
-                
+
                 await probePacketChannel.Writer.WriteAsync(probePacket, cancellationToken).ConfigureAwait(false);
 
             }

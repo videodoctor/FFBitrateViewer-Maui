@@ -71,7 +71,7 @@ public class GOPBasedPlotStrategy : IPlotStrategy
     public PlotViewType PlotViewType => PlotViewType.GOPBased;
 
     public string AxisYTickLabelSuffix => "kb/GOP";
-    
+
     public string AxisYTickLabelPrefix => "Bit rate";
 
     public string AxisYLegendTitle => "Bit rate [kb/GOP]";
@@ -92,7 +92,7 @@ internal class NonePlotStrategy : IPlotStrategy
     public static IPlotStrategy Instance => _lazyPlotStrategy.Value;
 
     private static readonly Lazy<IPlotStrategy> _lazyPlotStrategy = new Lazy<IPlotStrategy>(() => new NonePlotStrategy());
-    
+
     private NonePlotStrategy()
     { }
 
