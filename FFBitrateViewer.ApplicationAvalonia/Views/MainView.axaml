@@ -148,8 +148,12 @@
 
                 <!--Plot view-->
                 <Border Grid.Row="1" Padding="10 4">
-                    <ScottPlot_Avalonia:AvaPlot Name="PlotControl" >
-
+                    <ScottPlot_Avalonia:AvaPlot Name="PlotControl">
+						<i:Interaction.Behaviors>
+							<ia:EventTriggerBehavior EventName="PointerMoved" SourceObject="PlotControl">
+								<ia:InvokeCommandAction Command="{Binding PlotPointerMovedCommand,Mode=OneTime}" PassEventArgsToCommand="True" />
+							</ia:EventTriggerBehavior>
+						</i:Interaction.Behaviors>
                     </ScottPlot_Avalonia:AvaPlot>
                 </Border>
 

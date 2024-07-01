@@ -58,4 +58,8 @@ public partial class DesignMainViewModel : ViewModelBase
 
     [RelayCommand]
     private void AutoScale() { }
+
+    [RelayCommand]
+    private void PlotPointerMoved(Avalonia.Input.PointerEventArgs pointerEventArgs) { }
+
 }

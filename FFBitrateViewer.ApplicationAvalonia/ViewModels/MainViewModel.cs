@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Models.Config;
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
@@ -6,14 +7,17 @@ using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 using Microsoft.Extensions.Options;
 using ScottPlot;
+using ScottPlot.Plottables;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
@@ -195,6 +199,85 @@ public partial class MainViewModel(
     {
         _plotControllerFacade.AutoScaleViewport();
         _plotControllerFacade.Refresh();
+    }
+
+    [RelayCommand]
+    private void PlotPointerMoved(Avalonia.Input.PointerEventArgs pointerEventArgs)
+    {
+        // Get the control that raised the event
+        var avaPlot = (ScottPlot.Avalonia.AvaPlot)pointerEventArgs.Source!;
+
+        // Get the position relative to the control
+        var position = pointerEventArgs.GetPosition(avaPlot);
+
+        // determine where the mouse is
+        Pixel mousePixel = new(position.X, position.Y);
+        Coordinates mouseLocation = avaPlot.Plot.GetCoordinates(mousePixel);
+
+        // get the nearest point of each scatter
+        Dictionary<int, DataPoint> nearestPoints = new();
+        var MyScatters = avaPlot.Plot.PlottableList.OfType<Scatter>().ToList();
+        for (int i = 0; i < MyScatters.Count; i++)
+        {
+            DataPoint nearestPoint = MyScatters[i].Data.GetNearest(mouseLocation, avaPlot.Plot.LastRender);
+            nearestPoints.Add(i, nearestPoint);
+        }
+
+        // determine which scatter's nearest point is nearest to the mouse
+        bool pointSelected = false;
+        int scatterIndex = -1;
+        double smallestDistance = double.MaxValue;
+        for (int i = 0; i < nearestPoints.Count; i++)
+        {
+            if (nearestPoints[i].IsReal)
+            {
+                // calculate the distance of the point to the mouse
+                double distance = nearestPoints[i].Coordinates.Distance(mouseLocation);
+                if (distance < smallestDistance)
+                {
+                    // store the index
+                    scatterIndex = i;
+                    pointSelected = true;
+                    // update the smallest distance
+                    smallestDistance = distance;
+                }
+            }
+        }
+
+        // place the crosshair, marker and text over the selected point
+        if (pointSelected)
+        {
+            ScottPlot.Plottables.Scatter scatter = MyScatters[scatterIndex];
+            DataPoint point = nearestPoints[scatterIndex];
+
+            //MyCrosshair.IsVisible = true;
+            //MyCrosshair.Position = point.Coordinates;
+            //MyCrosshair.LineColor = scatter.MarkerStyle.FillColor;
+
+            //MyHighlightMarker.IsVisible = true;
+            //MyHighlightMarker.Location = point.Coordinates;
+            //MyHighlightMarker.MarkerStyle.LineColor = scatter.MarkerStyle.FillColor;
+
+            //MyHighlightText.IsVisible = true;
+            //MyHighlightText.Location = point.Coordinates;
+            //MyHighlightText.LabelText = $"{point.X:0.##}, {point.Y:0.##}";
+            //MyHighlightText.LabelFontColor = scatter.MarkerStyle.FillColor;
+
+            avaPlot.Refresh();
+            string text = $"Selected Scatter={scatter.LegendText}, Index={point.Index}, X={point.X:0.##}, Y={point.Y:0.##}";
+            Debug.WriteLine(text);
+        }
+
+        //// hide the crosshair, marker and text when no point is selected
+        //if (!pointSelected && MyCrosshair.IsVisible)
+        //{
+        //    MyCrosshair.IsVisible = false;
+        //    MyHighlightMarker.IsVisible = false;
+        //    MyHighlightText.IsVisible = false;
+        //    avaPlot.Refresh();
+        //    string text = $"No point selected";
+        //    Debug.WriteLine(text);
+        //}
     }
 
     private async Task AddFilesAsync(IEnumerable<IFileEntry> fileInfoEntries, CancellationToken token = default)
