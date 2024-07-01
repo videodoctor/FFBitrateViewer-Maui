@@ -4,6 +4,7 @@ using FFBitrateViewer.ApplicationAvalonia.Models.Config;
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Options;
 using ScottPlot;
 using System;
@@ -12,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -123,7 +125,13 @@ public partial class MainViewModel(
     private async Task AddFiles(CancellationToken token)
     {
 
-        var fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false).ConfigureAwait(false);
+        IEnumerable< IFileEntry> fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false).ConfigureAwait(false);
+
+        // Prevent duplicated files by name.
+        StringComparer stringComparer = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+        var existingFiles = Files.Select(f => f.Path.LocalPath).ToHashSet(stringComparer);
+        fileInfoEntries = fileInfoEntries.Where(f => !existingFiles.Contains(f.Path.LocalPath));
+
         await AddFilesAsync(fileInfoEntries, token).ConfigureAwait(false);
     }
 
