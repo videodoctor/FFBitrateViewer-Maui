@@ -1,8 +1,7 @@
 {
   "profiles": {
     "FFBitrateViewer.ApplicationAvalonia.Desktop": {
-      "commandName": "Project",
-      "commandLineArgs": "--AutoRun\r\n-p FrameBased\r\n-f C:\\Users\\hfmad\\Downloads\\video-sample\\sample-file-full-hd.mp4\r\n-f C:\\Users\\hfmad\\Downloads\\video-sample\\sample-file-hd.mp4\r\n-f C:\\Users\\hfmad\\Downloads\\video-sample\\sample-file-sd-2.mp4\r\n-f C:\\Users\\hfmad\\Downloads\\video-sample\\sample-file-sd.mp4"
+      "commandName": "Project"
     }
   }
 }
