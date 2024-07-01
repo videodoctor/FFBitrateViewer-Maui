@@ -14,8 +14,6 @@ public partial class FileItemViewModel : ViewModelBase
 {
     public static readonly Uri AboutBlankUri = new("about:blank");
 
-    public Guid Id { get; private set; } = Guid.NewGuid();
-
     [ObservableProperty]
     private bool _isSelected;
 
