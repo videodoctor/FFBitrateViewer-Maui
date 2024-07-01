@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Models.Config;
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
@@ -7,17 +6,14 @@ using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 using Microsoft.Extensions.Options;
 using ScottPlot;
-using ScottPlot.Plottables;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
@@ -53,15 +49,13 @@ public partial class MainViewModel(
     private PlotControllerFacade _plotControllerFacade = PlotControllerFacade.None;
 
     partial void OnPlotControllerChanging(global::ScottPlot.IPlotControl? value)
-        => _plotControllerFacade = new PlotControllerFacade(value);
+        => _plotControllerFacade = new PlotControllerFacade(value, PlotStrategy);
 
     public ObservableCollection<FileItemViewModel> Files { get; } = [];
 
     private IPlotStrategy PlotStrategy => _plotStrategies[PlotView];
 
     private readonly IDictionary<PlotViewType, IPlotStrategy> _plotStrategies = plotStrategies.ToDictionary(p => p.PlotViewType);
-
-    private string TrackerFormatStringBuild => $@"{{0}}{Environment.NewLine}Time={{2:hh\:mm\:ss\.fff}}{Environment.NewLine}{{3}}={{4:0}} {PlotStrategy.AxisYTickLabelSuffix}";
 
     private readonly GuiService _guiService = guiService;
 

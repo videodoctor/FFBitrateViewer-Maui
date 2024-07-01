@@ -68,3 +68,25 @@ public class GOPBasedPlotStrategy : IPlotStrategy
         throw new NotImplementedException();
     }
 }
+
+internal class NonePlotStrategy : IPlotStrategy
+{
+    public static IPlotStrategy Instance => _lazyPlotStrategy.Value;
+
+    private static readonly Lazy<IPlotStrategy> _lazyPlotStrategy = new Lazy<IPlotStrategy>(() => new NonePlotStrategy());
+    
+    private NonePlotStrategy()
+    { }
+
+    public PlotViewType PlotViewType => PlotViewType.FrameBased;
+
+    public string AxisYTickLabelSuffix => string.Empty;
+
+    public string AxisYTitleLabel => string.Empty;
+
+    public double? GetAxisYForFile(FileItemViewModel file)
+    { return 0.0; }
+
+    public (double? X, double Y) GetDataPoint(double startTime, FFProbePacket probePacket)
+    { return (0.0, 0.0); }
+}

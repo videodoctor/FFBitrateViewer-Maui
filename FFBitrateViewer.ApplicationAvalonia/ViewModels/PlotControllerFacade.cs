@@ -9,11 +9,15 @@ using System.Threading.Tasks;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
-public class PlotControllerFacade(IPlotControl? plotControl = null)
-{
+public class PlotControllerFacade(
+    IPlotControl? plotControl = null,
+    IPlotStrategy? plotStrategy = null
+) {
     internal static readonly PlotControllerFacade None = new();
 
     public IPlotControl? PlotController { get; private set; } = plotControl;
+
+    public IPlotStrategy PlotStrategy { get; private set; } = plotStrategy ?? NonePlotStrategy.Instance;
 
     public string AxisYTitleLabel
     {
@@ -21,9 +25,12 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
         set { if (PlotController is not null) { PlotController.Plot.Axes.Left.Label.Text = value; } }
     }
     private static readonly object _newScatterLock = new ();
-    private Crosshair MyCrosshair;
-    private Marker MyHighlightMarker;
-    private Text MyHighlightText;
+    
+    private Crosshair? MyCrosshair;
+    private Marker? MyHighlightMarker;
+    private Text? MyHighlightText;
+
+    //private string TrackerFormatStringBuild => $@"{{0}}{Environment.NewLine}Time={{2:hh\:mm\:ss\.fff}}{Environment.NewLine}{{3}}={{4:0}} "; //{PlotStrategy.AxisYTickLabelSuffix}
 
     public IPlottable? InsertScatter(
         List<double> xs,
@@ -143,6 +150,10 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
 
     public void HandleMouseMoved(Avalonia.Input.PointerEventArgs pointerEventArgs)
     {
+        // Prevents handling if it cannot draw the mark
+        if (pointerEventArgs.Handled || MyCrosshair is null || MyHighlightText is null || MyHighlightMarker is null)
+        {  return; }
+
         // Get the control that raised the event
         var avaPlot = (ScottPlot.Avalonia.AvaPlot)pointerEventArgs.Source!;
 
@@ -199,12 +210,13 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
 
             MyHighlightText.IsVisible = true;
             MyHighlightText.Location = point.Coordinates;
-            MyHighlightText.LabelText = $"{point.X:0.##}, {point.Y:0.##}";
+            //MyHighlightText.LabelText = $"{point.X:0.##}, {point.Y:0.##}";
+            MyHighlightText.LabelText = $"Tim{AxisXTickLabelFormatter(point.X)}{Environment.NewLine}{PlotStrategy.AxisYTitleLabel}={ point.Y:0.##}{PlotStrategy.AxisYTickLabelSuffix}";
             MyHighlightText.LabelFontColor = scatter.MarkerStyle.FillColor;
 
             avaPlot.Refresh();
-            string text = $"Selected Scatter={scatter.LegendText}, Index={point.Index}, X={point.X:0.##}, Y={point.Y:0.##}";
-            Debug.WriteLine(text);
+            //string text = $"Selected Scatter={scatter.LegendText}, Index={point.Index}, X={point.X:0.##}, Y={point.Y:0.##}";
+            //Debug.WriteLine(text);
         }
 
         // hide the crosshair, marker and text when no point is selected
@@ -214,8 +226,8 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
             MyHighlightMarker.IsVisible = false;
             MyHighlightText.IsVisible = false;
             avaPlot.Refresh();
-            string text = $"No point selected";
-            Debug.WriteLine(text);
+            //string text = $"No point selected";
+            //Debug.WriteLine(text);
         }
     }
 
