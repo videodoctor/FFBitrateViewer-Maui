@@ -110,7 +110,9 @@ public class FFProbeClient(ProcessService processService)
 #if DEBUG
         standardOutputMemoryStream.Seek(0, SeekOrigin.Begin);
         var jsonText = Encoding.UTF8.GetString(standardOutputMemoryStream.ToArray());
+        Debug.WriteLine("BEGIN ======= {0} ", mediaFilePath);
         Debug.WriteLine(jsonText);
+        Debug.WriteLine("  END ======= {0} ", mediaFilePath);
 #endif
 
         standardOutputMemoryStream.Seek(0, SeekOrigin.Begin);
