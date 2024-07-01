@@ -19,7 +19,7 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
         get => PlotController?.Plot.Axes.Left.Label.Text ?? string.Empty;
         set { if (PlotController is not null) { PlotController.Plot.Axes.Left.Label.Text = value; } }
     }
-
+    private static readonly object _newScatterLock = new ();
     public IPlottable? InsertScatter(
         List<double> xs,
         List<int> ys,
@@ -30,7 +30,9 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
         if (PlotController is null)
         { return null; }
 
-        var scatter = PlotController.Plot.Add.Scatter(xs, ys);
+        // NOTE: make thread safe scatter creation thus automatically color assignment do not reuse color.
+        Scatter scatter;
+        lock (_newScatterLock) { scatter = PlotController.Plot.Add.Scatter(xs, ys); }
         scatter.ConnectStyle = connectStyle;
         scatter.LegendText = legendText;
 
