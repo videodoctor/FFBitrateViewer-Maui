@@ -5,6 +5,7 @@
              xmlns:vm="clr-namespace:FFBitrateViewer.ApplicationAvalonia.ViewModels"
              xmlns:m="clr-namespace:FFBitrateViewer.ApplicationAvalonia.Models.Media"
              xmlns:Avalonia_Controls_Converters="using:Avalonia.Controls.Converters"
+			 xmlns:DesignData="using:FFBitrateViewer.ApplicationAvalonia.ViewModels.DesignData"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FFBitrateViewer.ApplicationAvalonia.Views.MainView"
              x:DataType="vm:MainViewModel"
@@ -30,7 +31,7 @@
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
+        <DesignData:DesignMainViewModel />
     </Design.DataContext>
 
     <Grid RowDefinitions="Auto,Auto,*,4,*,Auto">

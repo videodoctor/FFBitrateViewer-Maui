@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
-// TODO: Following dependencies make the preview designer to crash. Consider use DesignData or ViewModelLocator
 public partial class MainViewModel(
     GuiService guiService,
     FileDialogService fileDialogService,
