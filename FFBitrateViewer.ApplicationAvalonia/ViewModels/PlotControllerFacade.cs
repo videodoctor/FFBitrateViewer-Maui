@@ -2,10 +2,7 @@
 using ScottPlot.Plottables;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
@@ -103,7 +100,7 @@ public class PlotControllerFacade(
         // create a custom tick generator using your custom label formatter
         ScottPlot.TickGenerators.NumericAutomatic myTickGenerator = new()
         {
-            LabelFormatter = AxisXTickLabelFormatter
+            LabelFormatter = PlotStrategy.AxisXValueToString
         };
         PlotController.Plot.Axes.Bottom.TickGenerator = myTickGenerator;
 
@@ -135,7 +132,7 @@ public class PlotControllerFacade(
         MyHighlightMarker.LineWidth = 2;
 
         // Create a text label to place near the highlighted value
-        MyHighlightText = PlotController.Plot.Add.Text("", 0, 0);
+        MyHighlightText = PlotController.Plot.Add.Text(string.Empty, 0, 0);
         MyHighlightText.LabelAlignment = Alignment.LowerLeft;
         MyHighlightText.LabelBold = true;
         MyHighlightText.OffsetX = 7;
@@ -145,8 +142,6 @@ public class PlotControllerFacade(
 
     public void Refresh()
         => PlotController?.Refresh();
-
-    private string AxisXTickLabelFormatter(double duration) => TimeSpan.FromSeconds(duration).ToString("g");
 
     public void HandleMouseMoved(Avalonia.Input.PointerEventArgs pointerEventArgs)
     {
@@ -198,20 +193,19 @@ public class PlotControllerFacade(
         if (pointSelected)
         {
             ScottPlot.Plottables.Scatter scatter = MyScatters[scatterIndex];
-            DataPoint point = nearestPoints[scatterIndex];
+            DataPoint dataPoint = nearestPoints[scatterIndex];
 
             MyCrosshair.IsVisible = true;
-            MyCrosshair.Position = point.Coordinates;
+            MyCrosshair.Position = dataPoint.Coordinates;
             MyCrosshair.LineColor = scatter.MarkerStyle.FillColor;
 
             MyHighlightMarker.IsVisible = true;
-            MyHighlightMarker.Location = point.Coordinates;
+            MyHighlightMarker.Location = dataPoint.Coordinates;
             MyHighlightMarker.MarkerStyle.LineColor = scatter.MarkerStyle.FillColor;
 
             MyHighlightText.IsVisible = true;
-            MyHighlightText.Location = point.Coordinates;
-            //MyHighlightText.LabelText = $"{point.X:0.##}, {point.Y:0.##}";
-            MyHighlightText.LabelText = $"Tim{AxisXTickLabelFormatter(point.X)}{Environment.NewLine}{PlotStrategy.AxisYTitleLabel}={ point.Y:0.##}{PlotStrategy.AxisYTickLabelSuffix}";
+            MyHighlightText.Location = dataPoint.Coordinates;
+            MyHighlightText.LabelText =$"{PlotStrategy.AxisXTickLabelPrefix}={PlotStrategy.AxisXValueToString(dataPoint.X)}{PlotStrategy.AxisXTickLabelSuffix}{Environment.NewLine}{PlotStrategy.AxisYTickLabelPrefix}={PlotStrategy.AxisYValueToString(dataPoint.Y)}{PlotStrategy.AxisYTickLabelSuffix}";
             MyHighlightText.LabelFontColor = scatter.MarkerStyle.FillColor;
 
             avaPlot.Refresh();

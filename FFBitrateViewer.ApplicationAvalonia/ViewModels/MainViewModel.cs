@@ -72,7 +72,7 @@ public partial class MainViewModel(
         SetPlotViewType(_applicationOptions.PlotView);
 
         // initialize the plot view
-        _plotControllerFacade.Initialize(PlotStrategy.AxisYTitleLabel, _guiService.IsDarkTheme);
+        _plotControllerFacade.Initialize(PlotStrategy.AxisYLegendTitle, _guiService.IsDarkTheme);
         _plotControllerFacade.Refresh();
 
         // gets version of the ffprobe
@@ -96,7 +96,7 @@ public partial class MainViewModel(
     {
         PlotView = plotViewType;
 
-        _plotControllerFacade.AxisYTitleLabel = PlotStrategy.AxisYTitleLabel;
+        _plotControllerFacade.AxisYTitleLabel = PlotStrategy.AxisYLegendTitle;
         _plotControllerFacade.Refresh();
     }
 
