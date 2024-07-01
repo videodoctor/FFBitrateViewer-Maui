@@ -89,10 +89,6 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
         // Showing the left title
         PlotController.Plot.Axes.Left.Label.Text = axisYTitleLabel;
 
-        // Change style for the tick labels
-        PlotController.Plot.Axes.Bottom.TickLabelStyle.Rotation = 45;
-        PlotController.Plot.Axes.Bottom.TickLabelStyle.Alignment = Alignment.MiddleLeft;
-
         // create a custom tick generator using your custom label formatter
         ScottPlot.TickGenerators.NumericAutomatic myTickGenerator = new()
         {
@@ -122,10 +118,5 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
     public void Refresh()
         => PlotController?.Refresh();
 
-    private string AxisXTickLabelFormatter(double duration) =>
-      (duration < 60) ? TimeSpan.FromSeconds(duration).ToString(@"m\:ss")
-    : (duration < 60 * 60) ? TimeSpan.FromSeconds(duration).ToString(@"mm\:ss")
-    : (duration < 60 * 60 * 24) ? TimeSpan.FromSeconds(duration).ToString(@"h\:mm\:ss")
-    : TimeSpan.FromSeconds(duration).ToString(@"d\.hh\:mm\:ss")
-    ;
+    private string AxisXTickLabelFormatter(double duration) => TimeSpan.FromSeconds(duration).ToString("g");
 }
