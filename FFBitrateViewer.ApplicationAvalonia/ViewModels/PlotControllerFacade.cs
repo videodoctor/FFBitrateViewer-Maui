@@ -94,8 +94,19 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
         };
         PlotController.Plot.Axes.Bottom.TickGenerator = myTickGenerator;
 
-        // Shows title label in the left side
-        PlotController.Plot.ShowLegend(Alignment.LowerRight, Orientation.Horizontal);
+        // hide the default legend
+        PlotController.Plot.HideLegend();
+
+        // display the legend in a LegendPanel outside the plot
+        ScottPlot.Panels.LegendPanel pan = new(PlotController.Plot.Legend)
+        {
+            Edge = Edge.Right,
+            Alignment = Alignment.UpperCenter,
+        };
+
+        PlotController.Plot.Axes.AddPanel(pan);
+
+
     }
 
     public void Refresh()
