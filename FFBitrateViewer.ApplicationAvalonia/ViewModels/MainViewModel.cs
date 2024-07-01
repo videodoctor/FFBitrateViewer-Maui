@@ -9,6 +9,7 @@ using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -211,6 +212,7 @@ public partial class MainViewModel(
                 IsSelected = true
             };
             fileItemViewModel.Initialize();
+            Debug.WriteLine($"File Information: {Path.GetFileName(fileInfo.Path.LocalPath)}");
 
             // Add file to Data Grid
             await _guiService.RunNowAsync(() =>
