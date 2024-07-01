@@ -157,6 +157,9 @@ public partial class MainViewModel(
         // process files in parallel
         await Parallel.ForEachAsync(Files.Where(file => file.IsSelected), cancellationToken, async (file, token) =>
         {
+            // Skip file is it already has a plot
+            if (file.Scatters[PlotView] is not null)
+            { return; }
 
             var probePacketChannel = Channel.CreateUnbounded<FFProbePacket>();
 
