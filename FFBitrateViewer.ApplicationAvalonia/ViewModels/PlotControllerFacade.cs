@@ -2,6 +2,7 @@
 using ScottPlot.Plottables;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,9 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
         set { if (PlotController is not null) { PlotController.Plot.Axes.Left.Label.Text = value; } }
     }
     private static readonly object _newScatterLock = new ();
+    private Crosshair MyCrosshair;
+    private Marker MyHighlightMarker;
+    private Text MyHighlightText;
 
     public IPlottable? InsertScatter(
         List<double> xs,
@@ -116,10 +120,103 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
         // Makes auto scale to be tight
         PlotController.Plot.Axes.Margins(0, 0);
 
+        // Create a marker to highlight the point under the cursor
+        MyCrosshair = PlotController.Plot.Add.Crosshair(0, 0);
+        MyHighlightMarker = PlotController.Plot.Add.Marker(0, 0);
+        MyHighlightMarker.Shape = MarkerShape.OpenCircle;
+        MyHighlightMarker.Size = 17;
+        MyHighlightMarker.LineWidth = 2;
+
+        // Create a text label to place near the highlighted value
+        MyHighlightText = PlotController.Plot.Add.Text("", 0, 0);
+        MyHighlightText.LabelAlignment = Alignment.LowerLeft;
+        MyHighlightText.LabelBold = true;
+        MyHighlightText.OffsetX = 7;
+        MyHighlightText.OffsetY = -7;
+
     }
 
     public void Refresh()
         => PlotController?.Refresh();
 
     private string AxisXTickLabelFormatter(double duration) => TimeSpan.FromSeconds(duration).ToString("g");
+
+    public void HandleMouseMoved(Avalonia.Input.PointerEventArgs pointerEventArgs)
+    {
+        // Get the control that raised the event
+        var avaPlot = (ScottPlot.Avalonia.AvaPlot)pointerEventArgs.Source!;
+
+        // Get the position relative to the control
+        var position = pointerEventArgs.GetPosition(avaPlot);
+
+        // determine where the mouse is
+        Pixel mousePixel = new(position.X, position.Y);
+        Coordinates mouseLocation = avaPlot.Plot.GetCoordinates(mousePixel);
+
+        // get the nearest point of each scatter
+        Dictionary<int, DataPoint> nearestPoints = new();
+        var MyScatters = avaPlot.Plot.PlottableList.OfType<Scatter>().ToList();
+        for (int i = 0; i < MyScatters.Count; i++)
+        {
+            DataPoint nearestPoint = MyScatters[i].Data.GetNearest(mouseLocation, avaPlot.Plot.LastRender);
+            nearestPoints.Add(i, nearestPoint);
+        }
+
+        // determine which scatter's nearest point is nearest to the mouse
+        bool pointSelected = false;
+        int scatterIndex = -1;
+        double smallestDistance = double.MaxValue;
+        for (int i = 0; i < nearestPoints.Count; i++)
+        {
+            if (nearestPoints[i].IsReal)
+            {
+                // calculate the distance of the point to the mouse
+                double distance = nearestPoints[i].Coordinates.Distance(mouseLocation);
+                if (distance < smallestDistance)
+                {
+                    // store the index
+                    scatterIndex = i;
+                    pointSelected = true;
+                    // update the smallest distance
+                    smallestDistance = distance;
+                }
+            }
+        }
+
+        // place the crosshair, marker and text over the selected point
+        if (pointSelected)
+        {
+            ScottPlot.Plottables.Scatter scatter = MyScatters[scatterIndex];
+            DataPoint point = nearestPoints[scatterIndex];
+
+            MyCrosshair.IsVisible = true;
+            MyCrosshair.Position = point.Coordinates;
+            MyCrosshair.LineColor = scatter.MarkerStyle.FillColor;
+
+            MyHighlightMarker.IsVisible = true;
+            MyHighlightMarker.Location = point.Coordinates;
+            MyHighlightMarker.MarkerStyle.LineColor = scatter.MarkerStyle.FillColor;
+
+            MyHighlightText.IsVisible = true;
+            MyHighlightText.Location = point.Coordinates;
+            MyHighlightText.LabelText = $"{point.X:0.##}, {point.Y:0.##}";
+            MyHighlightText.LabelFontColor = scatter.MarkerStyle.FillColor;
+
+            avaPlot.Refresh();
+            string text = $"Selected Scatter={scatter.LegendText}, Index={point.Index}, X={point.X:0.##}, Y={point.Y:0.##}";
+            Debug.WriteLine(text);
+        }
+
+        // hide the crosshair, marker and text when no point is selected
+        if (!pointSelected && MyCrosshair.IsVisible)
+        {
+            MyCrosshair.IsVisible = false;
+            MyHighlightMarker.IsVisible = false;
+            MyHighlightText.IsVisible = false;
+            avaPlot.Refresh();
+            string text = $"No point selected";
+            Debug.WriteLine(text);
+        }
+    }
+
 }
