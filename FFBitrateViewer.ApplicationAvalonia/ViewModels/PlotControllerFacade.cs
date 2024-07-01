@@ -113,6 +113,9 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
         PlotController.Plot.Grid.MinorLineColor = Colors.Green.WithOpacity(.1);
         PlotController.Plot.Grid.MinorLineWidth = 1;
 
+        // Makes auto scale to be tight
+        PlotController.Plot.Axes.Margins(0, 0);
+
     }
 
     public void Refresh()
