@@ -15,9 +15,9 @@
              xmlns:ScottPlot_Avalonia="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
              x:Name="MainViewUserControl"
              >
-	<UserControl.Resources>
-		<Avalonia_Controls_Converters:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
-	</UserControl.Resources>
+    <UserControl.Resources>
+        <Avalonia_Controls_Converters:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
+    </UserControl.Resources>
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="Loaded" SourceObject="MainViewUserControl">
             <ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="PlotController" Value="{Binding ElementName=PlotControl,Mode=OneTime}" />
@@ -80,12 +80,12 @@
                       BorderThickness="1" BorderBrush="Gray"
                       SelectionMode="Extended" SelectedItem="{Binding SelectedFile}"
                       >
-					<i:Interaction.Behaviors>
-						<ia:EventTriggerBehavior EventName="SelectionChanged" SourceObject="FileDataGrid">
-							<ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="SelectedFiles" Value="{Binding Path=SelectedItems,ElementName=FileDataGrid,Mode=OneTime}" />
-							<!--<ia:InvokeCommandAction Command="{Binding RemoveSelectedFilesCommand,Mode=OneTime}"  />-->
-						</ia:EventTriggerBehavior>
-					</i:Interaction.Behaviors>
+                    <i:Interaction.Behaviors>
+                        <ia:EventTriggerBehavior EventName="SelectionChanged" SourceObject="FileDataGrid">
+                            <ia:ChangePropertyAction TargetObject="{Binding DataContext, ElementName=MainViewUserControl}" PropertyName="SelectedFiles" Value="{Binding Path=SelectedItems,ElementName=FileDataGrid,Mode=OneTime}" />
+                            <!--<ia:InvokeCommandAction Command="{Binding RemoveSelectedFilesCommand,Mode=OneTime}"  />-->
+                        </ia:EventTriggerBehavior>
+                    </i:Interaction.Behaviors>
                     <DataGrid.Columns>
                         <!--<DataGridTextColumn Header="" Binding="{Binding IsSelected}"/>-->
                         <DataGridCheckBoxColumn Header="Is Active" Binding="{Binding IsSelected}" IsReadOnly="False"/>
@@ -128,12 +128,12 @@
                           />-->
                         <Label Content="Plot view:" VerticalAlignment="Center" />
                         <RadioButton GroupName="PotViewGroupName" Content="Frame based"
-									 IsChecked="{Binding PlotView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static m:PlotViewType.FrameBased}}"
+                                     IsChecked="{Binding PlotView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static m:PlotViewType.FrameBased}}"
                                      Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
                                      CommandParameter="{x:Static m:PlotViewType.FrameBased}"
                          />
                         <RadioButton GroupName="PotViewGroupName" Content="Second based"
-									 IsChecked="{Binding PlotView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static m:PlotViewType.SecondBased}}"
+                                     IsChecked="{Binding PlotView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static m:PlotViewType.SecondBased}}"
                                      Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
                                      CommandParameter="{x:Static m:PlotViewType.SecondBased}"
                          />

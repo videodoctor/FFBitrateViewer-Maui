@@ -153,13 +153,6 @@ public partial class MainViewModel(
             var probePacketConsumerTask = Task.Run(async () =>
             {
                 file.Frames.AddRange(await probePacketChannel.Reader.ReadAllAsync().ToListAsync());
-                //await foreach (var probePacket in probePacketChannel.Reader.ReadAllAsync())
-                //{
-                //    file.Frames.Add(probePacket);
-                //    var (x, y) = PlotStrategy.GetDataPoint(file.StartTime, probePacket);
-                //    xs.Add(x ?? 0);
-                //    ys.Add(Convert.ToInt32(y));
-                //}
             }, token);
 
             await Task.WhenAll(probePacketProducerTask, probePacketConsumerTask).ConfigureAwait(false);
@@ -203,8 +196,9 @@ public partial class MainViewModel(
         await Parallel.ForEachAsync(fileInfoEntries, token, async (fileInfo, token) =>
         {
             var mediaInfo = await _probeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath, cancellationToken: token).ConfigureAwait(false);
-            FileItemViewModel fileItemViewModel = new () {
-                FileEntry = fileInfo, 
+            FileItemViewModel fileItemViewModel = new()
+            {
+                FileEntry = fileInfo,
                 MediaInfo = mediaInfo,
                 IsSelected = true
             };
@@ -216,8 +210,6 @@ public partial class MainViewModel(
                 Files.Add(fileItemViewModel);
             }).ConfigureAwait(false);
         }).ConfigureAwait(false);
-
-        //SelectedFile = Files.LastOrDefault();
     }
 
     private void RemoveFiles(IEnumerable<FileItemViewModel> files)
