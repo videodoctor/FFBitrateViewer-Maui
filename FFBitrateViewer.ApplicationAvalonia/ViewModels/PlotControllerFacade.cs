@@ -20,6 +20,7 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
         set { if (PlotController is not null) { PlotController.Plot.Axes.Left.Label.Text = value; } }
     }
     private static readonly object _newScatterLock = new ();
+
     public IPlottable? InsertScatter(
         List<double> xs,
         List<int> ys,
