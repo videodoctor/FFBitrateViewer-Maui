@@ -14,6 +14,8 @@ public partial class FileItemViewModel : ViewModelBase
 {
     public static readonly Uri AboutBlankUri = new("about:blank");
 
+    public Guid Id { get; private set; } = Guid.NewGuid();
+
     [ObservableProperty]
     private bool _isSelected;
 
@@ -51,7 +53,7 @@ public partial class FileItemViewModel : ViewModelBase
 
     #endregion
 
-    public IPlottable? Scatter { get; set; }
+    public IDictionary<PlotViewType, IPlottable?> Scatters { get; private set; } = Enum.GetValues<PlotViewType>().ToDictionary(e => e, r => default(IPlottable?));
 
     public IFileEntry? FileEntry { get; init; }
 

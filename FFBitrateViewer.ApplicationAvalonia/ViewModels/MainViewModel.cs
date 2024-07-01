@@ -93,11 +93,29 @@ public partial class MainViewModel(
     }
 
     [RelayCommand]
-    private void SetPlotViewType(PlotViewType plotViewType)
+    private void SetPlotViewType(PlotViewType newPlotViewType)
     {
-        PlotView = plotViewType;
+        PlotView = newPlotViewType;
+
+        foreach (var file in Files)
+        {
+            foreach (var plotViewType in Enum.GetValues<PlotViewType>())
+            {
+                // Compute plots for `PlotView`
+                if (plotViewType == newPlotViewType && file.Scatters[plotViewType] is null)
+                {
+                }
+
+                // Update plot visibility(Hide plots different from `PlotView`, show the others
+                if (file.Scatters[plotViewType] is not null)
+                {
+                    file.Scatters[plotViewType]!.IsVisible = plotViewType == newPlotViewType;
+                }
+            }
+        }
 
         _plotControllerFacade.AxisYTitleLabel = PlotStrategy.AxisYLegendTitle;
+        _plotControllerFacade.AutoScaleViewport();
         _plotControllerFacade.Refresh();
     }
 
@@ -180,7 +198,7 @@ public partial class MainViewModel(
             }
 
             // Add scatter to plot view
-            file.Scatter = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
+            file.Scatters[PlotView] = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
 
         });
 
@@ -231,7 +249,13 @@ public partial class MainViewModel(
 
         foreach (var file in filesToRemove)
         {
-            _plotControllerFacade.RemoveScatter(file.Scatter);
+            foreach (var plotViewType in Enum.GetValues<PlotViewType>())
+            {
+                if (file.Scatters[plotViewType] is null)
+                { continue; }
+
+                _plotControllerFacade.RemoveScatter(file.Scatters[plotViewType]);
+            }
             Files.Remove(file);
         }
 
