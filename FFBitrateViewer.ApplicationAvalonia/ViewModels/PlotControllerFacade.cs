@@ -69,6 +69,11 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
         PlotController.Plot.Legend.BackgroundColor = Color.FromHex("#404040");
         PlotController.Plot.Legend.FontColor = Color.FromHex("#d7d7d7");
         PlotController.Plot.Legend.OutlineColor = Color.FromHex("#d7d7d7");
+
+        // Customize grid with sublines
+        PlotController.Plot.Grid.MajorLineColor = Colors.LightGreen.WithOpacity(.5);
+        PlotController.Plot.Grid.MinorLineColor = Colors.LightGreen.WithOpacity(.1);
+        PlotController.Plot.Grid.MinorLineWidth = 1;
     }
 
     public void Initialize(string axisYTitleLabel, bool IsDarkThemeEnable)
@@ -107,6 +112,10 @@ public class PlotControllerFacade(IPlotControl? plotControl = null)
 
         PlotController.Plot.Axes.AddPanel(pan);
 
+        // Customize grid with sublines
+        PlotController.Plot.Grid.MajorLineColor = Colors.Green.WithOpacity(.5);
+        PlotController.Plot.Grid.MinorLineColor = Colors.Green.WithOpacity(.1);
+        PlotController.Plot.Grid.MinorLineWidth = 1;
 
     }
 
