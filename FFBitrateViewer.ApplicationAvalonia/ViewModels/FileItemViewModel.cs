@@ -5,6 +5,7 @@ using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 using ScottPlot;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 
@@ -13,48 +14,65 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 public partial class FileItemViewModel : ViewModelBase
 {
     public static readonly Uri AboutBlankUri = new("about:blank");
+    
+    private const string CategoryMediaInformation = "Media Infor";
 
     [ObservableProperty]
+    [property: Category(CategoryMediaInformation), DisplayName("Is Selected")]
     private bool _isSelected;
 
     #region File Info
     [ObservableProperty]
+    [property: Category(CategoryMediaInformation), DisplayName("Path")]
     private Uri _path = AboutBlankUri;
     #endregion
 
     #region Media Info
     [ObservableProperty]
+    [property: Category(CategoryMediaInformation), DisplayName("Start Time")]
     private double _startTime;
 
     [ObservableProperty]
+    [property: Category(CategoryMediaInformation), DisplayName("Duration")]
     private double? _duration;
 
     [ObservableProperty]
+    [property: Category(CategoryMediaInformation), DisplayName("Bit Rate")]
     private BitRate? _bitrate;
 
     [ObservableProperty]
+    [property: Category(CategoryMediaInformation), DisplayName("Video Description")]
     private string _firstVideoShortDesc = string.Empty;
 
     [ObservableProperty]
+    [property: Category(CategoryMediaInformation), DisplayName("Bit Range Avg")]
     private double _bitRateAverage = double.NaN;
 
     [ObservableProperty]
+    [property: Category(CategoryMediaInformation), DisplayName("Bit Range Max")]
     private double _bitRateMaximum = double.NaN;
 
+    [property: Browsable(false)]
     public List<FFProbePacket> Frames { get; } = [];
 
+    [property: Browsable(false)]
     public List<VideoStream> VideoStreams { get; } = [];
 
+    [property: Browsable(false)]
     public List<AudioStream> AudioStreams { get; } = [];
 
+    [property: Browsable(false)]
     public List<SubtitleStream> SubtitleStreams { get; } = [];
 
     #endregion
 
+    [property: Browsable(false)]
     public IDictionary<PlotViewType, IPlottable?> Scatters { get; private set; } = Enum.GetValues<PlotViewType>().ToDictionary(e => e, r => default(IPlottable?));
 
+    [property: Browsable(false)]
     public IFileEntry? FileEntry { get; init; }
 
+    [property: Browsable(false)]
     public FFProbeJsonOutput? MediaInfo { get; init; }
 
     public void Initialize()
