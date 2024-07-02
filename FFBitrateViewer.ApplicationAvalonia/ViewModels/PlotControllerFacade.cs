@@ -206,8 +206,9 @@ public class PlotControllerFacade(
 
             MyHighlightText.IsVisible = true;
             MyHighlightText.Location = dataPoint.Coordinates;
-            MyHighlightText.LabelText = $"{PlotStrategy.AxisXTickLabelPrefix}={PlotStrategy.AxisXValueToString(dataPoint.X)}{PlotStrategy.AxisXTickLabelSuffix}{Environment.NewLine}{PlotStrategy.AxisYTickLabelPrefix}={PlotStrategy.AxisYValueToString(dataPoint.Y)}{PlotStrategy.AxisYTickLabelSuffix}";
+            MyHighlightText.LabelText = $"{PlotStrategy.AxisXTickLabelPrefix} = {PlotStrategy.AxisXValueToString(dataPoint.X)}{PlotStrategy.AxisXTickLabelSuffix}{Environment.NewLine}{PlotStrategy.AxisYTickLabelPrefix} = {PlotStrategy.AxisYValueToString(dataPoint.Y)} {PlotStrategy.AxisYTickLabelSuffix}";
             MyHighlightText.LabelFontColor = scatter.MarkerStyle.FillColor;
+            MyHighlightText.LabelBackgroundColor = Colors.Black.WithAlpha(128);
 
             avaPlot.Refresh();
             //string text = $"Selected Scatter={scatter.LegendText}, Index={point.Index}, X={point.X:0.##}, Y={point.Y:0.##}";

@@ -21,7 +21,7 @@ public interface IPlotStrategy
 
     string AxisXValueToString(double duration) => TimeSpan.FromSeconds(duration).ToString("g");
 
-    string AxisYValueToString(double value) => $"{value:0.##}";
+    string AxisYValueToString(double value) => $"{value:n}";
 
     string AxisXTickLabelSuffix => string.Empty;
 
