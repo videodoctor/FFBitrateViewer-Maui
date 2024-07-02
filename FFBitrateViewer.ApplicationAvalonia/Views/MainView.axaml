@@ -50,8 +50,8 @@
                 <Separator/>
                 <MenuItem Header="Refresh _media info"/>
                 <Separator/>
-                <MenuItem Header="_Start"/>
-                <MenuItem Header="St_op"/>
+                <MenuItem Header="_Start" Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"/>
+                <MenuItem Header="St_op" Command="{Binding ToggleOnOffPlotterPlotterCancelCommand,Mode=OneTime}" />
                 <Separator/>
                 <MenuItem Header="Copy plot to _clipboard"/>
                 <MenuItem Header="Save plot to _file…"/>
@@ -127,9 +127,6 @@
                     <StackPanel Orientation="Horizontal">
                         <Button Content="Start" Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"/>
                         <Button Content="Stop" Command="{Binding ToggleOnOffPlotterPlotterCancelCommand,Mode=OneTime}"/>
-                        <!--<ToggleSwitch OnContent="Stop" OffContent="Start" IsChecked="{Binding IsPlotterOn,Mode=TwoWay}" 
-                          Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"
-                          />-->
                         <Label Content="Plot view:" VerticalAlignment="Center" />
                         <RadioButton GroupName="PotViewGroupName" Content="Frame based"
                                      IsChecked="{Binding PlotView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static m:PlotViewType.FrameBased}}"
