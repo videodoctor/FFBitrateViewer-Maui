@@ -4,6 +4,7 @@ using FFBitrateViewer.ApplicationAvalonia.Models.Config;
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ScottPlot;
 using System;
@@ -24,6 +25,7 @@ public partial class MainViewModel(
     FileDialogService fileDialogService,
     FFProbeClient probeAppClient,
     IEnumerable<IPlotStrategy> plotStrategies,
+    ILogger<MainViewModel> logger,
     IOptions<Models.Config.ApplicationOptions> applicationOptions
     ) : ViewModelBase
 {
@@ -66,6 +68,8 @@ public partial class MainViewModel(
     private readonly FFProbeClient _probeAppClient = probeAppClient;
 
     private readonly ApplicationOptions _applicationOptions = applicationOptions.Value;
+
+    private readonly ILogger _logger = logger;
 
     [RelayCommand]
     private async Task OnLoaded(CancellationToken token)

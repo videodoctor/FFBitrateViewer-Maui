@@ -1,4 +1,6 @@
-﻿using Hmb.ProcessRunner;
+﻿using Avalonia.Logging;
+using Hmb.ProcessRunner;
+using Microsoft.Extensions.Logging;
 using Sylvan.Data.Csv;
 using System;
 using System.Diagnostics;
@@ -17,7 +19,10 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 /// <summary>
 /// FFProbeAppClient is a wrapper for ffprobe command line tool.
 /// </summary>
-public class FFProbeClient(ProcessService processService)
+public class FFProbeClient(
+    ProcessService processService,
+    ILogger<FFProbeClient> logger
+    )
 {
     // ffprobe can produce different output as explained in
     // https://ffmpeg.org/ffprobe.html . Thus we use CSV for
@@ -26,6 +31,8 @@ public class FFProbeClient(ProcessService processService)
     // For hierarchical structures with "reasonable" size we use JSON with System.Text.Json parser.
 
     private readonly ProcessService _processService = processService;
+
+    private readonly ILogger _logger = logger;
 
     /// <summary>
     /// Returns the full path of ffprobe executable.
@@ -62,6 +69,7 @@ public class FFProbeClient(ProcessService processService)
         using StringWriter sw = new(sb);
 
         var command = $"{FFProbeFilePath} -version";
+        _logger.LogTrace(command);
         var exitCode = await _processService.ExecuteAsync(command, standardOutputWriter: sw, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (exitCode != 0)
         { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
@@ -96,7 +104,7 @@ public class FFProbeClient(ProcessService processService)
         { throw new FileNotFoundException(mediaFilePath); }
 
         var command = $@"{FFProbeFilePath} -hide_banner -threads {threadCount} -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration ""{mediaFilePath}""";
-
+        _logger.LogTrace(command);
         using var standardOutputMemoryStream = new MemoryStream();
         using var standardOutputWriter = new StreamWriter(standardOutputMemoryStream);
         //StringBuilder standardErrorStringBuilder = new StringBuilder();

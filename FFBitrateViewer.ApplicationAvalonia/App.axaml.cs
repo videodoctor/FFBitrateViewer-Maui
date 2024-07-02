@@ -5,7 +5,13 @@ using Avalonia.Markup.Xaml;
 
 using FFBitrateViewer.ApplicationAvalonia.ViewModels;
 using FFBitrateViewer.ApplicationAvalonia.Views;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Extensions.Logging;
+using System;
 
 namespace FFBitrateViewer.ApplicationAvalonia;
 
@@ -20,12 +26,30 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+
+        string workingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+#if DEBUG
+        workingDirectory = Environment.CurrentDirectory;
+#endif
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(workingDirectory)
+            .AddJsonFile("appsettings.json")
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", true)
+            .Build();
+
         // Line below is needed to remove Avalonia data validation.
         // Without this line you will get duplicate validations from both Avalonia and CT
         BindingPlugins.DataValidators.RemoveAt(0);
 
         // Register all the services needed for the application to run
         var collection = new ServiceCollection();
+        collection.AddLogging( c =>
+        {
+            var logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
+            c.AddProvider(new SerilogLoggerProvider(logger, dispose: true));
+        });
         collection.AddFFBitrateViewerServices();
         collection.AddFFBitrateViewerViewModels();
         collection.AddOptions<Models.Config.ApplicationOptions>()
@@ -45,6 +69,9 @@ public partial class App : Application
 
         // Creates a ServiceProvider containing services from the provided IServiceCollection
         var services = collection.BuildServiceProvider();
+
+        Microsoft.Extensions.Logging.ILogger logger = services.GetService<ILogger<App>>()!;
+        logger.LogInformation("Command Line: {commandLine}", Environment.CommandLine);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
