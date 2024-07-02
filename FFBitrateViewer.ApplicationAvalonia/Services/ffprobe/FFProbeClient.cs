@@ -1,9 +1,7 @@
-﻿using Avalonia.Logging;
-using Hmb.ProcessRunner;
+﻿using Hmb.ProcessRunner;
 using Microsoft.Extensions.Logging;
 using Sylvan.Data.Csv;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
