@@ -74,7 +74,7 @@
 
         <!-- data grid-->
         <Border Grid.Row="2">
-            <Grid ColumnDefinitions="0.8*,4,0.2*">
+            <Grid ColumnDefinitions="*,4,Auto">
 
                 <DataGrid Margin="2,4" Grid.Column="0" Name="FileDataGrid" ItemsSource="{Binding Files,Mode=OneTime}"
                       CanUserReorderColumns="True"
