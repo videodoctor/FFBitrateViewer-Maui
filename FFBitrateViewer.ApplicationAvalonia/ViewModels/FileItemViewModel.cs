@@ -14,7 +14,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 public partial class FileItemViewModel : ViewModelBase
 {
     public static readonly Uri AboutBlankUri = new("about:blank");
-    
+
     private const string CategoryMediaInformation = "Media Infor";
 
     [ObservableProperty]

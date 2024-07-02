@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.CommandLine;
-using System.CommandLine.NamingConventionBinder;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using FFBitrateViewer.ApplicationAvalonia.Models.Config;

@@ -4,7 +4,6 @@ using FFBitrateViewer.ApplicationAvalonia.Models.Config;
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Options;
 using ScottPlot;
 using System;
@@ -125,7 +124,7 @@ public partial class MainViewModel(
     private async Task AddFiles(CancellationToken token)
     {
 
-        IEnumerable< IFileEntry> fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false).ConfigureAwait(false);
+        IEnumerable<IFileEntry> fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false).ConfigureAwait(false);
 
         // Prevent duplicated files by name.
         StringComparer stringComparer = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
