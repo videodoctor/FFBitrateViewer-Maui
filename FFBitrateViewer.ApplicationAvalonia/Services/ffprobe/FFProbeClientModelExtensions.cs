@@ -2,7 +2,7 @@
 
 namespace FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 
-public static class FFProbeExtensions
+public static class FFProbeClientModelExtensions
 {
     public static double? GetDuration(this FFProbeJsonOutput ffProbeOutput)
     {
