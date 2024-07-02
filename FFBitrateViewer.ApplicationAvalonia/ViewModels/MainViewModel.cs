@@ -169,31 +169,35 @@ public partial class MainViewModel(
             if (file.Scatters[PlotView] is not null)
             { return; }
 
-            var probePacketChannel = Channel.CreateUnbounded<FFProbePacket>();
-
-            var probePacketProducerTask = Task.Run(async () =>
+            // Check if Probe Packets were already loaded
+            var hasFrames = file.Frames.Count > 0;
+            if (hasFrames is false)
             {
-                await _probeAppClient.GetProbePacketsAsync(probePacketChannel, file.Path.LocalPath).ConfigureAwait(false);
-                probePacketChannel.Writer.TryComplete();
-            }, token);
+                var probePacketChannel = Channel.CreateUnbounded<FFProbePacket>();
 
-            var probePacketConsumerTask = Task.Run(async () =>
-            {
-                file.Frames.AddRange(await probePacketChannel.Reader.ReadAllAsync().ToListAsync());
-            }, token);
+                var probePacketProducerTask = Task.Run(async () =>
+                {
+                    await _probeAppClient.GetProbePacketsAsync(probePacketChannel, file.Path.LocalPath).ConfigureAwait(false);
+                    probePacketChannel.Writer.TryComplete();
+                }, token);
 
-            await Task.WhenAll(probePacketProducerTask, probePacketConsumerTask).ConfigureAwait(false);
+                var probePacketConsumerTask = Task.Run(async () =>
+                {
+                    file.Frames.AddRange(await probePacketChannel.Reader.ReadAllAsync().ToListAsync());
+                }, token);
 
+                await Task.WhenAll(probePacketProducerTask, probePacketConsumerTask).ConfigureAwait(false);
+            }
 
             // Once all probe packets are received, we compute max and average
-            var bitRateAverage = file.GetAverageBitRate(magnitudeOrder: 1000);
-            var bitRateMaximum = file.GetBitRateMaximum(magnitudeOrder: 1000);
+            var bitRateAverage = double.IsNaN(file.BitRateAverage) ? file.GetAverageBitRate(magnitudeOrder: 1000) : file.BitRateAverage;
+            var bitRateMaximum = double.IsNaN(file.BitRateMaximum) ? file.GetBitRateMaximum(magnitudeOrder: 1000) : file.BitRateMaximum;
 
-            _guiService.RunLater(() =>
+            await _guiService.RunNowAsync(() =>
             {
                 file.BitRateAverage = bitRateAverage;
                 file.BitRateMaximum = bitRateMaximum;
-            });
+            }).ConfigureAwait(false);
 
             // Gather data points for plotting
             // NOTE: This could be done in `probePacketConsumerTask` but 
