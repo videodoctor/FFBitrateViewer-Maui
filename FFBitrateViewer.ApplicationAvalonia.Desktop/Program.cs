@@ -38,7 +38,7 @@ class Program
         var plotViewTypeOption = new Option<PlotViewType>("--PlotViewType", getDefaultValue: () => PlotViewType.FrameBased, "The kind of plot view selected by default");
         plotViewTypeOption.AddAlias("-p");
 
-        var rootCommand = new RootCommand("Visualizes video bitrate received by ffprobe.exe")
+        var rootCommand = new RootCommand("Visualizes video bitrate received by ffprobe (https://ffmpeg.org/)")
         {
             startTimeAdjustmentOption,
             exitOption,
