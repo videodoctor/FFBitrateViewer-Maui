@@ -56,9 +56,17 @@
                 <MenuItem Header="Copy plot to _clipboard"/>
                 <MenuItem Header="Save plot to _file…"/>
             </MenuItem>
-            <MenuItem Header="_Options">
-                <MenuItem Header="Write _FFProbe commands to log"/>
-            </MenuItem>
+            <!--<MenuItem Header="_Options">
+				<MenuItem Header="Write _FFProbe commands to log">
+					<MenuItem.Icon>
+						<CheckBox BorderThickness="0"
+								  IsHitTestVisible="False"
+								  Command="{Binding  }">
+							Toggle _Me
+						</CheckBox>
+					</MenuItem.Icon>
+				</MenuItem>
+            </MenuItem>-->
             <MenuItem Header="_Help">
                 <MenuItem Header="_About"/>
             </MenuItem>
