@@ -19,12 +19,13 @@
     <ProjectReference Include="..\FFBitrateViewer.ApplicationAvalonia\FFBitrateViewer.ApplicationAvalonia.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="appsettings - Copy.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+<ItemGroup>
+	<None Update="appsettings.json">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
+	<None Update="appsettings.development.json">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		<DependentUpon>appsettings.json</DependentUpon>
+	</None>
+</ItemGroup>
 </Project>

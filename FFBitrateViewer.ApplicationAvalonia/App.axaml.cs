@@ -34,7 +34,7 @@ public partial class App : Application
         var configuration = new ConfigurationBuilder()
             .SetBasePath(workingDirectory)
             .AddJsonFile("appsettings.json")
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", true)
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("FFBITRATEVIEWER_ENVIRONMENT") ?? "Production"}.json", true)
             .Build();
 
         // Line below is needed to remove Avalonia data validation.

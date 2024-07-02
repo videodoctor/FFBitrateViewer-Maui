@@ -240,7 +240,7 @@ public partial class MainViewModel(
     {
         await Parallel.ForEachAsync(fileInfoEntries, token, async (fileInfo, token) =>
         {
-            _logger.LogTrace("Adding file {localFilePath}", Path.GetFileName(fileInfo.Path.LocalPath));
+            _logger.LogDebug("Adding file {localFilePath}", Path.GetFileName(fileInfo.Path.LocalPath));
             var mediaInfo = await _probeAppClient.GetMediaInfoAsync(fileInfo.Path.LocalPath, cancellationToken: token).ConfigureAwait(false);
             FileItemViewModel fileItemViewModel = new()
             {

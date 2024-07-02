@@ -69,7 +69,7 @@ public class FFProbeClient(
         using StringWriter sw = new(sb);
 
         var command = $"{FFProbeFilePath} -version";
-        _logger.LogTrace("Running Command: {command}", command);
+        _logger.LogDebug("Running Command: {command}", command);
         var exitCode = await _processService.ExecuteAsync(command, standardOutputWriter: sw, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (exitCode != 0)
         { throw new FFProbeClientException($"Exit code {exitCode} when executing the following command:{Environment.NewLine}{command}"); }
@@ -104,7 +104,7 @@ public class FFProbeClient(
         { throw new FileNotFoundException(mediaFilePath); }
 
         var command = $@"{FFProbeFilePath} -hide_banner -threads {threadCount} -print_format json=compact=1 -loglevel fatal -show_error -show_format -show_streams -show_entries stream_tags=duration ""{mediaFilePath}""";
-        _logger.LogTrace("Running Command: {command}", command);
+        _logger.LogDebug("Running Command: {command}", command);
         using var standardOutputMemoryStream = new MemoryStream();
         using var standardOutputWriter = new StreamWriter(standardOutputMemoryStream);
 
@@ -140,7 +140,7 @@ public class FFProbeClient(
 #if DEBUG
         standardOutputMemoryStream.Seek(0, SeekOrigin.Begin);
         var jsonText = Encoding.UTF8.GetString(standardOutputMemoryStream.ToArray());
-        _logger.LogTrace("Command standard output: {commandOutput}", jsonText);
+        _logger.LogDebug("Command standard output: {commandOutput}", jsonText);
 #endif
 
         standardOutputMemoryStream.Seek(0, SeekOrigin.Begin);
