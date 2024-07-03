@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Extensions.Logging;
 using System;
+using System.Diagnostics;
 
 namespace FFBitrateViewer.ApplicationAvalonia;
 
@@ -32,7 +34,7 @@ public partial class App : Application
 #endif
         var configuration = new ConfigurationBuilder()
             .SetBasePath(workingDirectory)
-            .AddJsonFile("appsettings.json")
+            .AddJsonFile("appsettings.json", Design.IsDesignMode)
             .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("FFBITRATEVIEWER_ENVIRONMENT") ?? "Production"}.json", true)
             .Build();
 
