@@ -54,7 +54,7 @@
                 <MenuItem Header="St_op" Command="{Binding ToggleOnOffPlotterPlotterCancelCommand,Mode=OneTime}" />
                 <Separator/>
                 <MenuItem Header="Copy plot to _clipboard"/>
-                <MenuItem Header="Save plot to _file…"/>
+                <MenuItem Header="Save plot to _file…" Command="{Binding SavePlotToFileCommand,Mode=OneTime}"/>
             </MenuItem>
             <!--<MenuItem Header="_Options">
 				<MenuItem Header="Write _FFProbe commands to log">

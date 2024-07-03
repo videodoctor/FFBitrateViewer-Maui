@@ -2,6 +2,7 @@
 using ScottPlot.Plottables;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
@@ -225,4 +226,10 @@ public class PlotControllerFacade(
         }
     }
 
+    public void SavePlotImage(string filePath)
+    {
+        string extension = Path.GetExtension(filePath);
+        ImageFormat imageFormat = ImageFormatLookup.FromFileExtension(extension);
+        plotControl?.Plot.Save(filePath, 1920, 1080, imageFormat);
+    }
 }

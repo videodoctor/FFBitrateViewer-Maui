@@ -12,8 +12,8 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services;
 public class FileDialogService
 {
     public async Task<IList<IFileEntry>> OpenAsync(
-        string filePickerTitle = "Open media file",
-        bool IsSingleSelection = true
+        string title = "Open media file",
+        bool isSingleFileSelection = true
     )
     {
         if (GuiService.DesktopApplication is null)
@@ -25,15 +25,53 @@ public class FileDialogService
         // Start async operation to open the dialog.
         var files = await topLevel!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = filePickerTitle,
-            AllowMultiple = !IsSingleSelection
+            Title = title,
+            AllowMultiple = !isSingleFileSelection
         });
 
 
         return files.Select(f => new StorageFileEntry(f)).OfType<IFileEntry>().ToImmutableList();
     }
 
+    public async Task<IFileEntry?> SaveAsync(
+        string title, params SaveFilterOption[]? filterOptions
+    ) {
+        if (GuiService.DesktopApplication is null)
+        { throw new FileDialogException("A desktop application is required to save a file."); }
+
+        // Converts SaveFilterOption to FilePickerFileType
+        filterOptions ??= [];
+        var filePickerFileTypes = from filterOption in filterOptions
+                                  select new FilePickerFileType(filterOption.Name)
+                                  {
+                                      AppleUniformTypeIdentifiers = filterOption.AppleUniformTypeIdentifiers,
+                                      MimeTypes = filterOption.MimeTypes,
+                                      Patterns = filterOption.Patters,
+                                  };
+
+        // Get top level from the current control. Alternatively, you can use Window reference instead.
+        var topLevel = TopLevel.GetTopLevel(GuiService.DesktopApplication.MainWindow);
+
+        // Start async operation to open the dialog.
+        FilePickerSaveOptions filePickerSaveOptions = new FilePickerSaveOptions
+        {
+            Title = title, FileTypeChoices = filePickerFileTypes.ToArray()
+        };
+        var file = await topLevel!.StorageProvider.SaveFilePickerAsync(filePickerSaveOptions).ConfigureAwait(false);
+        if (file is not null)
+        {
+            return new StorageFileEntry(file);
+        }
+
+        return default;
+    }
 }
+
+public record SaveFilterOption(
+        string? Name = null,
+        string[]? Patters = null,
+        string[]? MimeTypes = null,
+        string[]? AppleUniformTypeIdentifiers = null);
 
 public class StorageFileEntry(IStorageFile storageFile) : IFileEntry
 {

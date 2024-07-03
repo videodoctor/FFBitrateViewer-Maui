@@ -70,6 +70,13 @@ public partial class MainViewModel(
 
     private readonly ILogger _logger = logger;
 
+    private static readonly SaveFilterOption SavePlotImagesOption = new (
+        "All Image formats",
+        ["*.bmp", "*.jpg", "*.png", "*.svg", "*.webp"],
+        ["public.image"],
+        ["image/*"]
+    );
+
     [RelayCommand]
     private async Task OnLoaded(CancellationToken token)
     {
@@ -127,7 +134,7 @@ public partial class MainViewModel(
     private async Task AddFiles(CancellationToken token)
     {
 
-        IEnumerable<IFileEntry> fileInfoEntries = await _fileDialogService.OpenAsync(IsSingleSelection: false).ConfigureAwait(false);
+        IEnumerable<IFileEntry> fileInfoEntries = await _fileDialogService.OpenAsync(isSingleFileSelection: false).ConfigureAwait(false);
 
         // Prevent duplicated files by name.
         StringComparer stringComparer = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
@@ -234,6 +241,18 @@ public partial class MainViewModel(
     [RelayCommand]
     private void PlotPointerMoved(Avalonia.Input.PointerEventArgs pointerEventArgs)
         => _plotControllerFacade.HandleMouseMoved(pointerEventArgs);
+
+    [RelayCommand]
+    private async Task SavePlotToFile(CancellationToken token)
+    {
+        await Task.Yield();
+        var file = await _fileDialogService.SaveAsync("Save Plot", SavePlotImagesOption).ConfigureAwait(false);
+
+        if (file is null)
+        { return; }
+
+        _plotControllerFacade.SavePlotImage(file.Path.LocalPath);
+    }
 
     private async Task AddFilesAsync(IEnumerable<IFileEntry> fileInfoEntries, CancellationToken token = default)
     {

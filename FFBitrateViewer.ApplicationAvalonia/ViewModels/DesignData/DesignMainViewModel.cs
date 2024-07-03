@@ -57,4 +57,7 @@ public partial class DesignMainViewModel : ViewModelBase
     [RelayCommand]
     private void PlotPointerMoved(Avalonia.Input.PointerEventArgs pointerEventArgs) { }
 
+    [RelayCommand]
+    private async Task SavePlotToFile(CancellationToken token) { await Task.Yield(); }
+
 }
