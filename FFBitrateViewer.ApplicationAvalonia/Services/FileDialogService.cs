@@ -12,7 +12,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services;
 public class FileDialogService
 {
     public async Task<IList<IFileEntry>> OpenAsync(
-        string filePickerTitle = "Open Text File",
+        string filePickerTitle = "Open media file",
         bool IsSingleSelection = true
     )
     {
