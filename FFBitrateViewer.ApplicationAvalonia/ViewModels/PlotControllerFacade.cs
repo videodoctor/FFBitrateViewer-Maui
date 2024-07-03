@@ -121,7 +121,7 @@ public class PlotControllerFacade(
         PlotController.Plot.Grid.MinorLineWidth = 1;
 
         // Makes auto scale to be tight
-        PlotController.Plot.Axes.Margins(0, 0);
+        // PlotController.Plot.Axes.Margins(0, 0, 0, 0);
 
         // Create a marker to highlight the point under the cursor
         _markerCrosshair = PlotController.Plot.Add.Crosshair(0, 0);
