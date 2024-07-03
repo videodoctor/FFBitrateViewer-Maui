@@ -159,7 +159,7 @@ public class PlotControllerFacade(
         Coordinates mouseLocation = avaPlot.Plot.GetCoordinates(mousePixel);
 
         // get the nearest point of each scatter
-        Dictionary<int, DataPoint> nearestPoints = new();
+        Dictionary<int, DataPoint> nearestPoints = [];
         var MyScatters = avaPlot.Plot.PlottableList.OfType<Scatter>().ToList();
         for (int i = 0; i < MyScatters.Count; i++)
         {
