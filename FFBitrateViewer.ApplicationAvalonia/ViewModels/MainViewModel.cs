@@ -251,6 +251,7 @@ public partial class MainViewModel(
         if (file is null)
         { return; }
 
+        _logger.LogDebug("Save Plot to file {targetFilename}", file.Path);
         _plotControllerFacade.SavePlotImage(file.Path.LocalPath);
 
     }
