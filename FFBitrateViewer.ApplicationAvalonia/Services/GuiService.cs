@@ -1,17 +1,15 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
 using Avalonia.Threading;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Services;
 
 public class GuiService
 {
-    internal static IClassicDesktopStyleApplicationLifetime? DesktopApplication => _desktopApplication.Value;
-
-    private static readonly Lazy<IClassicDesktopStyleApplicationLifetime?> _desktopApplication = new(() => Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime);
-
     /// <summary>
     /// Executes the specified action on the UI thread asynchronously.
     /// </summary>
@@ -73,12 +71,23 @@ public class GuiService
     /// </remarks>
     public void Exit(int exitCode = 0)
     {
-        _desktopApplication.Value?.Shutdown(exitCode);
+        ApplicationServices.Desktop.Shutdown(exitCode);
     }
 
     /// <summary>
     /// Whether or not the GUI is using Dark theme.
     /// </summary>
-    public bool IsDarkTheme => string.Equals("Dark", TopLevel.GetTopLevel(_desktopApplication.Value!.MainWindow)!.ActualThemeVariant.Key.ToString(), StringComparison.OrdinalIgnoreCase);
+    public bool IsDarkTheme => string.Equals("Dark", ApplicationServices.MainWindowTopLevel.ActualThemeVariant.Key.ToString(), StringComparison.OrdinalIgnoreCase);
 
+
+    //public async Task SetBitmapToClipboard(byte[] bytes)
+    //{
+    //    // For DataFormat listing see https://learn.microsoft.com/en-us/dotnet/api/system.windows.dataformats?view=windowsdesktop-7.0
+    //    await Dispatcher.UIThread.InvokeAsync(async () =>
+    //    {
+    //        DataObject dataObject = new();
+    //        dataObject.Set("Bitmap", bytes);
+    //        await ApplicationServices.Clipboard.SetDataObjectAsync(dataObject).ConfigureAwait(false);
+    //    });
+    //}
 }

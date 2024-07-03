@@ -252,7 +252,21 @@ public partial class MainViewModel(
         { return; }
 
         _plotControllerFacade.SavePlotImage(file.Path.LocalPath);
+
     }
+
+    //[RelayCommand]
+    //private async Task CopyPlotToClipboard(CancellationToken token)
+    //{
+    //    byte[]? imageBytes = _plotControllerFacade.GetPlotImageAsStream();
+        
+    //    if (imageBytes is null) 
+    //    { return; }
+
+    //    token.ThrowIfCancellationRequested();
+
+    //    await _guiService.SetBitmapToClipboard(imageBytes).ConfigureAwait(false);
+    //}
 
     private async Task AddFilesAsync(IEnumerable<IFileEntry> fileInfoEntries, CancellationToken token = default)
     {

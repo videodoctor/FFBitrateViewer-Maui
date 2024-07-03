@@ -16,14 +16,8 @@ public class FileDialogService
         bool isSingleFileSelection = true
     )
     {
-        if (GuiService.DesktopApplication is null)
-        { throw new FileDialogException("A desktop application is required to open files."); }
-
-        // Get top level from the current control. Alternatively, you can use Window reference instead.
-        var topLevel = TopLevel.GetTopLevel(GuiService.DesktopApplication.MainWindow);
-
         // Start async operation to open the dialog.
-        var files = await topLevel!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        var files = await ApplicationServices.Storage.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = title,
             AllowMultiple = !isSingleFileSelection
@@ -36,8 +30,6 @@ public class FileDialogService
     public async Task<IFileEntry?> SaveAsync(
         string title, params SaveFilterOption[]? filterOptions
     ) {
-        if (GuiService.DesktopApplication is null)
-        { throw new FileDialogException("A desktop application is required to save a file."); }
 
         // Converts SaveFilterOption to FilePickerFileType
         filterOptions ??= [];
@@ -49,15 +41,12 @@ public class FileDialogService
                                       Patterns = filterOption.Patters,
                                   };
 
-        // Get top level from the current control. Alternatively, you can use Window reference instead.
-        var topLevel = TopLevel.GetTopLevel(GuiService.DesktopApplication.MainWindow);
-
         // Start async operation to open the dialog.
         FilePickerSaveOptions filePickerSaveOptions = new FilePickerSaveOptions
         {
             Title = title, FileTypeChoices = filePickerFileTypes.ToArray()
         };
-        var file = await topLevel!.StorageProvider.SaveFilePickerAsync(filePickerSaveOptions).ConfigureAwait(false);
+        var file = await ApplicationServices.Storage.SaveFilePickerAsync(filePickerSaveOptions).ConfigureAwait(false);
         if (file is not null)
         {
             return new StorageFileEntry(file);

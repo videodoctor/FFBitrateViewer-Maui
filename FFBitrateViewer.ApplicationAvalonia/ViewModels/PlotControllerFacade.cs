@@ -232,4 +232,16 @@ public class PlotControllerFacade(
         ImageFormat imageFormat = ImageFormatLookup.FromFileExtension(extension);
         plotControl?.Plot.Save(filePath, 1920, 1080, imageFormat);
     }
+
+    public byte[]? GetPlotImageAsStream()
+    {
+        if (PlotController is null)
+        { return default; }
+
+        PixelSize lastRenderSize = PlotController.Plot.RenderManager.LastRender.FigureRect.Size;
+        Image bmp = PlotController.Plot.GetImage((int)lastRenderSize.Width, (int)lastRenderSize.Height);
+        byte[] bmpBytes = bmp.GetImageBytes();
+     
+        return bmpBytes;
+    }
 }
