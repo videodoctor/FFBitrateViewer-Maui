@@ -70,7 +70,7 @@ public partial class MainViewModel(
 
     private readonly ILogger _logger = logger;
 
-    private static readonly SaveFilterOption SavePlotImagesOption = new (
+    private static readonly SaveFilterOption SavePlotImagesOption = new(
         "All Image formats",
         ["*.bmp", "*.jpg", "*.png", "*.svg", "*.webp"],
         ["public.image"],
@@ -260,7 +260,7 @@ public partial class MainViewModel(
     //private async Task CopyPlotToClipboard(CancellationToken token)
     //{
     //    byte[]? imageBytes = _plotControllerFacade.GetPlotImageAsStream();
-        
+
     //    if (imageBytes is null) 
     //    { return; }
 

@@ -241,7 +241,7 @@ public class PlotControllerFacade(
         PixelSize lastRenderSize = PlotController.Plot.RenderManager.LastRender.FigureRect.Size;
         Image bmp = PlotController.Plot.GetImage((int)lastRenderSize.Width, (int)lastRenderSize.Height);
         byte[] bmpBytes = bmp.GetImageBytes();
-     
+
         return bmpBytes;
     }
 }

@@ -1,9 +1,6 @@
-﻿using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Input;
+﻿using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Services;

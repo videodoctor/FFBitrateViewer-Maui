@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Avalonia;
+using FFBitrateViewer.ApplicationAvalonia.Models.Config;
+using FFBitrateViewer.ApplicationAvalonia.Models.Media;
+using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.IO;
 using System.Threading.Tasks;
-using Avalonia;
-using FFBitrateViewer.ApplicationAvalonia.Models.Config;
-using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Desktop;
 
@@ -49,7 +49,7 @@ class Program
             plotViewTypeOption,
         };
 
-        ApplicationOptionsBinderBase applicationOptionsBinderBase =  new (startTimeAdjustmentOption, exitOption, logCommandsOption, autoRunOption, tempDirOption, filesOption, plotViewTypeOption);
+        ApplicationOptionsBinderBase applicationOptionsBinderBase = new(startTimeAdjustmentOption, exitOption, logCommandsOption, autoRunOption, tempDirOption, filesOption, plotViewTypeOption);
         rootCommand.SetHandler((applicationOptions) =>
         {
             BuildAvaloniaApp(applicationOptions)

@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Extensions.Logging;
 using System;
-using System.Diagnostics;
 
 namespace FFBitrateViewer.ApplicationAvalonia;
 
@@ -44,7 +43,7 @@ public partial class App : Application
 
         // Register all the services needed for the application to run
         var collection = new ServiceCollection();
-        collection.AddLogging( c =>
+        collection.AddLogging(c =>
         {
             var logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)

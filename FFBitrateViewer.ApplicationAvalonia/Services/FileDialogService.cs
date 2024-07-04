@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Platform.Storage;
+﻿using Avalonia.Platform.Storage;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -29,7 +28,8 @@ public class FileDialogService
 
     public async Task<IFileEntry?> SaveAsync(
         string title, params SaveFilterOption[]? filterOptions
-    ) {
+    )
+    {
 
         // Converts SaveFilterOption to FilePickerFileType
         filterOptions ??= [];
@@ -44,7 +44,8 @@ public class FileDialogService
         // Start async operation to open the dialog.
         FilePickerSaveOptions filePickerSaveOptions = new FilePickerSaveOptions
         {
-            Title = title, FileTypeChoices = filePickerFileTypes.ToArray()
+            Title = title,
+            FileTypeChoices = filePickerFileTypes.ToArray()
         };
         var file = await ApplicationServices.Storage.SaveFilePickerAsync(filePickerSaveOptions).ConfigureAwait(false);
         if (file is not null)
