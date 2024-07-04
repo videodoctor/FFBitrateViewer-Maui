@@ -23,7 +23,7 @@
 	<None Update="appsettings.json">
 		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	</None>
-	<None Update="appsettings.development.json">
+	<None Update="appsettings.development.json" Condition="'$(Configuration)' == 'Debug'" >
 		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		<DependentUpon>appsettings.json</DependentUpon>
 	</None>
