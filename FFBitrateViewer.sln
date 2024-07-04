@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.Application
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationAvalonia.Desktop", "FFBitrateViewer.ApplicationAvalonia.Desktop\FFBitrateViewer.ApplicationAvalonia.Desktop.csproj", "{3AE75912-772D-494A-8574-DA9E8F9FF770}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationAvalonia.Browser", "FFBitrateViewer.ApplicationAvalonia.Browser\FFBitrateViewer.ApplicationAvalonia.Browser.csproj", "{68D38951-4F97-4BA8-957A-F47D52918971}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationWPF", "FFBitrateViewer.ApplicationWPF\FFBitrateViewer.ApplicationWPF.csproj", "{ADB8C070-D1AA-44E4-B99F-A9A258A8EE52}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFBitrateViewer.ApplicationAvalonia.Tests", "FFBitrateViewer.ApplicationAvalonia.Tests\FFBitrateViewer.ApplicationAvalonia.Tests.csproj", "{52268157-AD3B-4A04-A608-10F74B1B9B3B}"
@@ -27,10 +25,6 @@ Global
 		{3AE75912-772D-494A-8574-DA9E8F9FF770}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AE75912-772D-494A-8574-DA9E8F9FF770}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AE75912-772D-494A-8574-DA9E8F9FF770}.Release|Any CPU.Build.0 = Release|Any CPU
-		{68D38951-4F97-4BA8-957A-F47D52918971}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{68D38951-4F97-4BA8-957A-F47D52918971}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{68D38951-4F97-4BA8-957A-F47D52918971}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{68D38951-4F97-4BA8-957A-F47D52918971}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ADB8C070-D1AA-44E4-B99F-A9A258A8EE52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ADB8C070-D1AA-44E4-B99F-A9A258A8EE52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADB8C070-D1AA-44E4-B99F-A9A258A8EE52}.Release|Any CPU.ActiveCfg = Release|Any CPU
