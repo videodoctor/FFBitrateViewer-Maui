@@ -1,10 +1,10 @@
 ﻿using FFBitrateViewer.ApplicationAvalonia.Extensions;
 
-namespace FFBitrateViewer.ApplicationAvalonia.Tests.Extensions;
+namespace FFBitrateViewer.ApplicationAvalonia.UnitTests.Extensions;
 
-internal class PrimitiveExtensionsTests
+public class PrimitiveExtensionsTests
 {
-    [Test]
+    [Fact]
     public void ToStringWithNullText()
     {
         // arrange
@@ -15,10 +15,10 @@ internal class PrimitiveExtensionsTests
         var result = PrimitiveExtensions.ToString(optionalBoolean, nullText: nullText);
 
         // assert
-        Assert.That(result, Is.EqualTo(nullText));
+        Assert.Equal(nullText, result);
     }
 
-    [Test]
+    [Fact]
     public void ToStringWithTrueText()
     {
         // arrange
@@ -29,10 +29,10 @@ internal class PrimitiveExtensionsTests
         var result = PrimitiveExtensions.ToString(optionalBoolean, trueText: trueText);
 
         // assert
-        Assert.That(result, Is.EqualTo(trueText));
+        Assert.Equal(trueText, result);
     }
 
-    [Test]
+    [Fact]
     public void ToStringWithFalseText()
     {
         // arrange
@@ -43,10 +43,10 @@ internal class PrimitiveExtensionsTests
         var result = PrimitiveExtensions.ToString(optionalBoolean, falseText: falseText);
 
         // assert
-        Assert.That(result, Is.EqualTo(falseText));
+        Assert.Equal(falseText, result);
     }
 
-    [Test]
+    [Fact]
     public void ToStringWithNullTextAndTrueText()
     {
         // arrange
@@ -58,6 +58,6 @@ internal class PrimitiveExtensionsTests
         var result = PrimitiveExtensions.ToString(optionalBoolean, nullText: nullText, trueText: trueText);
 
         // assert
-        Assert.That(result, Is.EqualTo(nullText));
+        Assert.Equal(nullText, result);
     }
 }
