@@ -230,7 +230,7 @@ public class PlotControllerFacade(
     {
         string extension = Path.GetExtension(filePath);
         ImageFormat imageFormat = ImageFormatLookup.FromFileExtension(extension);
-        plotControl?.Plot.Save(filePath, 1920, 1080, imageFormat);
+        PlotController?.Plot.Save(filePath, 1920, 1080, imageFormat);
     }
 
     public byte[]? GetPlotImageAsStream()
