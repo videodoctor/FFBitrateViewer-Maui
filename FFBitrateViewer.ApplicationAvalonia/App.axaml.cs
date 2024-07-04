@@ -26,13 +26,9 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-
-        string workingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-#if DEBUG
-        workingDirectory = Environment.CurrentDirectory;
-#endif
+        // Creates the configuration
         var configuration = new ConfigurationBuilder()
-            .SetBasePath(workingDirectory)
+            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddJsonFile("appsettings.json", Design.IsDesignMode)
             .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("FFBITRATEVIEWER_ENVIRONMENT") ?? "Production"}.json", true)
             .Build();
