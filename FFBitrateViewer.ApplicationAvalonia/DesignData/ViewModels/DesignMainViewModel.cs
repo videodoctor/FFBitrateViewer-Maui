@@ -1,12 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
+using FFBitrateViewer.ApplicationAvalonia.ViewModels;
 using ScottPlot;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FFBitrateViewer.ApplicationAvalonia.ViewModels.DesignData;
+namespace FFBitrateViewer.ApplicationAvalonia.DesignData.ViewModels;
 
 public partial class DesignMainViewModel : ViewModelBase
 {
