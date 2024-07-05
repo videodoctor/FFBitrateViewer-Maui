@@ -38,7 +38,7 @@ public class FFProbeClient(
     public string FFProbeFilePath { get => _fFProbeFilePath ??= WhichFFProbe(); }
     private string? _fFProbeFilePath;
 
-    private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         NumberHandling = JsonNumberHandling.AllowReadingFromString
     };
