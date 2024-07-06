@@ -12,4 +12,5 @@ public class ApplicationOptions
     public string TempDir { get; set; } = string.Empty;
     public List<string> Files { get; set; } = [];
     public PlotViewType PlotView { get; set; }
+    public string FFProbeFilePath { get; set; } = string.Empty;
 }

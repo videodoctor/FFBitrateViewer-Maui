@@ -61,6 +61,7 @@ public partial class App : Application
                 options.TempDir = ApplicationOptions.TempDir;
                 options.Files = ApplicationOptions.Files;
                 options.PlotView = ApplicationOptions.PlotView;
+                options.FFProbeFilePath = ApplicationOptions.FFProbeFilePath;
             }));
 
         // Creates a ServiceProvider containing services from the provided IServiceCollection

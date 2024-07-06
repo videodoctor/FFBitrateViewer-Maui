@@ -1,5 +1,7 @@
-﻿using Hmb.ProcessRunner;
+﻿using FFBitrateViewer.ApplicationAvalonia.Models.Config;
+using Hmb.ProcessRunner;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Sylvan.Data.Csv;
 using System;
 using System.IO;
@@ -19,6 +21,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 /// </summary>
 public class FFProbeClient(
     ProcessService processService,
+    IOptions<Models.Config.ApplicationOptions> applicationOptions,
     ILogger<FFProbeClient> logger
     )
 {
@@ -29,14 +32,14 @@ public class FFProbeClient(
     // For hierarchical structures with "reasonable" size we use JSON with System.Text.Json parser.
 
     private readonly ProcessService _processService = processService;
-
+    private readonly ApplicationOptions _applicationOptions = applicationOptions.Value;
     private readonly ILogger _logger = logger;
 
     /// <summary>
     /// Returns the full path of ffprobe executable.
     /// </summary>
     public string FFProbeFilePath { get => _fFProbeFilePath ??= WhichFFProbe(); }
-    private string? _fFProbeFilePath;
+    private string? _fFProbeFilePath = null;
 
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
@@ -45,14 +48,23 @@ public class FFProbeClient(
 
     private string WhichFFProbe()
     {
-        var fFProbeFileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ffprobe.exe" : "ffprobe";
-        var fFProbeFilePaths = _processService.Which(fFProbeFileName);
-        if (!fFProbeFilePaths.Any())
+        if (string.IsNullOrEmpty(_applicationOptions.FFProbeFilePath))
         {
-            throw new FFProbeClientException($"Executable {fFProbeFileName} was not found.");
+            var fFProbeFileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ffprobe.exe" : "ffprobe";
+            var fFProbeFilePaths = _processService.Which(fFProbeFileName);
+            if (!fFProbeFilePaths.Any())
+            {
+                throw new FFProbeClientException($"Executable {fFProbeFileName} was not found.");
+            }
+            return fFProbeFilePaths.First();
         }
-        return fFProbeFilePaths.First();
 
+        if (!File.Exists(_applicationOptions.FFProbeFilePath))
+        {
+            throw new FFProbeClientException($"Executable: '{_applicationOptions.FFProbeFilePath}' was not found");
+        }
+
+        return _applicationOptions.FFProbeFilePath;
     }
 
     /// <summary>

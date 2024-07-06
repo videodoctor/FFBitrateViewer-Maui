@@ -16,7 +16,8 @@ public class ApplicationOptionsBinderBase
     Option<bool> autoRunOption,
     Option<DirectoryInfo> tempDirOption,
     Option<List<FileInfo>> filesOption,
-    Option<PlotViewType> plotViewTypeOption
+    Option<PlotViewType> plotViewTypeOption,
+    Option<string> ffprobeFilePathOption
 )
     : BinderBase<Models.Config.ApplicationOptions>
 {
@@ -35,6 +36,8 @@ public class ApplicationOptionsBinderBase
 
     private readonly Option<PlotViewType> _plotViewTypeOption = plotViewTypeOption;
 
+    private readonly Option<string> _ffprobeFilePathOption = ffprobeFilePathOption;
+
     protected override ApplicationOptions GetBoundValue(BindingContext bindingContext)
         => new ApplicationOptions
         {
@@ -45,5 +48,6 @@ public class ApplicationOptionsBinderBase
             TempDir = bindingContext.ParseResult.GetValueForOption(_tempDirOption)!.FullName,
             Files = bindingContext.ParseResult.GetValueForOption(_filesOption)!.Select(fi => fi.FullName).ToList(),
             PlotView = bindingContext.ParseResult.GetValueForOption(_plotViewTypeOption)!,
+            FFProbeFilePath = bindingContext.ParseResult.GetValueForOption(_ffprobeFilePathOption)!,
         };
 }

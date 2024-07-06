@@ -38,6 +38,9 @@ class Program
         var plotViewTypeOption = new Option<PlotViewType>("--PlotViewType", getDefaultValue: () => PlotViewType.FrameBased, "The kind of plot view selected by default");
         plotViewTypeOption.AddAlias("-p");
 
+        var ffprobeFilePathOption = new Option<string>("--FFProbeFilePath", getDefaultValue: () => string.Empty, "The path to the executable ffprobe file");
+        ffprobeFilePathOption.AddAlias("-x");
+
         var rootCommand = new RootCommand("Visualizes video bitrate received by ffprobe (https://ffmpeg.org/)")
         {
             startTimeAdjustmentOption,
@@ -47,9 +50,19 @@ class Program
             tempDirOption,
             filesOption,
             plotViewTypeOption,
+            ffprobeFilePathOption
         };
 
-        ApplicationOptionsBinderBase applicationOptionsBinderBase = new(startTimeAdjustmentOption, exitOption, logCommandsOption, autoRunOption, tempDirOption, filesOption, plotViewTypeOption);
+        ApplicationOptionsBinderBase applicationOptionsBinderBase = new(
+            startTimeAdjustmentOption, 
+            exitOption, 
+            logCommandsOption, 
+            autoRunOption, 
+            tempDirOption, 
+            filesOption, 
+            plotViewTypeOption,
+            ffprobeFilePathOption
+        );
         rootCommand.SetHandler((applicationOptions) =>
         {
             BuildAvaloniaApp(applicationOptions)
