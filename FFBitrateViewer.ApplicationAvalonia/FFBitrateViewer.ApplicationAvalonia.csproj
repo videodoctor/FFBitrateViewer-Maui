@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.0.11" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.11" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.11" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.11" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.11" />
@@ -41,5 +42,14 @@
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="ScottPlot" Version="5.0.36" />
     <PackageReference Include="ScottPlot.Avalonia" Version="5.0.36" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\BitRateView.axaml.cs">
+      <DependentUpon>BitRateView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MainWindowView.axaml.cs">
+      <DependentUpon>MainWindowView.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

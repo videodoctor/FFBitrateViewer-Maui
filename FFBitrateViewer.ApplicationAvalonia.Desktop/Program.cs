@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.ReactiveUI;
 using FFBitrateViewer.ApplicationAvalonia.Models.Config;
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 using System;
@@ -78,6 +79,7 @@ class Program
 
     public static AppBuilder BuildAvaloniaApp(ApplicationOptions? applicationOptions)
         => AppBuilder.Configure(() => new App() { ApplicationOptions = applicationOptions })
+            .UseReactiveUI()
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();

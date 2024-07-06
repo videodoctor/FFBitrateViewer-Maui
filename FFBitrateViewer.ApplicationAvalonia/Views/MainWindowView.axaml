@@ -1,0 +1,48 @@
+<rxui:ReactiveWindow
+        xmlns="https://github.com/avaloniaui"
+        xmlns:rxui="http://reactiveui.net"
+        x:TypeArguments="vm:MainWindowViewModel"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FFBitrateViewer.ApplicationAvalonia.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:FFBitrateViewer.ApplicationAvalonia.Views"
+        xmlns:services="using:FFBitrateViewer.ApplicationAvalonia.Services"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:DesignData="using:FFBitrateViewer.ApplicationAvalonia.DesignData.ViewModels"
+        x:Class="FFBitrateViewer.ApplicationAvalonia.Views.MainWindowView"
+        x:DataType="vm:MainWindowViewModel"
+        x:CompileBindings="True"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+        Height="620" MinHeight="540"
+        Width="960" MinWidth="700"
+        Icon="/Assets/avalonia-logo.ico"
+        x:Name="MainWindow"
+        Title="FFBitrateViewer.ApplicationAvalonia">
+
+    <i:Interaction.Behaviors>
+        <ia:EventTriggerBehavior EventName="Loaded" SourceObject="MainWindow">
+            <ia:InvokeCommandAction Command="{Binding LoadedCommand, Mode=OneTime}" />
+        </ia:EventTriggerBehavior>
+    </i:Interaction.Behaviors>
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+		<DesignData:DesignMainWindowViewModel />
+    </Design.DataContext>
+
+    <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
+        <rxui:RoutedViewHost.DefaultContent>
+            <TextBlock Text="FF Bitrate Viewer"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+        </rxui:RoutedViewHost.DefaultContent>
+        <rxui:RoutedViewHost.ViewLocator>
+            <!-- See AppViewLocator.cs section below -->
+			<services:AppViewLocator/>
+        </rxui:RoutedViewHost.ViewLocator>
+    </rxui:RoutedViewHost>
+
+</rxui:ReactiveWindow>

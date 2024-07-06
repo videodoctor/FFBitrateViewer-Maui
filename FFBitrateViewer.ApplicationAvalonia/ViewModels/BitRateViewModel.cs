@@ -4,8 +4,10 @@ using FFBitrateViewer.ApplicationAvalonia.Models.Config;
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using ReactiveUI;
 using ScottPlot;
 using System;
 using System.Collections.Generic;
@@ -19,14 +21,16 @@ using System.Threading.Tasks;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
-public partial class MainViewModel(
+public partial class BitRateViewModel(
     GuiService guiService,
     FileDialogService fileDialogService,
     FFProbeClient probeAppClient,
     IEnumerable<IPlotStrategy> plotStrategies,
-    ILogger<MainViewModel> logger,
-    IOptions<Models.Config.ApplicationOptions> applicationOptions
-    ) : ViewModelBase
+    ILogger<BitRateViewModel> logger,
+    IOptions<Models.Config.ApplicationOptions> applicationOptions,
+    IScreen screen,
+    IServiceProvider serviceProvider
+    ) : RoutableViewModelBase(screen, nameof(BitRateViewModel))
 {
 
     [ObservableProperty]
@@ -69,7 +73,7 @@ public partial class MainViewModel(
     private readonly ApplicationOptions _applicationOptions = applicationOptions.Value;
 
     private readonly ILogger _logger = logger;
-
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
     private static readonly SaveFilterOption SavePlotImagesOption = new(
         "All Image formats",
         ["*.bmp", "*.jpg", "*.png", "*.svg", "*.webp"],
@@ -77,9 +81,14 @@ public partial class MainViewModel(
         ["image/*"]
     );
 
+    private bool _hasBeenLoaded = false;
+
     [RelayCommand]
     private async Task OnLoaded(CancellationToken token)
     {
+        if (_hasBeenLoaded)
+        { return; }
+
         // Sets the plot view based on the CLI input
         SetPlotViewType(_applicationOptions.PlotView);
 
@@ -101,6 +110,7 @@ public partial class MainViewModel(
             await ToggleOnOffPlotterPlotter(token).ConfigureAwait(false);
         }
 
+        _hasBeenLoaded = true;
     }
 
     [RelayCommand]
@@ -255,6 +265,14 @@ public partial class MainViewModel(
         _plotControllerFacade.SavePlotImage(file.Path.LocalPath);
 
     }
+
+    [RelayCommand]
+    private void GoToAboutView()
+    {
+        AboutViewModel aboutViewModel = _serviceProvider.GetService<AboutViewModel>()!;
+        HostScreen.Router.Navigate.Execute(aboutViewModel);
+    }
+
 
     //[RelayCommand]
     //private async Task CopyPlotToClipboard(CancellationToken token)

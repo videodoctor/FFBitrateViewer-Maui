@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FFBitrateViewer.ApplicationAvalonia.DesignData.ViewModels;
 
-public partial class DesignMainViewModel : ViewModelBase
+public partial class DesignBitRateViewModel : ViewModelBase
 {
     [ObservableProperty]
     private string _version = string.Empty;
@@ -60,5 +60,8 @@ public partial class DesignMainViewModel : ViewModelBase
 
     [RelayCommand]
     private async Task SavePlotToFile(CancellationToken token) { await Task.Yield(); }
+
+    [RelayCommand]
+    private void GoToAboutView() { }
 
 }

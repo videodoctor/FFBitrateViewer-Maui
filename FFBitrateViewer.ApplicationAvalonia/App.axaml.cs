@@ -19,6 +19,8 @@ public partial class App : Application
 {
     public Models.Config.ApplicationOptions? ApplicationOptions { get; set; }
 
+    internal IServiceProvider? ServiceProvider { get; private set; }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -66,22 +68,23 @@ public partial class App : Application
 
         // Creates a ServiceProvider containing services from the provided IServiceCollection
         var services = collection.BuildServiceProvider();
+        ServiceProvider = services;
 
         Microsoft.Extensions.Logging.ILogger logger = services.GetService<ILogger<App>>()!;
         logger.LogInformation("Command Line: {commandLine}", Environment.CommandLine);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
+            desktop.MainWindow = new MainWindowView
             {
-                DataContext = services.GetRequiredService<MainViewModel>()
+                DataContext = services.GetRequiredService<ReactiveUI.IScreen>()
             };
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
-            singleViewPlatform.MainView = new MainView
+            singleViewPlatform.MainView = new MainWindowView
             {
-                DataContext = services.GetRequiredService<MainViewModel>()
+                DataContext = services.GetRequiredService<ReactiveUI.IScreen>()
             };
         }
 

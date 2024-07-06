@@ -1,8 +1,10 @@
 ﻿using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 using FFBitrateViewer.ApplicationAvalonia.ViewModels;
+using FFBitrateViewer.ApplicationAvalonia.Views;
 using Hmb.ProcessRunner;
 using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
 
 namespace FFBitrateViewer.ApplicationAvalonia;
 
@@ -21,9 +23,16 @@ public static class ServiceCollectionExtensions
 
     public static void AddFFBitrateViewerViewModels(this IServiceCollection collection)
     {
-        collection.AddTransient<FileItemViewModel>();
-        collection.AddTransient<MainViewModel>();
-        collection.AddTransient<ViewModelBase>();
+        // Views
+        collection.AddSingleton<BitRateView>();
+        collection.AddSingleton<AboutView>();
+
+        // ViewModels
+        collection.AddSingleton<FileItemViewModel>();
+        collection.AddSingleton<BitRateViewModel>();
+        collection.AddSingleton<AboutViewModel>();
+
+        collection.AddSingleton<IScreen, MainWindowViewModel>();
     }
 
 }
