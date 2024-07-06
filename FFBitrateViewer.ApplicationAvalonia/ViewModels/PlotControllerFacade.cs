@@ -205,13 +205,17 @@ public class PlotControllerFacade(
 
             _markerHighlightText.IsVisible = true;
             _markerHighlightText.Location = dataPoint.Coordinates;
-            _markerHighlightText.LabelText = $"{PlotStrategy.AxisXTickLabelPrefix} = {PlotStrategy.AxisXValueToString(dataPoint.X)}{PlotStrategy.AxisXTickLabelSuffix}{Environment.NewLine}{PlotStrategy.AxisYTickLabelPrefix} = {PlotStrategy.AxisYValueToString(dataPoint.Y)} {PlotStrategy.AxisYTickLabelSuffix}";
+            string seriesDescription = $"Filename: {scatter.LegendText}";
+            string axisXDescription = $"{PlotStrategy.AxisXTickLabelPrefix} = {PlotStrategy.AxisXValueToString(dataPoint.X)}{PlotStrategy.AxisXTickLabelSuffix}";
+            string axisYDescription = $"{PlotStrategy.AxisYTickLabelPrefix} = {PlotStrategy.AxisYValueToString(dataPoint.Y)} {PlotStrategy.AxisYTickLabelSuffix}";
+            _markerHighlightText.LabelText = $"{seriesDescription}{Environment.NewLine}{axisXDescription}{Environment.NewLine}{axisYDescription}";
             _markerHighlightText.LabelFontColor = scatter.MarkerStyle.FillColor;
             _markerHighlightText.LabelBackgroundColor = Colors.Black.WithAlpha(128);
 
             avaPlot.Refresh();
             //string text = $"Selected Scatter={scatter.LegendText}, Index={point.Index}, X={point.X:0.##}, Y={point.Y:0.##}";
             //Debug.WriteLine(text);
+            PlotController?.Plot.Title($"{seriesDescription} {axisXDescription} {axisYDescription}");
         }
 
         // hide the crosshair, marker and text when no point is selected
@@ -223,6 +227,8 @@ public class PlotControllerFacade(
             avaPlot.Refresh();
             //string text = $"No point selected";
             //Debug.WriteLine(text);
+            PlotController?.Plot.Title("No point selected");
+
         }
     }
 
