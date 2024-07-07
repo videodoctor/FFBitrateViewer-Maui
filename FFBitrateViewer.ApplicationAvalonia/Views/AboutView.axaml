@@ -59,11 +59,11 @@
 									Padding="5">
 									<StackPanel>
 										<TextBlock Text="{Binding PackageId,Mode=OneTime}" FontWeight="Bold"/>
-										<TextBlock Text="{Binding PackageVersion,Mode=OneTime}"/>
+										<TextBlock Text="{Binding PackageVersion,Mode=OneTime,StringFormat='v{0}'}"/>
 										<TextBlock Text="{Binding PackageProjectUrl,Mode=OneTime}"/>
 										<TextBlock Text="{Binding Copyright,Mode=OneTime}"/>
-										<TextBlock Text="{Binding Authors,Mode=OneTime}"/>
-										<TextBlock Text="{Binding License,Mode=OneTime}"/>
+										<TextBlock Text="{Binding Authors,Mode=OneTime,StringFormat='Authored by {0}'}"/>
+										<TextBlock Text="{Binding License,Mode=OneTime,StringFormat='License: {0}'}"/>
 										<TextBlock Text="{Binding LicenseUrl,Mode=OneTime}"/>
 									</StackPanel>
 								</Border>
