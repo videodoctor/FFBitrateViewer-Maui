@@ -43,7 +43,7 @@ public class AppViewLocator : IViewLocator
 }
 
 [Serializable]
-public class AppViewLocatorException : Exception
+public class AppViewLocatorException : FFBitrateViewerException
 {
     public AppViewLocatorException() { }
     public AppViewLocatorException(string message) : base(message) { }
