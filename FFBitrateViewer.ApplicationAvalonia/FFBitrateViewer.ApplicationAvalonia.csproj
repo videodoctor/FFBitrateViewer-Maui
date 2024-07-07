@@ -15,6 +15,13 @@
     <Content Remove="C:\Users\hfmad\.nuget\packages\hmb.processrunner\1.0.4\contentFiles\any\net8.0\README.md" />
   </ItemGroup>
 
+  
+  <ItemGroup>
+    <Content Include="Content\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.0.11" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.11" />

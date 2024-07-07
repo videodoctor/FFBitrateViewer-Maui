@@ -6,13 +6,72 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:FFBitrateViewer.ApplicationAvalonia.ViewModels"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:DesignData="using:FFBitrateViewer.ApplicationAvalonia.DesignData.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="FFBitrateViewer.ApplicationAvalonia.Views.AboutView">
+             x:Class="FFBitrateViewer.ApplicationAvalonia.Views.AboutView"
+						  x:Name="AboutViewUserControl" >
+	<!--<rxui:ReactiveUserControl.Styles>
+		<Style Selector="Button.hyperlink">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<TextBlock Text="{TemplateBinding Content}" Foreground="{StaticResource SystemAccentColor}" TextDecorations="Underline">
+						<TextBlock.Styles>
+							<Style Selector="TextBlock:pointerover">
+								<Setter Property="Foreground" Value="{StaticResource SystemAccentColorLight1}"/>
+							</Style>
+						</TextBlock.Styles>
+					</TextBlock>
+				</ControlTemplate>
+			</Setter>
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+		</Style>
+	</rxui:ReactiveUserControl.Styles>-->
+	<i:Interaction.Behaviors>
+		<ia:EventTriggerBehavior EventName="Loaded" SourceObject="AboutViewUserControl">
+			<ia:InvokeCommandAction Command="{Binding LoadedCommand,Mode=OneTime}" />
+		</ia:EventTriggerBehavior>
+	</i:Interaction.Behaviors>
+	
 	<Design.DataContext>
 		<!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
 		<DesignData:DesignAboutViewModel />
 	</Design.DataContext>
-	<Button Command="{Binding GoBackCommand,Mode=OneTime}" >go back</Button>
+	<Grid RowDefinitions="Auto,*">
+		<Border Grid.Row="0">
+			<Button Command="{Binding GoBackCommand,Mode=OneTime}" >go back</Button>
+
+		</Border>
+
+		<Border Grid.Row="1">
+			<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+				<StackPanel Margin="20">
+					<TextBlock Margin="0 5">Third Party Libraries</TextBlock>
+					<ItemsControl ItemsSource="{Binding ThirdPartyPackages,Mode=OneTime}" >
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Border Margin="0,10,0,0"
+									CornerRadius="5"
+									BorderBrush="Gray" BorderThickness="1"
+									Padding="5">
+									<StackPanel>
+										<TextBlock Text="{Binding PackageId,Mode=OneTime}" FontWeight="Bold"/>
+										<TextBlock Text="{Binding PackageVersion,Mode=OneTime}"/>
+										<TextBlock Text="{Binding PackageProjectUrl,Mode=OneTime}"/>
+										<TextBlock Text="{Binding Copyright,Mode=OneTime}"/>
+										<TextBlock Text="{Binding Authors,Mode=OneTime}"/>
+										<TextBlock Text="{Binding License,Mode=OneTime}"/>
+										<TextBlock Text="{Binding LicenseUrl,Mode=OneTime}"/>
+									</StackPanel>
+								</Border>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</StackPanel>
+			</ScrollViewer>
+		</Border>
+	</Grid>
 </rxui:ReactiveUserControl>

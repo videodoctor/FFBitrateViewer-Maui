@@ -1,0 +1,350 @@
+[
+  {
+    "PackageId": "Avalonia",
+    "PackageVersion": "11.0.11",
+    "PackageProjectUrl": "https://avaloniaui.net/",
+    "Copyright": "Copyright 2013-2024 \u00A9 The AvaloniaUI Project",
+    "Authors": "Avalonia Team",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Avalonia.Controls.DataGrid",
+    "PackageVersion": "11.0.11",
+    "PackageProjectUrl": "https://avaloniaui.net/",
+    "Copyright": "Copyright 2013-2024 \u00A9 The AvaloniaUI Project",
+    "Authors": "Avalonia Team",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Avalonia.Desktop",
+    "PackageVersion": "11.0.11",
+    "PackageProjectUrl": "https://avaloniaui.net/",
+    "Copyright": "Copyright 2013-2024 \u00A9 The AvaloniaUI Project",
+    "Authors": "Avalonia Team",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Avalonia.Diagnostics",
+    "PackageVersion": "11.0.11",
+    "PackageProjectUrl": "https://avaloniaui.net/",
+    "Copyright": "Copyright 2013-2024 \u00A9 The AvaloniaUI Project",
+    "Authors": "Avalonia Team",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Avalonia.Fonts.Inter",
+    "PackageVersion": "11.0.11",
+    "PackageProjectUrl": "https://avaloniaui.net/",
+    "Copyright": "Copyright 2013-2024 \u00A9 The AvaloniaUI Project",
+    "Authors": "Avalonia Team",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Avalonia.ReactiveUI",
+    "PackageVersion": "11.0.11",
+    "PackageProjectUrl": "https://avaloniaui.net/",
+    "Copyright": "Copyright 2013-2024 \u00A9 The AvaloniaUI Project",
+    "Authors": "Avalonia Team",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Avalonia.Themes.Fluent",
+    "PackageVersion": "11.0.11",
+    "PackageProjectUrl": "https://avaloniaui.net/",
+    "Copyright": "Copyright 2013-2024 \u00A9 The AvaloniaUI Project",
+    "Authors": "Avalonia Team",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Avalonia.Xaml.Behaviors",
+    "PackageVersion": "11.0.10.9",
+    "PackageProjectUrl": "https://github.com/wieslawsoltes/AvaloniaBehaviors",
+    "Copyright": "Copyright \u00A9 Wies\u0142aw \u0160olt\u00E9s 2024",
+    "Authors": "Wies\u0142aw \u0160olt\u00E9s",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "bodong.Avalonia.PropertyGrid",
+    "PackageVersion": "11.0.10.1",
+    "PackageProjectUrl": "https://github.com/bodong1987/Avalonia.PropertyGrid",
+    "Authors": "bodong",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "bodong.PropertyModels",
+    "PackageVersion": "11.0.10.1",
+    "PackageProjectUrl": "https://github.com/bodong1987/Avalonia.PropertyGrid",
+    "Authors": "bodong",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "CommunityToolkit.Mvvm",
+    "PackageVersion": "8.2.2",
+    "PackageProjectUrl": "https://github.com/CommunityToolkit/dotnet",
+    "Copyright": "(c) .NET Foundation and Contributors. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "coverlet.collector",
+    "PackageVersion": "6.0.2",
+    "PackageProjectUrl": "https://github.com/coverlet-coverage/coverlet",
+    "Authors": "tonerdo",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Hmb.ProcessRunner",
+    "PackageVersion": "1.0.4",
+    "PackageProjectUrl": "https://github.com/hmadrigal/Hmb.ProcessRunner",
+    "Authors": "Hmb.ProcessRunner",
+    "ValidationErrors": [
+      {
+        "Error": "No license information found",
+        "Context": "D:\\projects\\github\\FFBitrateViewer-Maui\\FFBitrateViewer.ApplicationAvalonia\\FFBitrateViewer.ApplicationAvalonia.csproj"
+      }
+    ],
+    "LicenseInformationOrigin": 2
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Configuration.Json",
+    "PackageVersion": "8.0.0",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.DependencyInjection",
+    "PackageVersion": "8.0.0",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Logging",
+    "PackageVersion": "8.0.0",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Options",
+    "PackageVersion": "8.0.2",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.NET.Test.Sdk",
+    "PackageVersion": "17.10.0",
+    "PackageProjectUrl": "https://github.com/microsoft/vstest",
+    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Newtonsoft.Json",
+    "PackageVersion": "13.0.3",
+    "PackageProjectUrl": "https://www.newtonsoft.com/json",
+    "Copyright": "Copyright \u00A9 James Newton-King 2008",
+    "Authors": "James Newton-King",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "OxyPlot.Core",
+    "PackageVersion": "2.1.2",
+    "PackageProjectUrl": "https://oxyplot.github.io/",
+    "Copyright": "Copyright (c) 2014 OxyPlot contributors",
+    "Authors": "OxyPlot",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "OxyPlot.SkiaSharp.Wpf",
+    "PackageVersion": "2.1.2",
+    "PackageProjectUrl": "https://oxyplot.github.io/",
+    "Copyright": "OxyPlot contributors",
+    "Authors": "OxyPlot.SkiaSharp.Wpf",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "OxyPlot.Wpf",
+    "PackageVersion": "2.1.2",
+    "PackageProjectUrl": "https://oxyplot.github.io/",
+    "Copyright": "OxyPlot contributors",
+    "Authors": "OxyPlot.Wpf",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "ScottPlot",
+    "PackageVersion": "5.0.36",
+    "PackageProjectUrl": "https://scottplot.net/",
+    "Authors": "Scott Harden",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "ScottPlot.Avalonia",
+    "PackageVersion": "5.0.36",
+    "PackageProjectUrl": "https://scottplot.net/",
+    "Authors": "Scott Harden",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Serilog.Enrichers.Environment",
+    "PackageVersion": "3.0.1",
+    "PackageProjectUrl": "https://github.com/serilog/serilog-enrichers-environment",
+    "Authors": "Serilog Contributors",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Serilog.Extensions.Logging",
+    "PackageVersion": "8.0.0",
+    "PackageProjectUrl": "https://github.com/serilog/serilog-extensions-logging",
+    "Authors": "Microsoft,Serilog Contributors",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Serilog.Settings.Configuration",
+    "PackageVersion": "8.0.1",
+    "PackageProjectUrl": "https://github.com/serilog/serilog-settings-configuration",
+    "Authors": "Serilog Contributors",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Serilog.Sinks.Debug",
+    "PackageVersion": "3.0.0",
+    "PackageProjectUrl": "https://github.com/serilog/serilog-sinks-debug",
+    "Authors": "Serilog Contributors",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Serilog.Sinks.File",
+    "PackageVersion": "6.0.0",
+    "PackageProjectUrl": "https://github.com/serilog/serilog-sinks-file",
+    "Authors": "Serilog Contributors",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Sylvan.Data.Csv",
+    "PackageVersion": "1.3.9",
+    "PackageProjectUrl": "https://github.com/MarkPflug/Sylvan",
+    "Copyright": "\u00A9 2024 Mark Pflug",
+    "Authors": "Mark Pflug",
+    "ValidationErrors": [
+      {
+        "Error": "Validation for licenses of type File not yet supported",
+        "Context": "D:\\projects\\github\\FFBitrateViewer-Maui\\FFBitrateViewer.ApplicationAvalonia\\FFBitrateViewer.ApplicationAvalonia.csproj"
+      }
+    ],
+    "LicenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "LicenseInformationOrigin": 2
+  },
+  {
+    "PackageId": "System.CommandLine",
+    "PackageVersion": "2.0.0-beta4.22272.1",
+    "PackageProjectUrl": "https://github.com/dotnet/command-line-api",
+    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "System.CommandLine.NamingConventionBinder",
+    "PackageVersion": "2.0.0-beta4.22272.1",
+    "PackageProjectUrl": "https://github.com/dotnet/command-line-api",
+    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "System.Linq.Async",
+    "PackageVersion": "6.0.1",
+    "PackageProjectUrl": "https://github.com/dotnet/reactive",
+    "Copyright": "Copyright (c) .NET Foundation and Contributors.",
+    "Authors": ".NET Foundation and Contributors",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "xunit",
+    "PackageVersion": "2.8.1",
+    "PackageProjectUrl": "",
+    "Copyright": "Copyright (C) .NET Foundation",
+    "Authors": "jnewkirk,bradwilson",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "xunit.runner.visualstudio",
+    "PackageVersion": "2.8.1",
+    "PackageProjectUrl": "",
+    "Copyright": "Copyright (C) .NET Foundation",
+    "Authors": "jnewkirk,bradwilson",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  }
+]
