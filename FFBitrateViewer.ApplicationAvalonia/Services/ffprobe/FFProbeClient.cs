@@ -155,10 +155,6 @@ public class FFProbeClient(
 
         standardOutputMemoryStream.Seek(0, SeekOrigin.Begin);
 
-
-
-        standardOutputMemoryStream.Seek(0, SeekOrigin.Begin);
-
         var mediaInfo = await JsonSerializer.DeserializeAsync<FFProbeJsonOutput>(standardOutputMemoryStream, _jsonSerializerOptions, cancellationToken).ConfigureAwait(false);
 
         return mediaInfo!;
