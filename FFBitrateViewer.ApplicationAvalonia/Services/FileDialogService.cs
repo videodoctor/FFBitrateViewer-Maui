@@ -12,22 +12,37 @@ public class FileDialogService
 {
     public async Task<IList<IFileEntry>> OpenAsync(
         string title = "Open media file",
-        bool isSingleFileSelection = true
+        bool isSingleFileSelection = true, 
+        params OpenFileFilterOption[]? filterOptions 
     )
     {
+        // Converts OpenFileFilterOption to FilePickerFileType
+        filterOptions ??= [];
+        var filePickerFileTypes = from filterOption in filterOptions
+                                  select new FilePickerFileType(filterOption.Name)
+                                  {
+                                      AppleUniformTypeIdentifiers = filterOption.AppleUniformTypeIdentifiers,
+                                      MimeTypes = filterOption.MimeTypes,
+                                      Patterns = filterOption.Patters,
+                                  };
+
         // Start async operation to open the dialog.
-        var files = await ApplicationServices.Storage.OpenFilePickerAsync(new FilePickerOpenOptions
+        FilePickerOpenOptions filePickerOpenOptions = new FilePickerOpenOptions
         {
             Title = title,
-            AllowMultiple = !isSingleFileSelection
-        });
-
+            AllowMultiple = !isSingleFileSelection,
+            FileTypeFilter = filePickerFileTypes.ToArray()
+        };
+        var files = await ApplicationServices.Storage.OpenFilePickerAsync(filePickerOpenOptions).ConfigureAwait(false);
+        
+        if (files is null)
+        { return ImmutableList<IFileEntry>.Empty; }
 
         return files.Select(f => new StorageFileEntry(f)).OfType<IFileEntry>().ToImmutableList();
     }
 
     public async Task<IFileEntry?> SaveAsync(
-        string title, params SaveFilterOption[]? filterOptions
+        string title, params SaveFileFilterOption[]? filterOptions
     )
     {
 
@@ -57,11 +72,26 @@ public class FileDialogService
     }
 }
 
-public record SaveFilterOption(
+public record FileFilterOption(
         string? Name = null,
         string[]? Patters = null,
         string[]? MimeTypes = null,
         string[]? AppleUniformTypeIdentifiers = null);
+
+public record OpenFileFilterOption(
+        string? Name = null,
+        string[]? Patters = null,
+        string[]? MimeTypes = null,
+        string[]? AppleUniformTypeIdentifiers = null) 
+    : FileFilterOption(Name, Patters,MimeTypes, AppleUniformTypeIdentifiers);
+
+public record SaveFileFilterOption(
+        string? Name = null,
+        string[]? Patters = null,
+        string[]? MimeTypes = null,
+        string[]? AppleUniformTypeIdentifiers = null)
+    : FileFilterOption(Name, Patters, MimeTypes, AppleUniformTypeIdentifiers);
+
 
 public class StorageFileEntry(IStorageFile storageFile) : IFileEntry
 {

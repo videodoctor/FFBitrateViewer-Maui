@@ -80,11 +80,18 @@ public partial class BitRateViewModel(
 
     private readonly ILogger _logger = logger;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
-    private static readonly SaveFilterOption SavePlotImagesOption = new(
+    private static readonly SaveFileFilterOption SavePlotImagesOption = new(
         "All Image formats",
         ["*.bmp", "*.jpg", "*.png", "*.svg", "*.webp"],
         ["public.image"],
         ["image/*"]
+    );
+
+    private static readonly OpenFileFilterOption OpenVideoFilesOption = new(
+        "All Video formats",
+        ["*.264", "*.avi", "*.avs", "*.h264", "*.hevc", "*.m2ts", "*.mkv", "*.mov", "*.mp4", "*.mpeg", "*.mpg", "*.mts", "*.mxf", "*.ts", "*.webm"],
+        ["public.video"],
+        ["video/*"]
     );
 
     private bool _hasBeenLoaded = false;
@@ -149,8 +156,7 @@ public partial class BitRateViewModel(
     [RelayCommand]
     private async Task AddFiles(CancellationToken token)
     {
-
-        IEnumerable<IFileEntry> fileInfoEntries = await _fileDialogService.OpenAsync(isSingleFileSelection: false).ConfigureAwait(false);
+        IEnumerable<IFileEntry> fileInfoEntries = await _fileDialogService.OpenAsync("Open video file", false, OpenVideoFilesOption).ConfigureAwait(false);
 
         // Prevent duplicated files by name.
         StringComparer stringComparer = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
