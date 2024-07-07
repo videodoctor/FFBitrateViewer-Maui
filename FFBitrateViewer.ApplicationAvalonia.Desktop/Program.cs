@@ -55,12 +55,12 @@ class Program
         };
 
         ApplicationOptionsBinderBase applicationOptionsBinderBase = new(
-            startTimeAdjustmentOption, 
-            exitOption, 
-            logCommandsOption, 
-            autoRunOption, 
-            tempDirOption, 
-            filesOption, 
+            startTimeAdjustmentOption,
+            exitOption,
+            logCommandsOption,
+            autoRunOption,
+            tempDirOption,
+            filesOption,
             plotViewTypeOption,
             ffprobeFilePathOption
         );

@@ -12,8 +12,8 @@ public class FileDialogService
 {
     public async Task<IList<IFileEntry>> OpenAsync(
         string title = "Open media file",
-        bool isSingleFileSelection = true, 
-        params OpenFileFilterOption[]? filterOptions 
+        bool isSingleFileSelection = true,
+        params OpenFileFilterOption[]? filterOptions
     )
     {
         // Converts OpenFileFilterOption to FilePickerFileType
@@ -34,7 +34,7 @@ public class FileDialogService
             FileTypeFilter = filePickerFileTypes.ToArray()
         };
         var files = await ApplicationServices.Storage.OpenFilePickerAsync(filePickerOpenOptions).ConfigureAwait(false);
-        
+
         if (files is null)
         { return ImmutableList<IFileEntry>.Empty; }
 
@@ -82,8 +82,8 @@ public record OpenFileFilterOption(
         string? Name = null,
         string[]? Patters = null,
         string[]? MimeTypes = null,
-        string[]? AppleUniformTypeIdentifiers = null) 
-    : FileFilterOption(Name, Patters,MimeTypes, AppleUniformTypeIdentifiers);
+        string[]? AppleUniformTypeIdentifiers = null)
+    : FileFilterOption(Name, Patters, MimeTypes, AppleUniformTypeIdentifiers);
 
 public record SaveFileFilterOption(
         string? Name = null,
