@@ -63,11 +63,10 @@ public partial class FileItemViewModel : ViewModelBase
         Duration = MediaInfo?.GetDuration() ?? 0;
         Bitrate = MediaInfo?.Format?.BitRate == null ? Bitrate : new BitRate(MediaInfo.Format.BitRate.Value);
 
-        var streams = (MediaInfo?.Streams ?? Enumerable.Empty<FFProbeStream>()).ToArray();
+        var streams = MediaInfo?.Streams ?? Enumerable.Empty<FFProbeStream>();
 
-        for (int streamIndex = 0; streamIndex < streams.Length; streamIndex++)
+        foreach (FFProbeStream? stream in streams)
         {
-            FFProbeStream? stream = streams[streamIndex];
             switch (stream.CodecType?.ToUpper())
             {
                 case "VIDEO":
