@@ -94,6 +94,9 @@ public class PlotControllerFacade(
             SetDarkTheme();
         }
 
+        // default plot title
+        PlotController.Plot.Title("No point selected");
+
         // Showing the left title
         PlotController.Plot.Axes.Left.Label.Text = axisYTitleLabel;
 
@@ -206,8 +209,8 @@ public class PlotControllerFacade(
             _markerHighlightText.IsVisible = true;
             _markerHighlightText.Location = dataPoint.Coordinates;
             string seriesDescription = $"Filename: {scatter.LegendText}";
-            string axisXDescription = $"{PlotStrategy.AxisXTickLabelPrefix} = {PlotStrategy.AxisXValueToString(dataPoint.X)}{PlotStrategy.AxisXTickLabelSuffix}";
-            string axisYDescription = $"{PlotStrategy.AxisYTickLabelPrefix} = {PlotStrategy.AxisYValueToString(dataPoint.Y)} {PlotStrategy.AxisYTickLabelSuffix}";
+            string axisXDescription = $"{PlotStrategy.AxisXTickLabelPrefix}: {PlotStrategy.AxisXValueToString(dataPoint.X)}{PlotStrategy.AxisXTickLabelSuffix}";
+            string axisYDescription = $"{PlotStrategy.AxisYTickLabelPrefix}: {PlotStrategy.AxisYValueToString(dataPoint.Y)} {PlotStrategy.AxisYTickLabelSuffix}";
             _markerHighlightText.LabelText = $"{seriesDescription}{Environment.NewLine}{axisXDescription}{Environment.NewLine}{axisYDescription}";
             _markerHighlightText.LabelFontColor = scatter.MarkerStyle.FillColor;
             _markerHighlightText.LabelBackgroundColor = Colors.Black.WithAlpha(128);
