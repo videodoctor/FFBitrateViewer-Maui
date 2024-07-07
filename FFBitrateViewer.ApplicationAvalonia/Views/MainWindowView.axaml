@@ -30,7 +30,7 @@
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-		<DesignData:DesignMainWindowViewModel />
+        <DesignData:DesignMainWindowViewModel />
     </Design.DataContext>
 
     <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
@@ -41,7 +41,7 @@
         </rxui:RoutedViewHost.DefaultContent>
         <rxui:RoutedViewHost.ViewLocator>
             <!-- See AppViewLocator.cs section below -->
-			<services:AppViewLocator/>
+            <services:AppViewLocator/>
         </rxui:RoutedViewHost.ViewLocator>
     </rxui:RoutedViewHost>
 
