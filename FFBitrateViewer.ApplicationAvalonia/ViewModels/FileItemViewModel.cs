@@ -75,6 +75,8 @@ public partial class FileItemViewModel : ViewModelBase
     [property: Browsable(false)]
     public FFProbeJsonOutput? MediaInfo { get; init; }
 
+    public MediaInfoSummaryViewModel? MediaInfoSummary { get; set; }
+
     public void Initialize()
     {
         Path = FileEntry?.Path ?? AboutBlankUri;
@@ -106,6 +108,34 @@ public partial class FileItemViewModel : ViewModelBase
         }
 
         FirstVideoShortDesc = VideoStreams.FirstOrDefault()?.ToString(VideoStreamToStringMode.SHORT) ?? string.Empty;
+
+        VideoStream? videoStream = VideoStreams.FirstOrDefault();
+        const string unknownText = "Unknown";
+        MediaInfoSummaryViewModel mediaInfoSummary = new()
+        {
+            // File information
+            VideoStreamCount = VideoStreams.Count,
+            AudioStreamCount = AudioStreams.Count,
+            SubtitleStreamCount = SubtitleStreams.Count,
+            FileDuration = Duration is null ? unknownText : TimeSpan.FromSeconds(Duration.Value).ToString("g"),
+            FileBitRate = this.Bitrate is null ? unknownText : $"{this.Bitrate.Value / 1000} kb/s",
+            FileStart = TimeSpan.FromSeconds(this.StartTime).ToString("g"),
+
+            // Video information
+            // TODO: Sync up later, once plot has been computed
+            //FrameCount = 
+            FrameRate = videoStream?.FrameRateAvg?.Value is null ? unknownText : $"{videoStream?.FrameRateAvg?.Numerator ?? 0 / videoStream?.FrameRateAvg?.Denominator ?? 1} fps ({videoStream?.FrameRateAvg?.Value})",
+            VideoStart = videoStream?.StartTime is null ? unknownText : TimeSpan.FromSeconds(videoStream.StartTime.Value).ToString("g"),
+            VideoStreamDuration = videoStream?.Duration is null ? unknownText : TimeSpan.FromSeconds(videoStream.Duration.Value).ToString("g"),
+            VideoBitRate = videoStream?.BitRate?.Value is null ? unknownText : $"{videoStream.BitRate.Value / 1000} kb/s",
+
+            // Frame information
+            Size = videoStream?.Resolution is null ? unknownText : $"{videoStream.Resolution.X}x{videoStream.Resolution.Y}",
+            FileType = videoStream?.Format?.Progressive is null ? unknownText : $"{(videoStream.Format.Progressive.Value ? "Progressive" : "Interlaced")}",
+            ColorSpace = videoStream?.Format?.ColorSpace is null ? unknownText : $"{videoStream.Format.ColorSpace}{videoStream.Format.ChromaSubsampling ?? string.Empty}".ToUpper(),
+            ColorRange = videoStream?.Format?.ColorRange is null ? unknownText : videoStream.Format.ColorRange.ToUpper(),
+        };
+        MediaInfoSummary = mediaInfoSummary;
     }
 
     public double GetAverageBitRate(

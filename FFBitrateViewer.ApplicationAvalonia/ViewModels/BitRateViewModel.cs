@@ -49,11 +49,17 @@ public partial class BitRateViewModel(
     private FileItemViewModel? _selectedFile;
 
     [ObservableProperty]
+    private MediaInfoSummaryViewModel? _mediaInfoSummary;
+
+    [ObservableProperty]
     private PlotViewType _plotView = PlotViewType.FrameBased;
 
     public System.Collections.IList? SelectedFiles { get; set; }
 
     private PlotControllerFacade _plotControllerFacade = PlotControllerFacade.None;
+
+    partial void OnSelectedFileChanged(global::FFBitrateViewer.ApplicationAvalonia.ViewModels.FileItemViewModel? value)
+        => MediaInfoSummary = value?.MediaInfoSummary;
 
     partial void OnPlotControllerChanging(global::ScottPlot.IPlotControl? value)
         => _plotControllerFacade = new PlotControllerFacade(value, PlotStrategy);
@@ -272,7 +278,6 @@ public partial class BitRateViewModel(
         AboutViewModel aboutViewModel = _serviceProvider.GetService<AboutViewModel>()!;
         HostScreen.Router.Navigate.Execute(aboutViewModel);
     }
-
 
     //[RelayCommand]
     //private async Task CopyPlotToClipboard(CancellationToken token)
