@@ -113,9 +113,10 @@ public class PlotControllerFacade(
         // display the legend in a LegendPanel outside the plot
         ScottPlot.Panels.LegendPanel pan = new(PlotController.Plot.Legend)
         {
-            Edge = Edge.Right,
-            Alignment = Alignment.UpperCenter,
+            Edge = Edge.Bottom,
+            Alignment = Alignment.MiddleCenter,
         };
+        pan.Legend.Orientation = Orientation.Horizontal;
 
         PlotController.Plot.Axes.AddPanel(pan);
 
