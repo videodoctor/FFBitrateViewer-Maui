@@ -226,6 +226,7 @@ public partial class BitRateViewModel(
             {
                 file.BitRateAverage = bitRateAverage;
                 file.BitRateMaximum = bitRateMaximum;
+                file.FrameCount = file.Frames.Count;
             }).ConfigureAwait(false);
 
             // Gather data points for plotting

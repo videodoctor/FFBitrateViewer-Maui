@@ -1,8 +1,9 @@
-﻿using System.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel;
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
-public class FileItemSummaryViewModel : ViewModelBase
+public partial class FileItemSummaryViewModel : ViewModelBase
 {
     public const string CategoryNameFile = "File";
 
@@ -28,7 +29,8 @@ public class FileItemSummaryViewModel : ViewModelBase
     public const string CategoryNameVideoStream = "Video Stream";
 
     [property: Category(CategoryNameVideoStream), ReadOnly(true), DisplayName("Frames count"), Description("Video stream frames count")]
-    public int FrameCount { get; set; }
+    [ObservableProperty]
+    private int _frameCount;
 
     [property: Category(CategoryNameVideoStream), ReadOnly(true), DisplayName("Frame rate"), Description("Video stream frame rate")]
     public string FrameRate { get; set; } = string.Empty;
