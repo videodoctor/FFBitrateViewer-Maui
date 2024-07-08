@@ -105,8 +105,8 @@
                         <DataGridCheckBoxColumn Header="Is Active" Binding="{Binding IsActive}" IsReadOnly="False"/>
                         <DataGridTextColumn Header="Path to file"  Binding="{Binding Path.LocalPath,Mode=OneWay}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Media Info" Binding="{Binding FirstVideoShortDesc,Mode=OneWay}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Bit Rate (avg)" Binding="{Binding BitRateAverage,Mode=OneWay,StringFormat=' {0} kb/s'}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Bit Rate (max)" Binding="{Binding BitRateMaximum,Mode=OneWay,StringFormat=' {0} kb/s'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Bit Rate (avg)" Binding="{Binding BitRateAverage,Mode=OneWay,StringFormat=' {0:n} kb/s'}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Bit Rate (max)" Binding="{Binding BitRateMaximum,Mode=OneWay,StringFormat=' {0:n} kb/s'}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
 
