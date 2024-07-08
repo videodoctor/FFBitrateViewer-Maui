@@ -5,7 +5,6 @@ using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 using ScottPlot;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
 
@@ -16,7 +15,7 @@ public partial class FileItemViewModel : ViewModelBase
     public static readonly Uri AboutBlankUri = new("about:blank");
 
     [ObservableProperty]
-    private bool _isSelected;
+    private bool _isActive;
 
     [ObservableProperty]
     private Uri _path = AboutBlankUri;

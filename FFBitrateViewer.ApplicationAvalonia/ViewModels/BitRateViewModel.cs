@@ -194,7 +194,7 @@ public partial class BitRateViewModel(
         cancellationToken.ThrowIfCancellationRequested();
 
         // process files in parallel
-        await Parallel.ForEachAsync(Files.Where(file => file.IsSelected), cancellationToken, async (file, token) =>
+        await Parallel.ForEachAsync(Files.Where(file => file.IsActive), cancellationToken, async (file, token) =>
         {
             // Skip file is it already has a plot
             if (file.Scatters[PlotView] is not null)
@@ -308,7 +308,7 @@ public partial class BitRateViewModel(
             {
                 FileEntry = fileInfo,
                 MediaInfo = mediaInfo,
-                IsSelected = true
+                IsActive = true
             };
             fileItemViewModel.Initialize();
 
