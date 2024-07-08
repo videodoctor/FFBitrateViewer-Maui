@@ -49,17 +49,11 @@ public partial class BitRateViewModel(
     private FileItemViewModel? _selectedFile;
 
     [ObservableProperty]
-    private MediaInfoSummaryViewModel? _mediaInfoSummary;
-
-    [ObservableProperty]
     private PlotViewType _plotView = PlotViewType.FrameBased;
 
     public System.Collections.IList? SelectedFiles { get; set; }
 
     private PlotControllerFacade _plotControllerFacade = PlotControllerFacade.None;
-
-    partial void OnSelectedFileChanged(global::FFBitrateViewer.ApplicationAvalonia.ViewModels.FileItemViewModel? value)
-        => MediaInfoSummary = value?.MediaInfoSummary;
 
     partial void OnPlotControllerChanging(global::ScottPlot.IPlotControl? value)
         => _plotControllerFacade = new PlotControllerFacade(value, PlotStrategy);
@@ -111,7 +105,10 @@ public partial class BitRateViewModel(
 
         // gets version of the ffprobe
         var version = await _probeAppClient.GetVersionAsync(token).ConfigureAwait(false);
-        Version = $"{Path.GetFileName(_probeAppClient.FFProbeFilePath)} v{version}";
+        _guiService.RunLater(() =>
+        {
+            Version = $"{Path.GetFileName(_probeAppClient.FFProbeFilePath)} v{version}";
+        });
 
         // load files from CLI
         var localFiles = _applicationOptions.Files.Select(f => new LocalFileEntry(f));
@@ -133,6 +130,7 @@ public partial class BitRateViewModel(
 
         foreach (var file in Files)
         {
+            file.PlotViewType = newPlotViewType;
             foreach (var plotViewType in Enum.GetValues<PlotViewType>())
             {
                 // Compute plots for `PlotView`
@@ -143,7 +141,7 @@ public partial class BitRateViewModel(
                 // Update plot visibility(Hide plots different from `PlotView`, show the others
                 if (file.Scatters[plotViewType] is not null)
                 {
-                    file.Scatters[plotViewType]!.IsVisible = plotViewType == newPlotViewType;
+                    file.Scatters[plotViewType]!.IsVisible = file.IsActive && plotViewType == newPlotViewType;
                 }
             }
         }

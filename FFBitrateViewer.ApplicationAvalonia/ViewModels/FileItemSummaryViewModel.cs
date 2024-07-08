@@ -2,7 +2,7 @@
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
-public class MediaInfoSummaryViewModel : ViewModelBase
+public class FileItemSummaryViewModel : ViewModelBase
 {
     public const string CategoryNameFile = "File";
 

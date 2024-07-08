@@ -5,54 +5,70 @@ using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
 using ScottPlot;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
-public partial class FileItemViewModel : ViewModelBase
+public partial class FileItemViewModel : FileItemSummaryViewModel
 {
     public static readonly Uri AboutBlankUri = new("about:blank");
 
+    public const string CategoryNameMediaInfo = "Media Info";
+
+    [property: Category(CategoryNameMediaInfo), DisplayName("Is active"), Description("Whether or not this media file is active")]
     [ObservableProperty]
     private bool _isActive;
 
+    [property: Category(CategoryNameMediaInfo), ReadOnly(true), DisplayName("Path"), Description("Path to file")]
     [ObservableProperty]
     private Uri _path = AboutBlankUri;
 
+    [property: Browsable(false)]
     [ObservableProperty]
     private double _startTime;
 
+    [property: Browsable(false)]
     [ObservableProperty]
     private double? _duration;
 
+    [property: Browsable(false)]
     [ObservableProperty]
     private BitRate? _bitrate;
 
+    [property: Category(CategoryNameMediaInfo), ReadOnly(true), DisplayName("Media"), Description("Media information")]
     [ObservableProperty]
     private string _firstVideoShortDesc = string.Empty;
 
+    [property: Category(CategoryNameMediaInfo), ReadOnly(true), DisplayName("Bir rate (avg)"), Description("Bit rate average")]
     [ObservableProperty]
     private double _bitRateAverage = double.NaN;
 
+    [property: Category(CategoryNameMediaInfo), ReadOnly(true), DisplayName("Bit rate (max)"), Description("Bit rate maximum")]
     [ObservableProperty]
     private double _bitRateMaximum = double.NaN;
 
+    [property: Browsable(false)]
     public List<FFProbePacket> Frames { get; } = [];
 
+    [property: Browsable(false)]
     public List<VideoStream> VideoStreams { get; } = [];
 
+    [property: Browsable(false)]
     public List<AudioStream> AudioStreams { get; } = [];
 
+    [property: Browsable(false)]
     public List<SubtitleStream> SubtitleStreams { get; } = [];
 
+    [property: Browsable(false)]
     public IDictionary<PlotViewType, IPlottable?> Scatters { get; private set; } = Enum.GetValues<PlotViewType>().ToDictionary(e => e, r => default(IPlottable?));
 
+    [property: Browsable(false)]
     public IFileEntry? FileEntry { get; init; }
 
+    [property: Browsable(false)]
     public FFProbeJsonOutput? MediaInfo { get; init; }
-
-    public MediaInfoSummaryViewModel? MediaInfoSummary { get; set; }
 
     public void Initialize()
     {
@@ -87,31 +103,28 @@ public partial class FileItemViewModel : ViewModelBase
 
         VideoStream? videoStream = VideoStreams.FirstOrDefault();
         const string unknownText = "Unknown";
-        MediaInfoSummaryViewModel mediaInfoSummary = new()
-        {
-            // File information
-            VideoStreamCount = VideoStreams.Count,
-            AudioStreamCount = AudioStreams.Count,
-            SubtitleStreamCount = SubtitleStreams.Count,
-            FileDuration = Duration is null ? unknownText : TimeSpan.FromSeconds(Duration.Value).ToString("g"),
-            FileBitRate = this.Bitrate is null ? unknownText : $"{this.Bitrate.Value / 1000} kb/s",
-            FileStart = TimeSpan.FromSeconds(this.StartTime).ToString("g"),
 
-            // Video information
-            // TODO: Sync up later, once plot has been computed
-            //FrameCount = 
-            FrameRate = videoStream?.FrameRateAvg?.Value is null ? unknownText : $"{videoStream?.FrameRateAvg?.Numerator ?? 0 / videoStream?.FrameRateAvg?.Denominator ?? 1} fps ({videoStream?.FrameRateAvg?.Value})",
-            VideoStart = videoStream?.StartTime is null ? unknownText : TimeSpan.FromSeconds(videoStream.StartTime.Value).ToString("g"),
-            VideoStreamDuration = videoStream?.Duration is null ? unknownText : TimeSpan.FromSeconds(videoStream.Duration.Value).ToString("g"),
-            VideoBitRate = videoStream?.BitRate?.Value is null ? unknownText : $"{videoStream.BitRate.Value / 1000} kb/s",
+        // File information
+        VideoStreamCount = VideoStreams.Count;
+        AudioStreamCount = AudioStreams.Count;
+        SubtitleStreamCount = SubtitleStreams.Count;
+        FileDuration = Duration is null ? unknownText : TimeSpan.FromSeconds(Duration.Value).ToString("g");
+        FileBitRate = this.Bitrate is null ? unknownText : $"{this.Bitrate.Value / 1000} kb/s";
+        FileStart = TimeSpan.FromSeconds(this.StartTime).ToString("g");
 
-            // Frame information
-            Size = videoStream?.Resolution is null ? unknownText : $"{videoStream.Resolution.X}x{videoStream.Resolution.Y}",
-            FileType = videoStream?.Format?.Progressive is null ? unknownText : $"{(videoStream.Format.Progressive.Value ? "Progressive" : "Interlaced")}",
-            ColorSpace = videoStream?.Format?.ColorSpace is null ? unknownText : $"{videoStream.Format.ColorSpace}{videoStream.Format.ChromaSubsampling ?? string.Empty}".ToUpper(),
-            ColorRange = videoStream?.Format?.ColorRange is null ? unknownText : videoStream.Format.ColorRange.ToUpper(),
-        };
-        MediaInfoSummary = mediaInfoSummary;
+        // Video information
+        // TODO: Sync up later, once plot has been computed
+        //FrameCount = 
+        FrameRate = videoStream?.FrameRateAvg?.Value is null ? unknownText : $"{videoStream?.FrameRateAvg?.Numerator ?? 0 / videoStream?.FrameRateAvg?.Denominator ?? 1} fps ({videoStream?.FrameRateAvg?.Value})";
+        VideoStart = videoStream?.StartTime is null ? unknownText : TimeSpan.FromSeconds(videoStream.StartTime.Value).ToString("g");
+        VideoStreamDuration = videoStream?.Duration is null ? unknownText : TimeSpan.FromSeconds(videoStream.Duration.Value).ToString("g");
+        VideoBitRate = videoStream?.BitRate?.Value is null ? unknownText : $"{videoStream.BitRate.Value / 1000} kb/s";
+
+        // Frame information
+        Size = videoStream?.Resolution is null ? unknownText : $"{videoStream.Resolution.X}x{videoStream.Resolution.Y}";
+        FileType = videoStream?.Format?.Progressive is null ? unknownText : $"{(videoStream.Format.Progressive.Value ? "Progressive" : "Interlaced")}";
+        ColorSpace = videoStream?.Format?.ColorSpace is null ? unknownText : $"{videoStream.Format.ColorSpace}{videoStream.Format.ChromaSubsampling ?? string.Empty}".ToUpper();
+        ColorRange = videoStream?.Format?.ColorRange is null ? unknownText : videoStream.Format.ColorRange.ToUpper();
     }
 
     public double GetAverageBitRate(
@@ -238,6 +251,17 @@ public partial class FileItemViewModel : ViewModelBase
         //{ frames[index].BitRate = bitrate; }
         indexes.Clear();
 
+    }
+
+    [Browsable(false)]
+    internal PlotViewType PlotViewType { get; set; }
+
+    partial void OnIsActiveChanged(bool value)
+    {
+        if (Scatters.TryGetValue(PlotViewType, out var plottable) && plottable is not null)
+        {
+            plottable.IsVisible = value;
+        }
     }
 
 }

@@ -113,7 +113,7 @@
                 <GridSplitter Margin="1,2" Grid.Column="1" ResizeDirection="Columns" Background="LightGray" BorderBrush="Gray" BorderThickness="1"/>
 
                 <ScrollViewer Grid.Column="2">
-                    <pgc:PropertyGrid Margin="4,2" DataContext="{Binding MediaInfoSummary}" />
+                    <pgc:PropertyGrid Margin="4,2" DataContext="{Binding SelectedFile}" />
                 </ScrollViewer>
 
             </Grid>
