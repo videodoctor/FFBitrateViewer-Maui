@@ -1,9 +1,8 @@
 ## FFBitrateViewer — yet another program for video file bitrate visualization
 
-This is a port from the original `FFBitrateViewer`. This port is using AvaloniaUI and ScottPlot in order to support cross platform.
+This is a port from the original `FFBitrateViewer`. This port is using [AvaloniaUI](https://avaloniaui.net/) and [ScottPlot](https://scottplot.net/) in order to support cross platform.
 
-Here is the original application description:
-
+Please refer to the original application description:
 > _FFBitrateViewer is a FFProbe GUI that purpose is to visualize frames` bitrate extracted by FFProbe.
 It is inspired by [Bitrate Viewer](https://web.archive.org/web/20160730053853/http://www.winhoros.de/docs/bitrate-viewer/) (link to Web Archive as the program's web-site and forum are long dead).
 FFBitrateViewer allows you to select multiple files without dealing with command line and get “per frame” or “per second” info for all of them in one go._
@@ -27,14 +26,15 @@ Expanded Plot View
 ![alt](docs/assets/main-window-04-min.png)
 
 ## Features
-The port is still a work in progres.
 
-- ✅ Process as many files as your computer supports.
-- ⛔ Brief media info for all files (hover mouse over media info to see more details);
+- ✅ Process as many files as your computer can handle.
+- ✅ Side property panel with brief media info for the selected file.
 - ⛔ Easy to use UI: files can be added with file chooser or dropped from Windows Explorer, files can be re-ordered using Drag & Drop;
-- ✅ Graphs can be zoomed in/out with mouse wheel (try it over graph and/or axes), panned with right mouse button and saved as SVG or PNG;
-- ⛔ FFProbe commands issued by FFBitrateViewer can be saved to log file (`FFBitrateViewer.log`);
+- ✅ Graphs can be zoomed in/out with mouse wheel (try it over graph and/or axes), panned.
+- ✅ Save generated plot as image by using right mouse button or directly in menu
+- ✅ FFProbe commands can be saved to a log file.
 - ✅ No registration, banners, tracking etc;
+- ✅ Support for CLI arguments
 
 <!--
 - Free;
@@ -46,13 +46,57 @@ The port is still a work in progres.
 
 
 ## Requirements
-<!-- - Windows OS
-- .NET 7.0 or later. The program should ask you to download and install it if required.
-- FFProbe.exe (a part of FFMpeg package). You have to download it from [official ffmpeg web site](https://ffmpeg.org/download.html).
-  You can use sibgle file static build for simplicity, however, for real usage I'd recommend to make shared build accessible in %PATH%. -->
 
+FFBitrateViewer depends on ffprobe executable, which it is included as part of ffmpeg.
 
+Depending on your operating system you have to follow different steps to install ffmpeg and the ffprobe package. See oficial documentation at: https://ffmpeg.org/download.html
+
+Each operating system normally provides stores or package managers which could help you to install software
+
+For Windows thru [WinGet](https://winget.run/pkg/Gyan/FFmpeg):
+```powershell
+winget install -e --id Gyan.FFmpeg
+```
+
+For MacOS thru [Homebrew](https://formulae.brew.sh/formula/ffmpeg):
+```shell
+brew install ffmpeg
+```
+
+ffprobe should be in `PATH` environmental variable in oder to be used by FFBitrateViewer. This normally happens after you install ffmpeg. If you want to specify which ffprobe binary should be use, use the CLi option `-x` or `--FFProbeFilePath` along with the full path to the file.
+
+<!--
+Add notes on supported OS and required runtime
+-->
 ## How to use
+
+After you have download FFBitrateViewer. The most simple use is by:
+
+1. Start the application
+1. Add one or more video files
+1. Click on `Start` to generate a graph
+
+The application supports some CLI arguments that may become useful in some scnearios:
+
+```log
+Description:
+  Visualizes video bitrate received by ffprobe (https://ffmpeg.org/)
+
+Usage:
+  FFBitrateViewer.ApplicationAvalonia.Desktop [options]
+
+Options:
+  -s, --StartTimeAdjustment <StartTimeAdjustment>       Time adjustment when compting the plot []
+  -e, --Exit                                            [default: False]
+  -l, --LogCommands                                     Whether or not to log executed commands [default: False]
+  -a, --AutoRun                                         Whether or not start automatically the file processing. [default: False]
+  -t, --TempDir <TempDir>                               Temporary directory [default: C:\Users\johndoe\AppData\Local\Temp\]
+  -f, --Files <Files>                                   Input files []
+  -p, --PlotViewType <FrameBased|GOPBased|SecondBased>  The kind of plot view selected by default [default: FrameBased]
+  -x, --FFProbeFilePath <FFProbeFilePath>               The path to the executable ffprobe file []
+  --version                                             Show version information
+  -?, -h, --help                                        Show help and usage information
+```
 <!-- - Unpack into a folder;
 - Put FFProbe.exe (and accompanied dll files if you use shared build) into the program folder or make it available through system %PATH%;
 - Run the program;
@@ -73,7 +117,5 @@ The port is still a work in progres.
 
 ## Author
 - Original Application by fifonik
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/fifonik)
-- Port to Avalonia by hmadrigal
+- Ported by [Herber Madrigal](mailto:hfmad@hotmail.com)
 
