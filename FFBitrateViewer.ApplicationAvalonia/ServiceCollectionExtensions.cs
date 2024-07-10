@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions
         collection.AddSingleton<FileDialogService>();
         collection.AddSingleton<GuiService>();
         collection.AddSingleton<FFProbeClient>();
+        collection.AddSingleton<PlotControllerFacade>();
         collection.AddSingleton<IPlotStrategy, FrameBasedPlotStrategy>();
         collection.AddSingleton<IPlotStrategy, SecondBasedPlotStrategy>();
         collection.AddSingleton<IPlotStrategy, GOPBasedPlotStrategy>();

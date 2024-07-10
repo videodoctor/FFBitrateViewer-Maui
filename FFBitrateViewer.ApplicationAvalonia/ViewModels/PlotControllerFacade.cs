@@ -1,4 +1,5 @@
-﻿using ScottPlot;
+﻿using FFBitrateViewer.ApplicationAvalonia.Models.Media;
+using ScottPlot;
 using ScottPlot.Plottables;
 using System;
 using System.Collections.Generic;
@@ -8,15 +9,15 @@ using System.Linq;
 namespace FFBitrateViewer.ApplicationAvalonia.ViewModels;
 
 public class PlotControllerFacade(
-    IPlotControl? plotControl = null,
-    IPlotStrategy? plotStrategy = null
+    IEnumerable<IPlotStrategy> plotStrategies
 )
 {
-    internal static readonly PlotControllerFacade None = new();
 
-    public IPlotControl? PlotController { get; private set; } = plotControl;
+    public IPlotControl? PlotController { get; set; }
+    public PlotViewType PlotView { get; set; } = PlotViewType.FrameBased;
+    public IPlotStrategy PlotStrategy => _plotStrategies[PlotView];
 
-    public IPlotStrategy PlotStrategy { get; private set; } = plotStrategy ?? NonePlotStrategy.Instance;
+    private readonly IDictionary<PlotViewType, IPlotStrategy> _plotStrategies = plotStrategies.ToDictionary(p => p.PlotViewType);
 
     public string AxisYTitleLabel
     {

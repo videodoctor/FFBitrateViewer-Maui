@@ -140,13 +140,9 @@
                         <Label Content="Plot view:" VerticalAlignment="Center" />
                         <RadioButton GroupName="PotViewGroupName" Content="Frame based"
                                      IsChecked="{Binding PlotView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static m:PlotViewType.FrameBased}}"
-                                     Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
-                                     CommandParameter="{x:Static m:PlotViewType.FrameBased}"
                          />
                         <RadioButton GroupName="PotViewGroupName" Content="Second based"
                                      IsChecked="{Binding PlotView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static m:PlotViewType.SecondBased}}"
-                                     Command="{Binding SetPlotViewTypeCommand,Mode=OneTime}"
-                                     CommandParameter="{x:Static m:PlotViewType.SecondBased}"
                          />
                         <Label Content="Adjust frame start time" VerticalAlignment="Center"/>
                         <CheckBox IsChecked="{Binding HasToAdjustFrameStartTime}"></CheckBox>

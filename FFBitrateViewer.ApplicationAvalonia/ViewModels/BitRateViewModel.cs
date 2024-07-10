@@ -25,7 +25,7 @@ public partial class BitRateViewModel(
     GuiService guiService,
     FileDialogService fileDialogService,
     FFProbeClient probeAppClient,
-    IEnumerable<IPlotStrategy> plotStrategies,
+    PlotControllerFacade plotControllerFacade,
     ILogger<BitRateViewModel> logger,
     IOptions<Models.Config.ApplicationOptions> applicationOptions,
     IScreen screen,
@@ -53,16 +53,9 @@ public partial class BitRateViewModel(
 
     public System.Collections.IList? SelectedFiles { get; set; }
 
-    private PlotControllerFacade _plotControllerFacade = PlotControllerFacade.None;
-
-    partial void OnPlotControllerChanging(global::ScottPlot.IPlotControl? value)
-        => _plotControllerFacade = new PlotControllerFacade(value, PlotStrategy);
+    private PlotControllerFacade _plotControllerFacade = plotControllerFacade;
 
     public ObservableCollection<FileItemViewModel> Files { get; } = [];
-
-    private IPlotStrategy PlotStrategy => _plotStrategies[PlotView];
-
-    private readonly IDictionary<PlotViewType, IPlotStrategy> _plotStrategies = plotStrategies.ToDictionary(p => p.PlotViewType);
 
     private readonly GuiService _guiService = guiService;
 
@@ -96,11 +89,17 @@ public partial class BitRateViewModel(
         if (_hasBeenLoaded)
         { return; }
 
+        // Set up plot controller for the plot view
+        if (PlotController is not null)
+        { 
+            _plotControllerFacade.PlotController = PlotController;
+        }
+
         // Sets the plot view based on the CLI input
         SetPlotViewType(_applicationOptions.PlotView);
 
         // initialize the plot view
-        _plotControllerFacade.Initialize(PlotStrategy.AxisYLegendTitle, _guiService.IsDarkTheme);
+        _plotControllerFacade.Initialize(_plotControllerFacade.PlotStrategy.AxisYLegendTitle, _guiService.IsDarkTheme);
         _plotControllerFacade.Refresh();
 
         // gets version of the ffprobe
@@ -122,12 +121,15 @@ public partial class BitRateViewModel(
 
         _hasBeenLoaded = true;
     }
+    partial void OnPlotViewChanged(global::FFBitrateViewer.ApplicationAvalonia.Models.Media.PlotViewType value)
+    => SetPlotViewType(value);
 
-    [RelayCommand]
     private void SetPlotViewType(PlotViewType newPlotViewType)
     {
-        PlotView = newPlotViewType;
+        // Updates value in plot control facade
+        _plotControllerFacade.PlotView = newPlotViewType;
 
+        // Update plot settings for each file
         foreach (var file in Files)
         {
             file.PlotViewType = newPlotViewType;
@@ -146,7 +148,7 @@ public partial class BitRateViewModel(
             }
         }
 
-        _plotControllerFacade.AxisYTitleLabel = PlotStrategy.AxisYLegendTitle;
+        _plotControllerFacade.AxisYTitleLabel = _plotControllerFacade.PlotStrategy.AxisYLegendTitle;
         _plotControllerFacade.AutoScaleViewport();
         _plotControllerFacade.Refresh();
     }
@@ -195,7 +197,7 @@ public partial class BitRateViewModel(
         await Parallel.ForEachAsync(Files.Where(file => file.IsActive), cancellationToken, async (file, token) =>
         {
             // Skip file is it already has a plot
-            if (file.Scatters[PlotView] is not null)
+            if (file.Scatters[_plotControllerFacade.PlotView] is not null)
             { return; }
 
             // Check if Probe Packets were already loaded
@@ -237,13 +239,13 @@ public partial class BitRateViewModel(
             for (int frameIndex = 0; frameIndex < file.Frames.Count; frameIndex++)
             {
                 FFProbePacket? frame = file.Frames[frameIndex];
-                var (x, y) = PlotStrategy.GetDataPoint(file.StartTime, frame);
+                var (x, y) = _plotControllerFacade.PlotStrategy.GetDataPoint(file.StartTime, frame);
                 xs.Add(x ?? 0);
                 ys.Add(Convert.ToInt32(y));
             }
 
             // Add scatter to plot view
-            file.Scatters[PlotView] = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
+            file.Scatters[_plotControllerFacade.PlotView] = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
 
         });
 
