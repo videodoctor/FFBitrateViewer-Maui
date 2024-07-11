@@ -166,7 +166,7 @@ public class PlotControllerFacade(
 
         // get the nearest point of each scatter
         Dictionary<int, DataPoint> nearestPoints = [];
-        var MyScatters = avaPlot.Plot.PlottableList.OfType<Scatter>().ToList();
+        var MyScatters = avaPlot.Plot.PlottableList.OfType<Scatter>().Where(s => s.IsVisible).ToList();
         for (int i = 0; i < MyScatters.Count; i++)
         {
             DataPoint nearestPoint = MyScatters[i].Data.GetNearest(mouseLocation, avaPlot.Plot.LastRender);
