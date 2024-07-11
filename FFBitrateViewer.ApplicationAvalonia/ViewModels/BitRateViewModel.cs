@@ -91,7 +91,7 @@ public partial class BitRateViewModel(
 
         // Set up plot controller for the plot view
         if (PlotController is not null)
-        { 
+        {
             _plotControllerFacade.PlotController = PlotController;
         }
 
