@@ -14,6 +14,6 @@ public partial class DesignAboutViewModel : ViewModelBase
 
     public ObservableCollection<ThirdPartyPackage> ThirdPartyPackages { get; set; } =
     [
-        new ThirdPartyPackage("System.CommandLine.NamingConventionBinder", "2.0.0-beta4.22272.1", "https://github.com/dotnet/command-line-api", "\u00A9 Microsoft Corporation. All rights reserved.", "Microsoft", "MIT","https://licenses.nuget.org/MIT", 0)
+        new ThirdPartyPackage("System.CommandLine.NamingConventionBinder", "2.0.0-beta4.22272.1", "https://github.com/dotnet/command-line-api", "\u00A9 Microsoft Corporation. All rights reserved.", "Microsoft", "MIT", "https://licenses.nuget.org/MIT", 0)
     ];
 }
