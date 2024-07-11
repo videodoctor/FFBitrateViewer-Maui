@@ -133,20 +133,20 @@
 
             <Grid RowDefinitions="Auto,*">
                 <!--Button and check buttons-->
-                <Border Grid.Row="0">
+                <Border Grid.Row="0" Padding="3 1">
                     <StackPanel Orientation="Horizontal">
-                        <Button Content="Start" Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"/>
-                        <Button Content="Stop" Command="{Binding ToggleOnOffPlotterPlotterCancelCommand,Mode=OneTime}"/>
-                        <Label Content="Plot view:" VerticalAlignment="Center" />
-                        <RadioButton GroupName="PotViewGroupName" Content="Frame based"
+                        <Button Margin="2 1" Content="Start" Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"/>
+                        <Button Margin="2 1" Content="Stop" Command="{Binding ToggleOnOffPlotterPlotterCancelCommand,Mode=OneTime}"/>
+                        <Label Margin="2 1" Content="Plot view:" VerticalAlignment="Center" />
+                        <RadioButton Margin="2 1" GroupName="PotViewGroupName" Content="Frame based"
                                      IsChecked="{Binding PlotView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static m:PlotViewType.FrameBased}}"
                          />
-                        <RadioButton GroupName="PotViewGroupName" Content="Second based"
+                        <RadioButton Margin="2 1" GroupName="PotViewGroupName" Content="Second based"
                                      IsChecked="{Binding PlotView, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static m:PlotViewType.SecondBased}}"
                          />
-                        <Label Content="Adjust frame start time" VerticalAlignment="Center"/>
-                        <CheckBox IsChecked="{Binding HasToAdjustFrameStartTime}"></CheckBox>
-                        <Button
+                        <Label Margin="2 1" Content="Adjust frame start time" VerticalAlignment="Center"/>
+                        <CheckBox Margin="2 1" IsChecked="{Binding HasToAdjustFrameStartTime}"></CheckBox>
+                        <Button Margin="2 1"
                             Command="{Binding AutoScaleCommand,Mode=OneTime}"
                             Content="AutoScale" />
                     </StackPanel>
