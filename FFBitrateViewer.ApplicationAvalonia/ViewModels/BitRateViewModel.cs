@@ -123,37 +123,6 @@ public partial class BitRateViewModel(
 
         _hasBeenLoaded = true;
     }
-    partial void OnPlotViewChanged(global::FFBitrateViewer.ApplicationAvalonia.Models.Media.PlotViewType value)
-    => SetPlotViewType(value);
-
-    private void SetPlotViewType(PlotViewType newPlotViewType)
-    {
-        // Updates value in plot control facade
-        _plotControllerFacade.PlotView = newPlotViewType;
-
-        // Update plot settings for each file
-        foreach (var file in Files)
-        {
-            file.PlotViewType = newPlotViewType;
-            foreach (var plotViewType in Enum.GetValues<PlotViewType>())
-            {
-                // Compute plots for `PlotView`
-                if (plotViewType == newPlotViewType && file.ScattersByType[plotViewType] is null)
-                {
-                }
-
-                // Update plot visibility(Hide plots different from `PlotView`, show the others
-                if (file.ScattersByType[plotViewType] is not null)
-                {
-                    file.ScattersByType[plotViewType]!.IsVisible = file.IsActive && plotViewType == newPlotViewType;
-                }
-            }
-        }
-
-        _plotControllerFacade.AxisYTitleLabel = _plotControllerFacade.PlotStrategy.AxisYLegendTitle;
-        _plotControllerFacade.AutoScaleViewport();
-        _plotControllerFacade.Refresh();
-    }
 
     [RelayCommand]
     private async Task AddFiles(CancellationToken token)
@@ -347,6 +316,38 @@ public partial class BitRateViewModel(
 
     //    await _guiService.SetBitmapToClipboard(imageBytes).ConfigureAwait(false);
     //}
+
+    partial void OnPlotViewChanged(global::FFBitrateViewer.ApplicationAvalonia.Models.Media.PlotViewType value)
+        => SetPlotViewType(value);
+
+    private void SetPlotViewType(PlotViewType newPlotViewType)
+    {
+        // Updates value in plot control facade
+        _plotControllerFacade.PlotView = newPlotViewType;
+
+        // Update plot settings for each file
+        foreach (var file in Files)
+        {
+            file.PlotViewType = newPlotViewType;
+            foreach (var plotViewType in Enum.GetValues<PlotViewType>())
+            {
+                // Compute plots for `PlotView`
+                if (plotViewType == newPlotViewType && file.ScattersByType[plotViewType] is null)
+                {
+                }
+
+                // Update plot visibility(Hide plots different from `PlotView`, show the others
+                if (file.ScattersByType[plotViewType] is not null)
+                {
+                    file.ScattersByType[plotViewType]!.IsVisible = file.IsActive && plotViewType == newPlotViewType;
+                }
+            }
+        }
+
+        _plotControllerFacade.AxisYTitleLabel = _plotControllerFacade.PlotStrategy.AxisYLegendTitle;
+        _plotControllerFacade.AutoScaleViewport();
+        _plotControllerFacade.Refresh();
+    }
 
     private async Task AddFilesAsync(IEnumerable<IFileEntry> fileInfoEntries, CancellationToken token = default)
     {
