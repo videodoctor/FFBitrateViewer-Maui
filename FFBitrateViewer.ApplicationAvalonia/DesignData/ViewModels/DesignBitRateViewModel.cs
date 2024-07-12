@@ -64,4 +64,7 @@ public partial class DesignBitRateViewModel : ViewModelBase
     [RelayCommand]
     private void GoToAboutView() { }
 
+    [RelayCommand]
+    private async Task RefreshMediaInfo() { await Task.Yield(); }
+
 }

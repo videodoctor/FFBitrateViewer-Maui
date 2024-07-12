@@ -50,7 +50,7 @@
                 <MenuItem Header="_Remove selected files" Command="{Binding RemoveSelectedFilesCommand,Mode=OneTime}"/>
                 <MenuItem Header="Remove ALL files" Command="{Binding RemoveAllFilesCommand,Mode=OneTime}"/>
                 <Separator/>
-                <MenuItem Header="Refresh _media info"/>
+                <MenuItem Header="Refresh _media info" Command="{Binding RefreshMediaInfoCommand,Mode=OneTime}" />
                 <Separator/>
                 <MenuItem Header="_Start" Command="{Binding ToggleOnOffPlotterPlotterCommand,Mode=OneTime}"/>
                 <MenuItem Header="St_op" Command="{Binding ToggleOnOffPlotterPlotterCancelCommand,Mode=OneTime}" />

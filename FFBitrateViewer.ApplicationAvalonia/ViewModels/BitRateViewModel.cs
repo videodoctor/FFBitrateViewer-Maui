@@ -136,14 +136,14 @@ public partial class BitRateViewModel(
             foreach (var plotViewType in Enum.GetValues<PlotViewType>())
             {
                 // Compute plots for `PlotView`
-                if (plotViewType == newPlotViewType && file.Scatters[plotViewType] is null)
+                if (plotViewType == newPlotViewType && file.ScattersByType[plotViewType] is null)
                 {
                 }
 
                 // Update plot visibility(Hide plots different from `PlotView`, show the others
-                if (file.Scatters[plotViewType] is not null)
+                if (file.ScattersByType[plotViewType] is not null)
                 {
-                    file.Scatters[plotViewType]!.IsVisible = file.IsActive && plotViewType == newPlotViewType;
+                    file.ScattersByType[plotViewType]!.IsVisible = file.IsActive && plotViewType == newPlotViewType;
                 }
             }
         }
@@ -197,7 +197,7 @@ public partial class BitRateViewModel(
         await Parallel.ForEachAsync(Files.Where(file => file.IsActive), cancellationToken, async (file, token) =>
         {
             // Skip file is it already has a plot
-            if (file.Scatters[_plotControllerFacade.PlotView] is not null)
+            if (file.ScattersByType[_plotControllerFacade.PlotView] is not null)
             { return; }
 
             // Check if Probe Packets were already loaded
@@ -245,7 +245,7 @@ public partial class BitRateViewModel(
             }
 
             // Add scatter to plot view
-            file.Scatters[_plotControllerFacade.PlotView] = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
+            file.ScattersByType[_plotControllerFacade.PlotView] = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
 
         });
 
@@ -284,6 +284,53 @@ public partial class BitRateViewModel(
     {
         AboutViewModel aboutViewModel = _serviceProvider.GetService<AboutViewModel>()!;
         HostScreen.Router.Navigate.Execute(aboutViewModel);
+    }
+
+    [RelayCommand]
+    private async Task RefreshMediaInfo(CancellationToken token)
+    {
+        await Task.Yield();
+        if (Files is null)
+        { return; }
+
+        List<IFileEntry> fileInfoEntries = new(Files.Count);
+
+        // Remove plot references, and computed plot data
+        bool hasAnyPlot = false;
+        foreach (var file in Files)
+        {
+            fileInfoEntries.Add(file.FileEntry!);
+
+            foreach (var kvp in file.ScattersByType)
+            {
+                var scatter = kvp.Value;
+                if (scatter is null)
+                { continue; }
+
+                hasAnyPlot = hasAnyPlot || scatter.IsVisible;
+
+                scatter.IsVisible = false;
+
+                _plotControllerFacade.RemoveScatter(scatter);
+            }
+
+            file.Frames?.Clear();
+            file.BitRateAverage = double.NaN;
+            file.BitRateMaximum = double.NaN;
+            file.FrameCount = 0;
+        }
+
+        // Remove all files
+        Files.Clear();
+        
+        // Readd the files and regenerates media info
+        await AddFilesAsync(fileInfoEntries, token).ConfigureAwait(false);
+
+        // If there is any plot, then regenerate it
+        if (hasAnyPlot)
+        {
+            await _guiService.RunNowAsync(async () => await ToggleOnOffPlotterPlotterCommand.ExecuteAsync(default));
+        }
     }
 
     //[RelayCommand]
@@ -332,10 +379,10 @@ public partial class BitRateViewModel(
         {
             foreach (var plotViewType in Enum.GetValues<PlotViewType>())
             {
-                if (file.Scatters[plotViewType] is null)
+                if (file.ScattersByType[plotViewType] is null)
                 { continue; }
 
-                _plotControllerFacade.RemoveScatter(file.Scatters[plotViewType]);
+                _plotControllerFacade.RemoveScatter(file.ScattersByType[plotViewType]);
             }
             Files.Remove(file);
         }

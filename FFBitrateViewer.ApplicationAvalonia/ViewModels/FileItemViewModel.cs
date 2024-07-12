@@ -62,7 +62,7 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
     public List<SubtitleStream> SubtitleStreams { get; } = [];
 
     [property: Browsable(false)]
-    public IDictionary<PlotViewType, IPlottable?> Scatters { get; private set; } = Enum.GetValues<PlotViewType>().ToDictionary(e => e, r => default(IPlottable?));
+    public IDictionary<PlotViewType, IPlottable?> ScattersByType { get; private set; } = Enum.GetValues<PlotViewType>().ToDictionary(e => e, r => default(IPlottable?));
 
     [property: Browsable(false)]
     public IFileEntry? FileEntry { get; init; }
@@ -258,7 +258,7 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
 
     partial void OnIsActiveChanged(bool value)
     {
-        if (Scatters.TryGetValue(PlotViewType, out var plottable) && plottable is not null)
+        if (ScattersByType.TryGetValue(PlotViewType, out var plottable) && plottable is not null)
         {
             plottable.IsVisible = value;
         }
