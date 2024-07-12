@@ -70,6 +70,9 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
     [property: Browsable(false)]
     public FFProbeJsonOutput? MediaInfo { get; init; }
 
+    [property: Browsable(false)]
+    internal PlotControllerFacade? PlotControllerFacade { get; init; }
+
     public void Initialize()
     {
         Path = FileEntry?.Path ?? AboutBlankUri;
@@ -253,15 +256,18 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
 
     }
 
-    [Browsable(false)]
-    internal PlotViewType PlotViewType { get; set; }
-
     partial void OnIsActiveChanged(bool value)
     {
-        if (ScattersByType.TryGetValue(PlotViewType, out var plottable) && plottable is not null)
+        if (PlotControllerFacade is null)
+        { return; }
+     
+        if (ScattersByType.TryGetValue(PlotControllerFacade.PlotView, out var plottable) 
+            && plottable is not null)
         {
             plottable.IsVisible = value;
         }
+
+        PlotControllerFacade.Refresh();
     }
 
 }

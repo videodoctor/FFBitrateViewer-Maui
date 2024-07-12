@@ -328,7 +328,6 @@ public partial class BitRateViewModel(
         // Update plot settings for each file
         foreach (var file in Files)
         {
-            file.PlotViewType = newPlotViewType;
             foreach (var plotViewType in Enum.GetValues<PlotViewType>())
             {
                 // Compute plots for `PlotView`
@@ -359,6 +358,7 @@ public partial class BitRateViewModel(
             {
                 FileEntry = fileInfo,
                 MediaInfo = mediaInfo,
+                PlotControllerFacade = _plotControllerFacade,
                 IsActive = true
             };
             fileItemViewModel.Initialize();
