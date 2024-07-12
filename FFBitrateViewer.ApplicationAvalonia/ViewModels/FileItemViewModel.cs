@@ -113,7 +113,7 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
         FileStart = TimeSpan.FromSeconds(this.StartTime).ToString("g");
 
         // Video information
-        // TODO: Sync up later, once plot has been computed
+        // FrameCount us synced up later, once plot has been computed
         //FrameCount = 
         FrameRate = videoStream?.FrameRateAvg?.Value is null ? unknownText : $"{videoStream?.FrameRateAvg?.Numerator ?? 0 / videoStream?.FrameRateAvg?.Denominator ?? 1} fps ({videoStream?.FrameRateAvg?.Value})";
         VideoStart = videoStream?.StartTime is null ? unknownText : TimeSpan.FromSeconds(videoStream.StartTime.Value).ToString("g");
