@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ReactiveUI;
-using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,7 +42,7 @@ public partial class BitRateViewModel(
     private bool _hasToAdjustFrameStartTime = false;
 
     [ObservableProperty]
-    private IPlotControl? _plotController;
+    private ScottPlot.IPlotControl? _plotController;
 
     [ObservableProperty]
     private FileItemViewModel? _selectedFile;
@@ -216,7 +215,7 @@ public partial class BitRateViewModel(
             }
 
             // Add scatter to plot view
-            (IPlottable? scatter, string scatterLineColor) = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
+            (ScottPlot.IPlottable? scatter, string scatterLineColor) = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
             file.ScattersByType[_plotControllerFacade.PlotView] = scatter;
             file.ScatterLineColor = scatterLineColor;
         });
@@ -329,17 +328,23 @@ public partial class BitRateViewModel(
         // Update plot settings for each file
         foreach (var file in Files)
         {
+            file.ScatterLineColor = ScottPlot.Colors.Transparent.ToStringRGB();
             foreach (var plotViewType in Enum.GetValues<PlotViewType>())
             {
-                // Compute plots for `PlotView`
+                // TODO: Compute plots for `PlotView`
                 if (plotViewType == newPlotViewType && file.ScattersByType[plotViewType] is null)
                 {
                 }
 
-                // Update plot visibility(Hide plots different from `PlotView`, show the others
-                if (file.ScattersByType[plotViewType] is not null)
+                if (file.ScattersByType[plotViewType] is null)
                 {
-                    file.ScattersByType[plotViewType]!.IsVisible = file.IsActive && plotViewType == newPlotViewType;
+                    continue;
+                }
+                // Update plot visibility(Hide plots different from `PlotView`, show the others
+                file.ScattersByType[plotViewType]!.IsVisible = file.IsActive && plotViewType == newPlotViewType;
+                if (file.ScattersByType[plotViewType] is ScottPlot.Plottables.Scatter scatter && scatter.IsVisible)
+                {
+                    file.ScatterLineColor = scatter.LineColor.ToStringRGB();
                 }
             }
         }
