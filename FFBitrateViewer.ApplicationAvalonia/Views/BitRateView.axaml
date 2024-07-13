@@ -26,16 +26,16 @@
     </UserControl.Resources>
 
     <UserControl.Styles>
-        <Style Selector="ToggleButton PathIcon.audio-on">
+        <Style Selector="ToggleButton PathIcon.eye-open">
             <Setter Property="IsVisible" Value="False"/>
         </Style>
-        <Style Selector="ToggleButton:checked PathIcon.audio-on">
+        <Style Selector="ToggleButton:checked PathIcon.eye-open">
             <Setter Property="IsVisible" Value="True"/>
         </Style>
-        <Style Selector="ToggleButton PathIcon.audio-mute">
+        <Style Selector="ToggleButton PathIcon.eye-closed">
             <Setter Property="IsVisible" Value="True"/>
         </Style>
-        <Style Selector="ToggleButton:checked PathIcon.audio-mute">
+        <Style Selector="ToggleButton:checked PathIcon.eye-closed">
             <Setter Property="IsVisible" Value="False"/>
         </Style>
     </UserControl.Styles>
@@ -123,11 +123,13 @@
                                 <DataTemplate>
                                     <ToggleButton IsChecked="{Binding IsActive, Mode=TwoWay}"
                                                   VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                  Background="Transparent" Padding="0">
+												  Background="Transparent" BorderBrush="Transparent"
+												  Padding="0" BorderThickness="0"
+												  >
                                         <Panel Background="{Binding ScatterLineColor}">
-                                            <PathIcon Classes="audio-on"
+                                            <PathIcon Classes="eye-open"
                                                       Data="{StaticResource speaker_regular}" />
-                                            <PathIcon Classes="audio-mute"
+                                            <PathIcon Classes="eye-closed"
                                                       Data="{StaticResource speaker_off_regular}" />
                                         </Panel>
                                     </ToggleButton>
