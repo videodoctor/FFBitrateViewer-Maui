@@ -17,6 +17,10 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
 
     public const string CategoryNameMediaInfo = "Media Info";
 
+    [property: Category(CategoryNameMediaInfo), DisplayName("Line Color"), Description("Scatter line color")]
+    [ObservableProperty]
+    private string _scatterLineColor = string.Empty;
+
     [property: Category(CategoryNameMediaInfo), DisplayName("Is active"), Description("Whether or not this media file is active")]
     [ObservableProperty]
     private bool _isActive;
@@ -176,7 +180,7 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
         return bitRateMaximum;
     }
 
-    private void TryUpdateBitratesInAllFrames(
+    private static void TryUpdateBitratesInAllFrames(
         IList<FFProbePacket> frames,
         double intervalDuration = 1,
         double intervalStartTime = 0

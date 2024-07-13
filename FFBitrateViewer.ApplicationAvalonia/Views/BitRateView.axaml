@@ -21,7 +21,24 @@
 
     <UserControl.Resources>
         <Avalonia_Controls_Converters:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
+        <StreamGeometry x:Key="speaker_off_regular">M23.765011,8.0000009C28.673002,10.572999 32,14.597993 32,14.597993 32,14.597993 24.836025,23.289004 15.999993,23.289004 14.338004,23.289004 12.736014,22.981997 11.230001,22.483004L13.476004,19.888003C14.297996,20.071001 15.14202,20.177996 15.999993,20.177996 20.866999,20.177996 25.304013,16.854006 27.754027,14.597993 26.413998,13.364992 24.473995,11.821 22.202021,10.666994 22.378016,11.181001 22.476008,11.724 22.476008,12.287004 22.476008,15.406999 19.576014,17.935992 15.999993,17.935992 15.730004,17.935992 15.467002,17.916994 15.206992,17.888995L21.683008,10.405992z M15.999993,5.905991C16.775994,5.905991,17.530998,5.9929966,18.277001,6.1149906L17.657006,6.8329934 17.658013,6.8329934 10.439,15.171998C9.8609974,14.326997 9.523,13.343004 9.523,12.287004 9.523,11.720994 9.6210072,11.175996 9.799001,10.660997 7.5229986,11.813005 5.5860012,13.364 4.2460043,14.597993 5.2729976,15.545 6.656009,16.679003 8.2710001,17.677996L6.2420075,20.022005C2.4510052,17.556002 0,14.597993 0,14.597993 0,14.597993 7.164005,5.905991 15.999993,5.905991z M25.689022,0L27.337004,1.4279938 4.5599997,27.742999 2.912004,26.317004z</StreamGeometry>
+        <StreamGeometry x:Key="speaker_regular">M9.8010254,4.7550061C7.5220032,5.9089983 5.5870056,7.4539969 4.2440186,8.692004 6.6970215,10.949008 11.129028,14.271 15.996033,14.271 20.863037,14.271 25.30304,10.949008 27.747986,8.692004 26.413025,7.4539969 24.470032,5.9089983 22.197998,4.7550061 22.377991,5.2720044 22.475037,5.8119982 22.475037,6.3820055 22.475037,9.5010097 19.572998,12.02901 15.996033,12.02901 12.419006,12.02901 9.5240173,9.5010097 9.5240173,6.3820055 9.5240173,5.8119982 9.6220093,5.2720044 9.8010254,4.7550061z M15.996033,0C24.830017,1.9660001E-07 32,8.692004 32,8.692004 32,8.692004 24.830017,17.383 15.996033,17.383 7.1620178,17.383 0,8.692004 0,8.692004 0,8.692004 7.1620178,1.9660001E-07 15.996033,0z</StreamGeometry>
     </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="ToggleButton PathIcon.audio-on">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="ToggleButton:checked PathIcon.audio-on">
+            <Setter Property="IsVisible" Value="True"/>
+        </Style>
+        <Style Selector="ToggleButton PathIcon.audio-mute">
+            <Setter Property="IsVisible" Value="True"/>
+        </Style>
+        <Style Selector="ToggleButton:checked PathIcon.audio-mute">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+    </UserControl.Styles>
 
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="Loaded" SourceObject="BitRateViewUserControl">
@@ -101,8 +118,23 @@
                         </ia:EventTriggerBehavior>
                     </i:Interaction.Behaviors>
                     <DataGrid.Columns>
-                        <!--<DataGridTextColumn Header="" Binding="{Binding IsSelected}"/>-->
-                        <DataGridCheckBoxColumn Header="Is Active" Binding="{Binding IsActive}" IsReadOnly="False" />
+                        <DataGridTemplateColumn Header="Is Active">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ToggleButton IsChecked="{Binding IsActive, Mode=TwoWay}"
+                                                  VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                  Background="Transparent" Padding="0">
+                                        <Panel Background="{Binding ScatterLineColor}">
+                                            <PathIcon Classes="audio-on"
+                                                      Data="{StaticResource speaker_regular}" />
+                                            <PathIcon Classes="audio-mute"
+                                                      Data="{StaticResource speaker_off_regular}" />
+                                        </Panel>
+                                    </ToggleButton>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <!--<DataGridCheckBoxColumn Header="Is Active" Binding="{Binding IsActive}" IsReadOnly="False" />-->
                         <DataGridTextColumn Header="Path to file"  Binding="{Binding Path.LocalPath,Mode=OneWay}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Media Info" Binding="{Binding FirstVideoShortDesc,Mode=OneWay}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Bit Rate (avg)" Binding="{Binding BitRateAverage,Mode=OneWay,StringFormat=' {0:n} kb/s'}" IsReadOnly="True" />

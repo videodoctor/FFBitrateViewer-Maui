@@ -30,7 +30,7 @@ public class PlotControllerFacade(
     private Marker? _markerHighlightMarker;
     private Text? _markerHighlightText;
 
-    public IPlottable? InsertScatter(
+    public (IPlottable? plottable,string scatterLineColor) InsertScatter(
         List<double> xs,
         List<int> ys,
         string legendText,
@@ -38,7 +38,7 @@ public class PlotControllerFacade(
     )
     {
         if (PlotController is null)
-        { return null; }
+        { return (null, string.Empty); }
 
         // NOTE: make thread safe scatter creation thus automatically color assignment do not reuse color.
         Scatter scatter;
@@ -46,7 +46,7 @@ public class PlotControllerFacade(
         scatter.ConnectStyle = connectStyle;
         scatter.LegendText = legendText;
 
-        return scatter;
+        return (scatter, scatter.LineColor.ToStringRGB());
     }
 
     public void RemoveScatter(IPlottable? plottable)

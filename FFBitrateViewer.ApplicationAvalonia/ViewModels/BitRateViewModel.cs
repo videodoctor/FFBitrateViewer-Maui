@@ -53,7 +53,7 @@ public partial class BitRateViewModel(
 
     public System.Collections.IList? SelectedFiles { get; set; }
 
-    private PlotControllerFacade _plotControllerFacade = plotControllerFacade;
+    private readonly PlotControllerFacade _plotControllerFacade = plotControllerFacade;
 
     public ObservableCollection<FileItemViewModel> Files { get; } = [];
 
@@ -216,8 +216,9 @@ public partial class BitRateViewModel(
             }
 
             // Add scatter to plot view
-            file.ScattersByType[_plotControllerFacade.PlotView] = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
-
+            (IPlottable? scatter, string scatterLineColor) = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
+            file.ScattersByType[_plotControllerFacade.PlotView] = scatter;
+            file.ScatterLineColor = scatterLineColor;
         });
 
         // Request Plot to adjust viewport and redraw
