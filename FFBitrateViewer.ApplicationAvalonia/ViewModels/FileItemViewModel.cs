@@ -264,12 +264,18 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
     {
         if (PlotControllerFacade is null)
         { return; }
-     
-        if (ScattersByType.TryGetValue(PlotControllerFacade.PlotView, out var plottable) 
-            && plottable is not null)
+
+        if (!ScattersByType.TryGetValue(PlotControllerFacade.PlotView, out var plottable)
+            || plottable is not ScottPlot.Plottables.Scatter scatter)
+        { return; }
+
+        scatter.IsVisible =  value;
+        ScatterLineColor = value switch
         {
-            plottable.IsVisible = value;
-        }
+            true => scatter.LineColor.ToStringRGB(),
+            false => ScottPlot.Colors.Transparent.ToStringRGB()
+        };
+            
 
         PlotControllerFacade.Refresh();
     }
