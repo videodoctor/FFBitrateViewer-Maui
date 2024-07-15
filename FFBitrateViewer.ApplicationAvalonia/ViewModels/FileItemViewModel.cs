@@ -269,13 +269,13 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
             || plottable is not ScottPlot.Plottables.Scatter scatter)
         { return; }
 
-        scatter.IsVisible =  value;
+        scatter.IsVisible = value;
         ScatterLineColor = value switch
         {
             true => scatter.LineColor.ToDrawingColor(),
             false => PlotControllerFacade.TransparentColor,
         };
-            
+
 
         PlotControllerFacade.Refresh();
     }

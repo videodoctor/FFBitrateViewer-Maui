@@ -66,7 +66,7 @@ public partial class BitRateViewModel(
     private readonly ApplicationOptions _applicationOptions = applicationOptions.Value;
 
     private readonly ILogger _logger = logger;
-    
+
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     private static readonly SaveFileFilterOption SavePlotImagesOption = new(
@@ -294,7 +294,7 @@ public partial class BitRateViewModel(
 
         // Remove all files
         Files.Clear();
-        
+
         // Readd the files and regenerates media info
         await AddFilesAsync(fileInfoEntries, token).ConfigureAwait(false);
 

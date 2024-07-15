@@ -32,7 +32,7 @@ public class PlotControllerFacade(
     private Marker? _markerHighlightMarker;
     private Text? _markerHighlightText;
 
-    public (IPlottable? plottable,System.Drawing.Color scatterLineColor) InsertScatter(
+    public (IPlottable? plottable, System.Drawing.Color scatterLineColor) InsertScatter(
         List<double> xs,
         List<int> ys,
         string legendText,

@@ -5,7 +5,7 @@ namespace FFBitrateViewer.ApplicationAvalonia.Extensions;
 
 public static class ScottPlotExtensions
 {
-    
+
     public static IBrush ToAvaloniaBrush(this ScottPlot.Color scottPlotColor)
     {
         // Convert ScottPlot.Color to System.Drawing.Color
