@@ -1,11 +1,12 @@
 ## FFBitrateViewer — yet another program for video file bitrate visualization
 
-This is a port from the original `FFBitrateViewer`. This port is using [AvaloniaUI](https://avaloniaui.net/) and [ScottPlot](https://scottplot.net/) in order to support cross platform.
+This version of `FFBitrateViewer` is a unofficial port of the original version. The original version states:
 
-Please refer to the original application description:
 > _FFBitrateViewer is a FFProbe GUI that purpose is to visualize frames` bitrate extracted by FFProbe.
 It is inspired by [Bitrate Viewer](https://web.archive.org/web/20160730053853/http://www.winhoros.de/docs/bitrate-viewer/) (link to Web Archive as the program's web-site and forum are long dead).
 FFBitrateViewer allows you to select multiple files without dealing with command line and get “per frame” or “per second” info for all of them in one go._
+
+This port has been built using cross platform technologies, allowing to run native desktop application on Windows, Mac and Linux.
 
 
 ## Screenshots
@@ -29,12 +30,12 @@ Expanded Plot View
 
 - ✅ Process as many files as your computer can handle.
 - ✅ Side property panel with brief media info for the selected file.
-- ⛔ Easy to use UI: files can be added with file chooser or dropped from Windows Explorer, files can be re-ordered using Drag & Drop;
 - ✅ Graphs can be zoomed in/out with mouse wheel (try it over graph and/or axes), panned.
 - ✅ Save generated plot as image by using right mouse button or directly in menu
 - ✅ FFProbe commands can be saved to a log file.
 - ✅ No registration, banners, tracking etc;
 - ✅ Support for CLI arguments
+<!-- - ⛔ Easy to use UI: files can be added with file chooser or dropped from Windows Explorer, files can be re-ordered using Drag & Drop; -->
 
 <!--
 - Free;
@@ -103,9 +104,9 @@ Options:
 - Use UI to add files;
 - Click “Start” button. -->
 
-
+<!--
 ## Troubleshooting
-<!-- - Close FFBitrateViewer and delete `FFBitrateViewer.log`;
+- Close FFBitrateViewer and delete `FFBitrateViewer.log`;
 - Run the program with option `-log-level=debug`;
 - Add file;
 - Click “Start” button;
@@ -117,5 +118,5 @@ Options:
 
 ## Author
 - Original Application by fifonik
-- Ported by [Herber Madrigal](mailto:hfmad@hotmail.com)
+- New ported version by [Herber Madrigal](mailto:hfmad@hotmail.com)
 
