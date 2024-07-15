@@ -257,7 +257,7 @@
   },
   {
     "PackageId": "Serilog.Settings.Configuration",
-    "PackageVersion": "8.0.1",
+    "PackageVersion": "8.0.2",
     "PackageProjectUrl": "https://github.com/serilog/serilog-settings-configuration",
     "Authors": "Serilog Contributors",
     "License": "Apache-2.0",
@@ -329,7 +329,7 @@
   },
   {
     "PackageId": "xunit",
-    "PackageVersion": "2.8.1",
+    "PackageVersion": "2.9.0",
     "PackageProjectUrl": "",
     "Copyright": "Copyright (C) .NET Foundation",
     "Authors": "jnewkirk,bradwilson",
@@ -339,7 +339,7 @@
   },
   {
     "PackageId": "xunit.runner.visualstudio",
-    "PackageVersion": "2.8.1",
+    "PackageVersion": "2.8.2",
     "PackageProjectUrl": "",
     "Copyright": "Copyright (C) .NET Foundation",
     "Authors": "jnewkirk,bradwilson",
