@@ -215,7 +215,7 @@ public partial class BitRateViewModel(
             }
 
             // Add scatter to plot view
-            (ScottPlot.IPlottable? scatter, string scatterLineColor) = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
+            (ScottPlot.IPlottable? scatter, ScottPlot.Color scatterLineColor) = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
             file.ScattersByType[_plotControllerFacade.PlotView] = scatter;
             file.ScatterLineColor = scatterLineColor;
         });
@@ -344,7 +344,7 @@ public partial class BitRateViewModel(
                 file.ScattersByType[plotViewType]!.IsVisible = file.IsActive && plotViewType == newPlotViewType;
                 if (file.ScattersByType[plotViewType] is ScottPlot.Plottables.Scatter scatter && scatter.IsVisible)
                 {
-                    file.ScatterLineColor = scatter.LineColor.ToStringRGB();
+                    file.ScatterLineColor = scatter.LineColor;
                 }
             }
         }

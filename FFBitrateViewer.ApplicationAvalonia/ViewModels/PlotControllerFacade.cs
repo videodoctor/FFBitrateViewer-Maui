@@ -12,10 +12,8 @@ public class PlotControllerFacade(
     IEnumerable<IPlotStrategy> plotStrategies
 )
 {
-    public string TransparentColor => _transparentColor;
+    public Color TransparentColor => Colors.Transparent;
 
-    private static readonly string _transparentColor = ScottPlot.Colors.Transparent.ToStringRGB();
-    
     public IPlotControl? PlotController { get; set; }
     public PlotViewType PlotView { get; set; } = PlotViewType.FrameBased;
     public IPlotStrategy PlotStrategy => _plotStrategies[PlotView];
@@ -33,7 +31,7 @@ public class PlotControllerFacade(
     private Marker? _markerHighlightMarker;
     private Text? _markerHighlightText;
 
-    public (IPlottable? plottable,string scatterLineColor) InsertScatter(
+    public (IPlottable? plottable,Color scatterLineColor) InsertScatter(
         List<double> xs,
         List<int> ys,
         string legendText,
@@ -41,7 +39,7 @@ public class PlotControllerFacade(
     )
     {
         if (PlotController is null)
-        { return (null, string.Empty); }
+        { return (null, Colors.Transparent); }
 
         // NOTE: make thread safe scatter creation thus automatically color assignment do not reuse color.
         Scatter scatter;
@@ -49,7 +47,7 @@ public class PlotControllerFacade(
         scatter.ConnectStyle = connectStyle;
         scatter.LegendText = legendText;
 
-        return (scatter, scatter.LineColor.ToStringRGB());
+        return (scatter, scatter.LineColor);
     }
 
     public void RemoveScatter(IPlottable? plottable)

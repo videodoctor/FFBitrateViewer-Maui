@@ -18,7 +18,7 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
 
     [property: Category(CategoryNameMediaInfo), DisplayName("Line Color"), Description("Scatter line color")]
     [ObservableProperty]
-    private string _scatterLineColor = string.Empty;
+    private ScottPlot.Color _scatterLineColor;
 
     [property: Category(CategoryNameMediaInfo), DisplayName("Is active"), Description("Whether or not this media file is active")]
     [ObservableProperty]
@@ -271,7 +271,7 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
         scatter.IsVisible =  value;
         ScatterLineColor = value switch
         {
-            true => scatter.LineColor.ToStringRGB(),
+            true => scatter.LineColor,
             false => PlotControllerFacade.TransparentColor,
         };
             
