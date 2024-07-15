@@ -10,11 +10,8 @@ public class ScottPlotColorToBrushConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is ScottPlot.Color scottPlotColor)
+        if (value is System.Drawing.Color drawingColor)
         {
-            // Convert ScottPlot.Color to System.Drawing.Color
-            System.Drawing.Color drawingColor = System.Drawing.Color.FromArgb(scottPlotColor.A, scottPlotColor.R, scottPlotColor.G, scottPlotColor.B);
-
             // Convert System.Drawing.Color to Avalonia.Media.Color
             Avalonia.Media.Color avaloniaColor = Avalonia.Media.Color.FromArgb(drawingColor.A, drawingColor.R, drawingColor.G, drawingColor.B);
 
@@ -27,6 +24,6 @@ public class ScottPlotColorToBrushConverter : IValueConverter
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        throw new NotSupportedException("ScottPlotColorToBrushConverter does not support ConvertBack.");
+        throw new NotSupportedException($"{nameof(ScottPlotColorToBrushConverter)} does not support ConvertBack.");
     }
 }

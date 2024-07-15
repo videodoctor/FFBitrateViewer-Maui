@@ -1,4 +1,5 @@
-﻿using FFBitrateViewer.ApplicationAvalonia.Models.Media;
+﻿using FFBitrateViewer.ApplicationAvalonia.Extensions;
+using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 using ScottPlot;
 using ScottPlot.Plottables;
 using System;
@@ -12,7 +13,7 @@ public class PlotControllerFacade(
     IEnumerable<IPlotStrategy> plotStrategies
 )
 {
-    public Color TransparentColor => Colors.Transparent;
+    public System.Drawing.Color TransparentColor => Colors.Transparent.ToDrawingColor();
 
     public IPlotControl? PlotController { get; set; }
     public PlotViewType PlotView { get; set; } = PlotViewType.FrameBased;
@@ -31,7 +32,7 @@ public class PlotControllerFacade(
     private Marker? _markerHighlightMarker;
     private Text? _markerHighlightText;
 
-    public (IPlottable? plottable,Color scatterLineColor) InsertScatter(
+    public (IPlottable? plottable,System.Drawing.Color scatterLineColor) InsertScatter(
         List<double> xs,
         List<int> ys,
         string legendText,
@@ -39,7 +40,7 @@ public class PlotControllerFacade(
     )
     {
         if (PlotController is null)
-        { return (null, Colors.Transparent); }
+        { return (null, TransparentColor); }
 
         // NOTE: make thread safe scatter creation thus automatically color assignment do not reuse color.
         Scatter scatter;
@@ -47,7 +48,7 @@ public class PlotControllerFacade(
         scatter.ConnectStyle = connectStyle;
         scatter.LegendText = legendText;
 
-        return (scatter, scatter.LineColor);
+        return (scatter, scatter.LineColor.ToDrawingColor());
     }
 
     public void RemoveScatter(IPlottable? plottable)

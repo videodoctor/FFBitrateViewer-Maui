@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media;
+using System.Runtime.CompilerServices;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Extensions;
 
@@ -18,5 +19,10 @@ public static class ScottPlotExtensions
 
         return avaloniaBrush;
     }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static System.Drawing.Color ToDrawingColor(this ScottPlot.Color scottPlotColor)
+        => ScottPlot.Color.ToColor(scottPlotColor);
 
 }

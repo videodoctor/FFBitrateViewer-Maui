@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FFBitrateViewer.ApplicationAvalonia.Extensions;
 using FFBitrateViewer.ApplicationAvalonia.Models.Config;
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 using FFBitrateViewer.ApplicationAvalonia.Services;
@@ -215,7 +216,7 @@ public partial class BitRateViewModel(
             }
 
             // Add scatter to plot view
-            (ScottPlot.IPlottable? scatter, ScottPlot.Color scatterLineColor) = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
+            (ScottPlot.IPlottable? scatter, System.Drawing.Color scatterLineColor) = _plotControllerFacade.InsertScatter(xs, ys, Path.GetFileName(file.Path.LocalPath));
             file.ScattersByType[_plotControllerFacade.PlotView] = scatter;
             file.ScatterLineColor = scatterLineColor;
         });
@@ -344,7 +345,7 @@ public partial class BitRateViewModel(
                 file.ScattersByType[plotViewType]!.IsVisible = file.IsActive && plotViewType == newPlotViewType;
                 if (file.ScattersByType[plotViewType] is ScottPlot.Plottables.Scatter scatter && scatter.IsVisible)
                 {
-                    file.ScatterLineColor = scatter.LineColor;
+                    file.ScatterLineColor = scatter.LineColor.ToDrawingColor();
                 }
             }
         }

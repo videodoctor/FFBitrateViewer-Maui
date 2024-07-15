@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using FFBitrateViewer.ApplicationAvalonia.Extensions;
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
@@ -18,7 +19,7 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
 
     [property: Category(CategoryNameMediaInfo), DisplayName("Line Color"), Description("Scatter line color")]
     [ObservableProperty]
-    private ScottPlot.Color _scatterLineColor;
+    private System.Drawing.Color _scatterLineColor;
 
     [property: Category(CategoryNameMediaInfo), DisplayName("Is active"), Description("Whether or not this media file is active")]
     [ObservableProperty]
@@ -271,7 +272,7 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
         scatter.IsVisible =  value;
         ScatterLineColor = value switch
         {
-            true => scatter.LineColor,
+            true => scatter.LineColor.ToDrawingColor(),
             false => PlotControllerFacade.TransparentColor,
         };
             
