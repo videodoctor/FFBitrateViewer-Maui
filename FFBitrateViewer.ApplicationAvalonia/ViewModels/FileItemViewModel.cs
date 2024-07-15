@@ -17,7 +17,7 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
 
     public const string CategoryNameMediaInfo = "Media Info";
 
-    [property: Category(CategoryNameMediaInfo), DisplayName("Line Color"), Description("Scatter line color")]
+    [property: Category(CategoryNameMediaInfo), ReadOnly(true), DisplayName("Line Color"), Description("Scatter line color")]
     [ObservableProperty]
     private System.Drawing.Color _scatterLineColor = PlotControllerFacade.TransparentColor;
 
