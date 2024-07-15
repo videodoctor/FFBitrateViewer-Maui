@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace FFBitrateViewer
 {
-    public record FFProbeFormat
+    public class FFProbeFormat
     {
         [JsonProperty("bit_rate")]
         public int? BitRate { get; set; }
@@ -47,7 +47,7 @@ namespace FFBitrateViewer
     }
 
 
-    public record FFProbeFrame
+    public class FFProbeFrame
     {
         [JsonProperty("best_effort_timestamp")]
         public int? BestEffortTimestamp { get; set; }
@@ -138,7 +138,7 @@ namespace FFBitrateViewer
     }
 
 
-    public record FFProbePacket
+    public class FFProbePacket
     {
         [JsonProperty("codec_type")]
         public string? CodecType { get; set; }
@@ -177,7 +177,7 @@ namespace FFBitrateViewer
     }
 
 
-    public record FFProbeStream
+    public class FFProbeStream
     {
         [JsonProperty("bit_rate")]
         public int? BitRate { get; set; }
@@ -320,7 +320,7 @@ namespace FFBitrateViewer
     }
 
 
-    public record FFProbeJsonOutput
+    public class FFProbeJsonOutput
     {
         /// <summary>Information about the container</summary>
         [JsonProperty("format")]
