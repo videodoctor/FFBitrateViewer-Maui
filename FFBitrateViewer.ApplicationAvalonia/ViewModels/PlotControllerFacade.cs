@@ -13,7 +13,7 @@ public class PlotControllerFacade(
     IEnumerable<IPlotStrategy> plotStrategies
 )
 {
-    public System.Drawing.Color TransparentColor => Colors.Transparent.ToDrawingColor();
+    internal static System.Drawing.Color TransparentColor = Colors.Transparent.ToDrawingColor();
 
     public IPlotControl? PlotController { get; set; }
     public PlotViewType PlotView { get; set; } = PlotViewType.FrameBased;

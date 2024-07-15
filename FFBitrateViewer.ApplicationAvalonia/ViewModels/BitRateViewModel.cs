@@ -329,7 +329,7 @@ public partial class BitRateViewModel(
         // Update plot settings for each file
         foreach (var file in Files)
         {
-            file.ScatterLineColor = _plotControllerFacade.TransparentColor;
+            file.ScatterLineColor = PlotControllerFacade.TransparentColor;
             foreach (var plotViewType in Enum.GetValues<PlotViewType>())
             {
                 // TODO: Compute plots for `PlotView`

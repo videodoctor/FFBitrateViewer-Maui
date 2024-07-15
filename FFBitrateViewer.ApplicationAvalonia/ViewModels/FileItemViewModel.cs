@@ -19,7 +19,7 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
 
     [property: Category(CategoryNameMediaInfo), DisplayName("Line Color"), Description("Scatter line color")]
     [ObservableProperty]
-    private System.Drawing.Color _scatterLineColor;
+    private System.Drawing.Color _scatterLineColor = PlotControllerFacade.TransparentColor;
 
     [property: Category(CategoryNameMediaInfo), DisplayName("Is active"), Description("Whether or not this media file is active")]
     [ObservableProperty]
