@@ -2,7 +2,6 @@
 using FFBitrateViewer.ApplicationAvalonia.Models.Media;
 using FFBitrateViewer.ApplicationAvalonia.Services;
 using FFBitrateViewer.ApplicationAvalonia.Services.FFProbe;
-using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -66,7 +65,7 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
     public List<SubtitleStream> SubtitleStreams { get; } = [];
 
     [property: Browsable(false)]
-    public IDictionary<PlotViewType, IPlottable?> ScattersByType { get; private set; } = Enum.GetValues<PlotViewType>().ToDictionary(e => e, r => default(IPlottable?));
+    public IDictionary<PlotViewType, ScottPlot.IPlottable?> ScattersByType { get; private set; } = Enum.GetValues<PlotViewType>().ToDictionary(e => e, r => default(ScottPlot.IPlottable?));
 
     [property: Browsable(false)]
     public IFileEntry? FileEntry { get; init; }
