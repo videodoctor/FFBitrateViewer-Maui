@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace FFBitrateViewer.ApplicationAvalonia.Extensibility.AvaloniaUI;
 
-public class ScottPlotColorToBrushConverter : IValueConverter
+public class SystemDrawingColorToBrushConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -24,6 +24,6 @@ public class ScottPlotColorToBrushConverter : IValueConverter
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        throw new NotSupportedException($"{nameof(ScottPlotColorToBrushConverter)} does not support ConvertBack.");
+        throw new NotSupportedException($"{nameof(SystemDrawingColorToBrushConverter)} does not support ConvertBack.");
     }
 }
