@@ -272,7 +272,7 @@ public partial class FileItemViewModel : FileItemSummaryViewModel
         ScatterLineColor = value switch
         {
             true => scatter.LineColor.ToStringRGB(),
-            false => ScottPlot.Colors.Transparent.ToStringRGB()
+            false => PlotControllerFacade.TransparentColor,
         };
             
 

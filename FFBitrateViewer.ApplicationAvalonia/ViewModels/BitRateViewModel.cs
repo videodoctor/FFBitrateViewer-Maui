@@ -328,7 +328,7 @@ public partial class BitRateViewModel(
         // Update plot settings for each file
         foreach (var file in Files)
         {
-            file.ScatterLineColor = ScottPlot.Colors.Transparent.ToStringRGB();
+            file.ScatterLineColor = _plotControllerFacade.TransparentColor;
             foreach (var plotViewType in Enum.GetValues<PlotViewType>())
             {
                 // TODO: Compute plots for `PlotView`

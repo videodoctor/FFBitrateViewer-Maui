@@ -12,7 +12,10 @@ public class PlotControllerFacade(
     IEnumerable<IPlotStrategy> plotStrategies
 )
 {
+    public string TransparentColor => _transparentColor;
 
+    private static readonly string _transparentColor = ScottPlot.Colors.Transparent.ToStringRGB();
+    
     public IPlotControl? PlotController { get; set; }
     public PlotViewType PlotView { get; set; } = PlotViewType.FrameBased;
     public IPlotStrategy PlotStrategy => _plotStrategies[PlotView];
